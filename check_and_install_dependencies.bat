@@ -23,6 +23,7 @@ set "CFG_FFPROBE="
 set "DOWNLOADED_FFMPEG="
 set "DOWNLOADED_FFPLAY="
 set "DOWNLOADED_FFPROBE="
+set "WINAPPS_DIR=%LocalAppData%\Microsoft\WindowsApps\"
 
 set "WAIT_ON_EXIT=1"
 if /I "%~1"=="--no-wait" set "WAIT_ON_EXIT=0"
@@ -76,26 +77,120 @@ exit /b 0
 
 :detect_python_cmd
 set "PY_CMD="
-where py >nul 2>nul
-if not errorlevel 1 (
-  set "PY_CMD=py -3"
-  exit /b 0
+
+for /f "delims=" %%P in ('where py 2^>nul') do (
+  if /I not "%%~dpP"=="%WINAPPS_DIR%" (
+    "%%~fP" -3 -m pip --version >nul 2>nul
+    if not errorlevel 1 (
+      set "PY_CMD=py -3"
+      exit /b 0
+    )
+    "%%~fP" -m pip --version >nul 2>nul
+    if not errorlevel 1 (
+      set "PY_CMD=py"
+      exit /b 0
+    )
+  )
 )
-where python >nul 2>nul
-if not errorlevel 1 (
-  set "PY_CMD=python"
-  exit /b 0
+
+for /f "delims=" %%P in ('where python 2^>nul') do (
+  if /I not "%%~dpP"=="%WINAPPS_DIR%" (
+    "%%~fP" -m pip --version >nul 2>nul
+    if not errorlevel 1 (
+      set "PY_CMD="%%~fP""
+      exit /b 0
+    )
+  )
 )
+
+call :scan_python_dirs_with_pip "%LocalAppData%\Programs\Python"
+if defined PY_CMD exit /b 0
+call :scan_python_dirs_with_pip "%ProgramFiles%"
+if defined PY_CMD exit /b 0
+call :scan_python_dirs_with_pip "%ProgramFiles(x86)%"
+if defined PY_CMD exit /b 0
+
+rem Fallback: select a non-alias Python command even if pip is missing.
+for /f "delims=" %%P in ('where py 2^>nul') do (
+  if /I not "%%~dpP"=="%WINAPPS_DIR%" (
+    set "PY_CMD=py -3"
+    exit /b 0
+  )
+)
+
+for /f "delims=" %%P in ('where python 2^>nul') do (
+  if /I not "%%~dpP"=="%WINAPPS_DIR%" (
+    set "PY_CMD="%%~fP""
+    exit /b 0
+  )
+)
+
+call :scan_python_dirs "%LocalAppData%\Programs\Python"
+if defined PY_CMD exit /b 0
+call :scan_python_dirs "%ProgramFiles%"
+if defined PY_CMD exit /b 0
+call :scan_python_dirs "%ProgramFiles(x86)%"
+if defined PY_CMD exit /b 0
+
+exit /b 0
+
+:scan_python_dirs_with_pip
+set "SCAN_ROOT=%~1"
+if "%SCAN_ROOT%"=="" exit /b 0
+if not exist "%SCAN_ROOT%" exit /b 0
+
+for /d %%V in ("%SCAN_ROOT%\Python3*") do (
+  if exist "%%~fV\python.exe" (
+    "%%~fV\python.exe" -m pip --version >nul 2>nul
+    if not errorlevel 1 (
+      set "PY_CMD="%%~fV\python.exe""
+      exit /b 0
+    )
+  )
+)
+exit /b 0
+
+:scan_python_dirs
+set "SCAN_ROOT=%~1"
+if "%SCAN_ROOT%"=="" exit /b 0
+if not exist "%SCAN_ROOT%" exit /b 0
+
+for /d %%V in ("%SCAN_ROOT%\Python3*") do (
+  if exist "%%~fV\python.exe" (
+    set "PY_CMD="%%~fV\python.exe""
+    exit /b 0
+  )
+)
+exit /b 0
+
+:validate_python_cmd
+set "PY_VALID=0"
+set "PY_EXE="
+if not defined PY_CMD exit /b 0
+
+for /f "usebackq delims=" %%E in (`%PY_CMD% -c "import sys; print(sys.executable)" 2^>nul`) do (
+  set "PY_EXE=%%~fE"
+  goto :validate_python_cmd_done
+)
+
+:validate_python_cmd_done
+if not defined PY_EXE exit /b 0
+echo !PY_EXE! | findstr /I /C:"\Microsoft\WindowsApps\" >nul
+if not errorlevel 1 exit /b 0
+
+set "PY_VALID=1"
 exit /b 0
 
 :ensure_python
 call :refresh_path
 call :detect_python_cmd
-if defined PY_CMD (
+call :validate_python_cmd
+if "!PY_VALID!"=="1" (
   echo [OK] Python is already available via !PY_CMD!. No download is needed.
   echo.
   exit /b 0
 )
+set "PY_CMD="
 
 echo [MISSING] Python is not found.
 
@@ -104,7 +199,8 @@ if "%HAS_WINGET%"=="1" (
   winget install --id Python.Python.3.11 -e --accept-package-agreements --accept-source-agreements
   call :refresh_path
   call :detect_python_cmd
-  if defined PY_CMD (
+  call :validate_python_cmd
+  if "!PY_VALID!"=="1" (
     echo [OK] Python installed successfully via winget. Using !PY_CMD!.
     echo.
     exit /b 0
@@ -113,9 +209,17 @@ if "%HAS_WINGET%"=="1" (
 
 echo [ACTION] Trying fallback installer from python.org...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $url='https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe'; $dst=Join-Path $env:TEMP 'python-3.11.9-amd64.exe'; Invoke-WebRequest -Uri $url -OutFile $dst; Start-Process -FilePath $dst -ArgumentList '/quiet InstallAllUsers=0 PrependPath=1 Include_launcher=1 Include_pip=1' -Wait"
+if errorlevel 1 (
+  echo [ERROR] PowerShell command to download Python installer failed.
+  set "HAS_FAILURE=1"
+  echo.
+  exit /b 0
+)
+
 call :refresh_path
 call :detect_python_cmd
-if defined PY_CMD (
+call :validate_python_cmd
+if "!PY_VALID!"=="1" (
   echo [OK] Python installed successfully via fallback installer. Using !PY_CMD!.
 ) else (
   echo [ERROR] Could not install Python automatically.
@@ -126,8 +230,10 @@ exit /b 0
 
 :ensure_pip
 if not defined PY_CMD call :detect_python_cmd
+call :validate_python_cmd
+if not "!PY_VALID!"=="1" set "PY_CMD="
 if not defined PY_CMD (
-  echo [SKIP] pip check skipped because Python is not available.
+  echo [SKIP] pip check skipped because a valid Python interpreter is not available.
   set "HAS_FAILURE=1"
   echo.
   exit /b 0
@@ -153,7 +259,25 @@ if not errorlevel 1 (
 
 echo [ACTION] Trying get-pip.py fallback...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $dst=Join-Path $env:TEMP 'get-pip.py'; Invoke-WebRequest -Uri 'https://bootstrap.pypa.io/get-pip.py' -OutFile $dst"
+if errorlevel 1 (
+  echo [ERROR] PowerShell command to download get-pip.py failed.
+  set "HAS_FAILURE=1"
+  echo.
+  exit /b 0
+)
+
+if not exist "%TEMP%\get-pip.py" (
+  echo [ERROR] get-pip.py was not downloaded.
+  set "HAS_FAILURE=1"
+  echo.
+  exit /b 0
+)
+
 %PY_CMD% "%TEMP%\get-pip.py" >nul 2>nul
+if errorlevel 1 (
+  echo [WARN] get-pip.py returned a non-zero exit code. Re-checking pip...
+)
+
 call :refresh_path
 %PY_CMD% -m pip --version >nul 2>nul
 if not errorlevel 1 (
@@ -173,8 +297,18 @@ if not exist "%REQ_FILE%" (
 )
 
 if not defined PY_CMD call :detect_python_cmd
+call :validate_python_cmd
+if not "!PY_VALID!"=="1" set "PY_CMD="
 if not defined PY_CMD (
-  echo [SKIP] Python package check skipped because Python is not available.
+  echo [SKIP] Python package check skipped because a valid Python interpreter is not available.
+  set "HAS_FAILURE=1"
+  echo.
+  exit /b 0
+)
+
+%PY_CMD% -m pip --version >nul 2>nul
+if errorlevel 1 (
+  echo [ERROR] pip is still unavailable for %PY_CMD%.
   set "HAS_FAILURE=1"
   echo.
   exit /b 0
@@ -191,6 +325,7 @@ echo [MISSING] Required Python packages are missing.
 echo [ACTION] Installing from requirements file...
 %PY_CMD% -m pip install --upgrade pip
 %PY_CMD% -m pip install -r "%REQ_FILE%"
+call :refresh_path
 %PY_CMD% -c "import pycaw" >nul 2>nul
 if not errorlevel 1 (
   echo [OK] Required Python packages installed successfully.
@@ -350,6 +485,9 @@ exit /b 0
 
 :download_ffmpeg_fallback
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $zip=Join-Path $env:TEMP 'ffmpeg-release-essentials.zip'; $dst=Join-Path $env:TEMP 'ffmpeg-release-essentials'; if(Test-Path $zip){Remove-Item $zip -Force}; if(Test-Path $dst){Remove-Item $dst -Recurse -Force}; Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile $zip; Expand-Archive -Path $zip -DestinationPath $dst -Force; $ffmpeg=Get-ChildItem -Path $dst -Recurse -Filter ffmpeg.exe | Select-Object -First 1; $ffplay=Get-ChildItem -Path $dst -Recurse -Filter ffplay.exe | Select-Object -First 1; $ffprobe=Get-ChildItem -Path $dst -Recurse -Filter ffprobe.exe | Select-Object -First 1; if(-not $ffmpeg -or -not $ffplay -or -not $ffprobe){ throw 'FFmpeg binaries not found in archive.' }; Copy-Item $ffmpeg.FullName -Destination '%LOCAL_FFMPEG%' -Force; Copy-Item $ffplay.FullName -Destination '%LOCAL_FFPLAY%' -Force; Copy-Item $ffprobe.FullName -Destination '%LOCAL_FFPROBE%' -Force"
+if errorlevel 1 (
+  echo [WARN] FFmpeg zip fallback download failed.
+)
 exit /b 0
 
 :find_global_ffmpeg
