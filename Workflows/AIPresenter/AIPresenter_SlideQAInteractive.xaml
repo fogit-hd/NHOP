@@ -1,0 +1,326 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="AIPresenter_SlideQAInteractive" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="bln_UseWindowsDefaultMic" Type="InOutArgument(x:Boolean)" />
+    <x:Property Name="dict_Headers" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="int_PlayResponseShellResult" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="str_AIResponse" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_AudioPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_CurrentSlideContent" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ElevenJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ElevenLabsKey" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ElevenResponseRaw" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegArgLine" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegRecordArgFile" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegRecordExeFile" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegRecordPidFile" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_GptJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_GptUserContent" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_MicrophoneName" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_OpenAIKey" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_PlayResponseAudioScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_PythonExe" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_RecordInputArgs" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ResolvedMicFile" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ResolveMicScriptPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_SlidePrompt" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_StartFfmpegScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_StopFfmpegScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_VoiceId" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_WavInputPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_WhisperJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_WhisperResponse" Type="InOutArgument(x:String)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="64">
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Runtime.InteropServices</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Text.RegularExpressions</x:String>
+      <x:String>System.Windows.Forms</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>UiPath.Platform.Activities</x:String>
+      <x:String>System.Globalization</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="80">
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.ComponentModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>System.Configuration.ConfigurationManager</AssemblyReference>
+      <AssemblyReference>System.Console</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System.Private.Uri</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+      <AssemblyReference>System.Security.Permissions</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.Windows.Forms</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities.Design</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UIAutomationCore</AssemblyReference>
+      <AssemblyReference>UiPath.Workflow</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.EventBasedAsync</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Primitives</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <!-- Record mic → Whisper → GPT → ElevenLabs answer (shared by AfterPresentation and per-slide Q&amp;A). -->
+  <Sequence DisplayName="Slide Q&amp;A interactive (record, STT, GPT, TTS)" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_SlideQAInteractive">
+              <If Condition="[bln_UseWindowsDefaultMic]" DisplayName="Resolve current default mic (each Q&amp;A)" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ResolveMicPerRecord">
+                <If.Then>
+                  <Sequence DisplayName="Resolve default mic steps" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_ResolveMicSteps">
+                    <ui:StartProcess Arguments="[&quot;&quot;&quot;&quot; + str_ResolveMicScriptPath + &quot;&quot;&quot; &quot;&quot;&quot; + str_ResolvedMicFile + &quot;&quot;&quot;&quot;]" DisplayName="Run resolve_default_microphone.py" FileName="[str_PythonExe]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_ResolveMicLoop" WorkingDirectory="[Environment.CurrentDirectory]" />
+                    <Delay DisplayName="Wait resolve script" Duration="00:00:03" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_ResolveMicLoop" />
+                    <If Condition="[System.IO.File.Exists(str_ResolvedMicFile)]" DisplayName="Read resolved mic name" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ReadResolvedMicLoop">
+                      <If.Then>
+                        <ui:ReadTextFile File="{x:Null}" Content="[str_MicrophoneName]" DisplayName="Load resolved microphone name" FileName="[str_ResolvedMicFile]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_ResolvedMicLoop" />
+                      </If.Then>
+                      <If.Else>
+                        <Throw DisplayName="Resolve mic failed" Exception="[New Exception(&quot;Could not resolve default microphone name. Install pycaw: py -m pip install -r Data\\AIPresenter\\Scripts\\requirements-aipresenter.txt&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_ResolveMicFailedLoop" />
+                      </If.Else>
+                    </If>
+                    <Assign DisplayName="Trim resolved microphone name" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_TrimResolvedMicLoop">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[str_MicrophoneName]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[str_MicrophoneName.Trim()]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                  </Sequence>
+                </If.Then>
+              </If>
+              <Assign DisplayName="Build ffmpeg dshow input (bundled ffmpeg has no WASAPI)" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_RecordInputArgs">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_RecordInputArgs]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">["-f dshow -i audio=""" + str_MicrophoneName.Trim() + """"]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="Full ffmpeg args (no -nostdin; allow graceful stop)" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_FfmpegArgLine">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_FfmpegArgLine]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">["-y " + str_RecordInputArgs + " -loglevel error -ac 1 -ar 16000 -c:a pcm_s16le """ + str_WavInputPath + """"]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="Paths for ffmpeg Python launcher" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_FfmpegLauncherPaths">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_FfmpegRecordExeFile]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","ffmpeg_record_exe.txt")]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="Path argline file" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_FfmpegArgFile">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_FfmpegRecordArgFile]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","ffmpeg_record_argline.txt")]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="Path pid file" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_FfmpegPidFile">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_FfmpegRecordPidFile]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","ffmpeg_record_pid.txt")]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="Start/stop script paths" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_FfmpegScripts">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_StartFfmpegScript]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","start_ffmpeg_record.py")]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="Stop script path" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_StopFfmpegScript">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_StopFfmpegScript]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","stop_ffmpeg_record.py")]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:WriteTextFile File="{x:Null}" DisplayName="Write ffmpeg exe path for launcher" FileName="[str_FfmpegRecordExeFile]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_FfmpegExe" Text="[str_FfmpegPath]" />
+              <ui:WriteTextFile File="{x:Null}" DisplayName="Write ffmpeg full arg line" FileName="[str_FfmpegRecordArgFile]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_FfmpegArgs" Text="[str_FfmpegArgLine]" />
+              <ui:StartProcess Arguments="[&quot;&quot;&quot;&quot; + str_StartFfmpegScript + &quot;&quot;&quot; --exe-file &quot;&quot;&quot; + str_FfmpegRecordExeFile + &quot;&quot;&quot; --arg-file &quot;&quot;&quot; + str_FfmpegRecordArgFile + &quot;&quot;&quot; --pid-file &quot;&quot;&quot; + str_FfmpegRecordPidFile + &quot;&quot;&quot; --working-directory &quot;&quot;&quot; + Environment.CurrentDirectory + &quot;&quot;&quot;&quot;]" DisplayName="Start Recording (ffmpeg hidden via Python launcher)" FileName="[str_PythonExe]" sap:VirtualizedContainerService.HintSize="780,110" sap2010:WorkflowViewState.IdRef="StartProcess_FfmpegLauncher" WorkingDirectory="[Environment.CurrentDirectory]" />
+              <Delay DisplayName="Wait for PID file" Duration="00:00:01" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_WaitPidFile" />
+              <If Condition="[Not System.IO.File.Exists(str_FfmpegRecordPidFile) OrElse New System.IO.FileInfo(str_FfmpegRecordPidFile).Length = 0]" DisplayName="PID file created?" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_PidFileExists">
+                <If.Then>
+                  <Throw DisplayName="Throw ffmpeg launcher failed" Exception="[New Exception(&quot;Could not start ffmpeg (missing PID). Check Data\\AIPresenter\\Scripts\\start_ffmpeg_record.py and pyw/python. ffmpeg: &quot; + str_FfmpegPath)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_FfmpegLauncherFailed" />
+                </If.Then>
+              </If>
+              <Delay DisplayName="Minimum record duration (2s)" Duration="00:00:02" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_MinRecordDuration" />
+              <Assign DisplayName="Recording prompt (bottom-right, no title bar)" sap:VirtualizedContainerService.HintSize="780,88" sap2010:WorkflowViewState.IdRef="Assign_RecordPromptBottomRight">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonExe + Chr(34) + &quot; &quot; + Chr(34) + System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Scripts&quot;,&quot;ask_slide_question.py&quot;) + Chr(34) + &quot; --mode ok --title &quot; + Chr(34) + &quot;Recording&quot; + Chr(34) + &quot; --message &quot; + Chr(34) + &quot;Microphone is recording. Click Stop to finish.&quot; + Chr(34) + &quot; --ok-text &quot; + Chr(34) + &quot;Stop&quot; + Chr(34), Microsoft.VisualBasic.AppWinStyle.NormalFocus, True))]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:StartProcess Arguments="[&quot;&quot;&quot;&quot; + str_StopFfmpegScript + &quot;&quot;&quot; --pid-file &quot;&quot;&quot; + str_FfmpegRecordPidFile + &quot;&quot;&quot; --expect-wav &quot;&quot;&quot; + str_WavInputPath + &quot;&quot;&quot;&quot;]" DisplayName="Stop Recording (graceful ffmpeg stop, Python)" FileName="[str_PythonExe]" sap:VirtualizedContainerService.HintSize="780,110" sap2010:WorkflowViewState.IdRef="StartProcess_FfmpegStop" WorkingDirectory="[Environment.CurrentDirectory]" />
+              <Delay DisplayName="Wait file flush after stop" Duration="00:00:01" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_RecordFlush" />
+              <If Condition="[Not System.IO.File.Exists(str_WavInputPath) OrElse New System.IO.FileInfo(str_WavInputPath).Length &lt; 320]" DisplayName="Validate recorded WAV exists" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateRecordedWav">
+                <If.Then>
+                  <Throw DisplayName="Throw missing WAV with raw path hint" Exception="[New Exception(&quot;Recorded WAV missing or too small: &quot; + str_WavInputPath + &quot;. Full ffmpeg args: &quot; + str_FfmpegArgLine + &quot;. Mic (dshow): &quot; + str_RecordInputArgs + &quot;. ffmpeg: &quot; + str_FfmpegPath + &quot;. Stop recording via stop_ffmpeg_record.py (soft taskkill / Ctrl+C). If using a named mic, set microphone_name in ai_settings.json to match ffmpeg -list_devices (dshow).&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_MissingRecordedWav" />
+                </If.Then>
+              </If>
+              <Assign DisplayName="Whisper Body (placeholder - configure multipart in Studio)" sap:VirtualizedContainerService.HintSize="780,80" sap2010:WorkflowViewState.IdRef="Assign_5">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_WhisperJsonBody]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">["{""model"":""whisper-1""}"]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke Whisper STT Workflow (Python)" sap:VirtualizedContainerService.HintSize="780,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_STT" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AI\WhisperSTTWorkflow_Python.xaml">
+                <ui:InvokeWorkflowFile.Arguments>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_AudioFilePath">[str_WavInputPath]</InArgument>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_OpenAIKey">[str_OpenAIKey]</InArgument>
+                  <OutArgument x:TypeArguments="x:String" x:Key="out_TranscriptionRaw">[str_WhisperResponse]</OutArgument>
+                </ui:InvokeWorkflowFile.Arguments>
+              </ui:InvokeWorkflowFile>
+              <If Condition="[String.IsNullOrWhiteSpace(str_WhisperResponse) OrElse str_WhisperResponse.StartsWith(&quot;WHISPER_ERROR:&quot;)]" DisplayName="Validate Whisper result" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateWhisper">
+                <If.Then>
+                  <Throw DisplayName="Throw Whisper failed" Exception="[New Exception(&quot;Whisper failed: &quot; + If(str_WhisperResponse, &quot;[empty]&quot;))]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_WhisperFailed" />
+                </If.Then>
+              </If>
+              <Assign DisplayName="Build GPT User Content" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_6">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_GptUserContent]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">["Slide Content:" &amp; Environment.NewLine &amp; str_CurrentSlideContent &amp; Environment.NewLine &amp; Environment.NewLine &amp; "User Question (Whisper raw):" &amp; Environment.NewLine &amp; str_WhisperResponse]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="GPT Body" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_7">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_GptJsonBody]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">["{""model"":""gpt-4o"",""messages"":[{""role"":""system"",""content"":""" &amp; str_SlidePrompt.Replace("""","\""") &amp; """},{""role"":""user"",""content"":""" &amp; str_GptUserContent.Replace("""","\""") &amp; """}],""temperature"":0.4}"]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke GPT Response Workflow" sap:VirtualizedContainerService.HintSize="416,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_GPT" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AI\GPTResponseWorkflow.xaml">
+                <ui:InvokeWorkflowFile.Arguments>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_SlideContent">[str_CurrentSlideContent]</InArgument>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_UserQuestionRaw">[str_WhisperResponse]</InArgument>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_OpenAIKey">[str_OpenAIKey]</InArgument>
+                  <OutArgument x:TypeArguments="x:String" x:Key="out_AIResponse">[str_AIResponse]</OutArgument>
+                </ui:InvokeWorkflowFile.Arguments>
+              </ui:InvokeWorkflowFile>
+              <If Condition="[String.IsNullOrWhiteSpace(str_AIResponse) OrElse str_AIResponse.StartsWith(&quot;GPT_ERROR:&quot;)]" DisplayName="Validate GPT response" sap:VirtualizedContainerService.HintSize="416,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateGpt">
+                <If.Then>
+                  <Throw DisplayName="Throw GPT failed" Exception="[New Exception(&quot;GPT failed: &quot; + If(str_AIResponse, &quot;[empty]&quot;))]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_GptFailed" />
+                </If.Then>
+              </If>
+              <Assign DisplayName="Normalize AI response text" sap:VirtualizedContainerService.HintSize="416,165.6" sap2010:WorkflowViewState.IdRef="Assign_8">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_AIResponse]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(str_AIResponse), "Sorry, no response was received from the AI.", str_AIResponse)]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="ElevenLabs Headers" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_9">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[dict_Headers]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[New Dictionary(Of String,String) From {{"xi-api-key",str_ElevenLabsKey},{"accept","audio/wav"},{"Content-Type","application/json"}}]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="ElevenLabs Body" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_10">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_ElevenJsonBody]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">["{""text"":""" &amp; If(str_AIResponse, "").Replace("""","\""") &amp; """,""model_id"":""eleven_multilingual_v2""}"]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke ElevenLabs TTS Workflow" sap:VirtualizedContainerService.HintSize="451.2,176" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_TTS" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AI\ElevenLabsTTSWorkflow.xaml">
+                <ui:InvokeWorkflowFile.Arguments>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_TextToSpeak">[str_AIResponse]</InArgument>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_ElevenLabsKey">[str_ElevenLabsKey]</InArgument>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_VoiceId">[str_VoiceId]</InArgument>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_OutputAudioPath">[str_AudioPath]</InArgument>
+                  <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseRaw">[str_ElevenResponseRaw]</OutArgument>
+                </ui:InvokeWorkflowFile.Arguments>
+              </ui:InvokeWorkflowFile>
+              <If Condition="[String.IsNullOrWhiteSpace(str_ElevenResponseRaw) OrElse str_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;)]" DisplayName="Validate TTS result" sap:VirtualizedContainerService.HintSize="451.2,332" sap2010:WorkflowViewState.IdRef="If_ValidateTts">
+                <If.Then>
+                  <Throw DisplayName="Throw TTS failed" Exception="[New Exception(&quot;TTS failed: &quot; + If(str_ElevenResponseRaw, &quot;[empty]&quot;))]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_TtsFailed" />
+                </If.Then>
+              </If>
+              <If Condition="[System.IO.File.Exists(str_AudioPath)]" DisplayName="Audio file exists?" sap:VirtualizedContainerService.HintSize="416,404.8" sap2010:WorkflowViewState.IdRef="If_PlayAudio">
+                <If.Then>
+                  <Assign DisplayName="Play response WAV (block until end; VB Shell /Wait)" sap:VirtualizedContainerService.HintSize="334.4,88" sap2010:WorkflowViewState.IdRef="Assign_PlayResponseWav">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:Int32">[Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonExe + Chr(34) + &quot; &quot; + Chr(34) + str_PlayResponseAudioScript + Chr(34) + &quot; --wav &quot; + Chr(34) + str_AudioPath + Chr(34) + &quot; --ffmpeg &quot; + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True)]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                </If.Then>
+                <If.Else>
+                  <ui:LogMessage DisplayName="Audio output missing - skip play" sap:VirtualizedContainerService.HintSize="334.4,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_MissingAudio" Level="Warn" Message="[&quot;Audio output not found: &quot; + str_AudioPath + &quot;. Skip playback.&quot;]" />
+                </If.Else>
+              </If>
+
+  </Sequence>
+</Activity>

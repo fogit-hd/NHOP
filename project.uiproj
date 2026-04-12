@@ -1,0 +1,6 @@
+{
+  "Name": "NHOP Project",
+  "ProjectType": "Process",
+  "Description": "A Capstone project using UI Path automation to create a presentation video using AI Voice - Configured by NEO Force.",
+  "MainFile": "Main.xaml"
+}

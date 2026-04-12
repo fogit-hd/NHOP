@@ -1,0 +1,36 @@
+FFMPEG INSTALL GUIDE (Windows)
+================================
+
+Option 1 - Install with winget (recommended)
+--------------------------------------------
+1) Open PowerShell as Administrator.
+2) Run:
+   winget install --id Gyan.FFmpeg -e
+3) Close terminal and open a new one.
+4) Verify:
+   ffmpeg -version
+
+
+Option 2 - Manual install (ZIP)
+-------------------------------
+1) Open website:
+   https://www.gyan.dev/ffmpeg/builds/
+2) Download:
+   ffmpeg-release-essentials.zip
+   (or ffmpeg-git-full.7z if you need full build)
+3) Extract to:
+   C:\ffmpeg
+4) Add this path to Environment Variables -> Path:
+   C:\ffmpeg\bin
+5) Open a new terminal and verify:
+   ffmpeg -version
+
+
+Troubleshooting
+---------------
+- If "ffmpeg is not recognized":
+  + You did not reopen terminal after adding PATH, or
+  + PATH entry is wrong (must end with \bin).
+- In UiPath, you can also use full path directly:
+  C:\ffmpeg\bin\ffmpeg.exe
+

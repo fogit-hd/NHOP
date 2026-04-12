@@ -1,0 +1,21 @@
+{
+  "openai": {
+    "whisper": {
+      "endpoint": "https://api.openai.com/v1/audio/transcriptions",
+      "model": "whisper-1"
+    },
+    "gpt": {
+      "endpoint": "https://api.openai.com/v1/chat/completions",
+      "model": "gpt-4o",
+      "temperature": 0.4
+    }
+  },
+  "elevenlabs": {
+    "endpoint_template": "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+    "model_id": "eleven_multilingual_v2",
+    "accept": "audio/wav"
+  },
+  "paths": {
+    "system_prompt": "Data\\AIPresenter\\Config\\system_prompt.txt"
+  }
+}

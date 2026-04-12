@@ -1,0 +1,116 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="GPTResponseWorkflow" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_SlideContent" Type="InArgument(x:String)" />
+    <x:Property Name="in_UserQuestionRaw" Type="InArgument(x:String)" />
+    <x:Property Name="in_OpenAIKey" Type="InArgument(x:String)" />
+    <x:Property Name="out_AIResponse" Type="OutArgument(x:String)" />
+  </x:Members>
+  <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="GPT Response Workflow" sap:VirtualizedContainerService.HintSize="550,240" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="str_ScriptPath" />
+      <Variable x:TypeArguments="x:String" Name="str_ResultPath" />
+      <Variable x:TypeArguments="x:String" Name="str_SlidePath" />
+      <Variable x:TypeArguments="x:String" Name="str_QuestionPath" />
+      <Variable x:TypeArguments="x:String" Name="str_KeyPath" />
+      <Variable x:TypeArguments="x:String" Default="pyw" Name="str_PythonExe" />
+      <Variable x:TypeArguments="x:Boolean" Name="bln_ResultExists" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <Assign DisplayName="Set script path" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ScriptPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","gpt_response.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set result path (latest)" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ResultPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","gpt_result.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set slide input path" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_5">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_SlidePath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","gpt_slide.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set question input path" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_6">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_QuestionPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","gpt_question.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set key input path" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_7">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_KeyPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","gpt_key.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write slide content input" FileName="[str_SlidePath]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" Text="[in_SlideContent]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write question input" FileName="[str_QuestionPath]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_2" Text="[in_UserQuestionRaw]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write API key input" FileName="[str_KeyPath]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_3" Text="[in_OpenAIKey]" />
+    <ui:StartProcess WorkingDirectory="{x:Null}" Arguments="[&quot;&quot;&quot;&quot; + str_ScriptPath + &quot;&quot;&quot; --output-path &quot;&quot;&quot; + str_ResultPath + &quot;&quot;&quot;&quot;]" DisplayName="Run GPT Python script" FileName="[str_PythonExe]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_1" />
+    <Delay DisplayName="Wait GPT result file" Duration="00:00:06" sap:VirtualizedContainerService.HintSize="508,90.4" sap2010:WorkflowViewState.IdRef="Delay_1" />
+    <Assign DisplayName="Check GPT result file exists" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_8">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[bln_ResultExists]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[System.IO.File.Exists(str_ResultPath)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <If Condition="[bln_ResultExists]" DisplayName="Read GPT result if exists" sap:VirtualizedContainerService.HintSize="508,108.8" sap2010:WorkflowViewState.IdRef="If_1">
+      <If.Then>
+        <ui:ReadTextFile File="{x:Null}" Content="[out_AIResponse]" DisplayName="Read GPT result" FileName="[str_ResultPath]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+      </If.Then>
+    </If>
+    <Assign DisplayName="Fallback AI response" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_4">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_AIResponse]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(out_AIResponse), "No AI response returned.", out_AIResponse)]</InArgument>
+      </Assign.Value>
+    </Assign>
+  </Sequence>
+</Activity>

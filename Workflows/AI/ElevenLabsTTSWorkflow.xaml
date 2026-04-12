@@ -1,0 +1,127 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="ElevenLabsTTSWorkflow" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_TextToSpeak" Type="InArgument(x:String)" />
+    <x:Property Name="in_ElevenLabsKey" Type="InArgument(x:String)" />
+    <x:Property Name="in_VoiceId" Type="InArgument(x:String)" />
+    <x:Property Name="in_OutputAudioPath" Type="InArgument(x:String)" />
+    <x:Property Name="out_ResponseRaw" Type="OutArgument(x:String)" />
+  </x:Members>
+  <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="ElevenLabs TTS Workflow" sap:VirtualizedContainerService.HintSize="560,260" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="str_ScriptPath" />
+      <Variable x:TypeArguments="x:String" Name="str_ResultPath" />
+      <Variable x:TypeArguments="x:String" Name="str_TextPath" />
+      <Variable x:TypeArguments="x:String" Name="str_KeyPath" />
+      <Variable x:TypeArguments="x:String" Name="str_VoicePath" />
+      <Variable x:TypeArguments="x:String" Name="str_OutputAudioPathFile" />
+      <Variable x:TypeArguments="x:String" Default="pyw" Name="str_PythonExe" />
+      <Variable x:TypeArguments="x:Boolean" Name="bln_ResultExists" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <Assign DisplayName="Set script path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ScriptPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","elevenlabs_tts.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set result path (latest)" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ResultPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_result.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set tts text input path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_3">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_TextPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_text.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set tts key input path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_5">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_KeyPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_key.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set tts voice input path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_6">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_VoicePath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_voice.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set output-audio input path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_7">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_OutputAudioPathFile]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_output_audio_path.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS text input" FileName="[str_TextPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" Text="[in_TextToSpeak]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS key input" FileName="[str_KeyPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_2" Text="[in_ElevenLabsKey]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS voice input" FileName="[str_VoicePath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_3" Text="[in_VoiceId]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS output-audio path" FileName="[str_OutputAudioPathFile]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_4" Text="[in_OutputAudioPath]" />
+    <ui:StartProcess WorkingDirectory="{x:Null}" Arguments="[&quot;&quot;&quot;&quot; + str_ScriptPath + &quot;&quot;&quot; --output-path &quot;&quot;&quot; + str_ResultPath + &quot;&quot;&quot;&quot;]" DisplayName="Run ElevenLabs Python script" FileName="[str_PythonExe]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_1" />
+    <Delay DisplayName="Wait TTS result file" Duration="00:00:15" sap:VirtualizedContainerService.HintSize="518,90.4" sap2010:WorkflowViewState.IdRef="Delay_1" />
+    <Assign DisplayName="Check TTS result file exists" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_8">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[bln_ResultExists]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[System.IO.File.Exists(str_ResultPath)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <If Condition="[bln_ResultExists]" DisplayName="Read TTS result if exists" sap:VirtualizedContainerService.HintSize="518,108.8" sap2010:WorkflowViewState.IdRef="If_1">
+      <If.Then>
+        <ui:ReadTextFile File="{x:Null}" Content="[out_ResponseRaw]" DisplayName="Read TTS result" FileName="[str_ResultPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+      </If.Then>
+    </If>
+    <Assign DisplayName="Fallback TTS result" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_4">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_ResponseRaw]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(out_ResponseRaw), "No TTS result returned.", out_ResponseRaw)]</InArgument>
+      </Assign.Value>
+    </Assign>
+  </Sequence>
+</Activity>
