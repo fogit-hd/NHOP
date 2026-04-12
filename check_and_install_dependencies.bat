@@ -143,6 +143,7 @@ if not errorlevel 1 (
 echo [MISSING] pip is not available for %PY_CMD%.
 echo [ACTION] Running ensurepip...
 %PY_CMD% -m ensurepip --upgrade >nul 2>nul
+call :refresh_path
 %PY_CMD% -m pip --version >nul 2>nul
 if not errorlevel 1 (
   echo [OK] pip was installed successfully.
@@ -153,6 +154,7 @@ if not errorlevel 1 (
 echo [ACTION] Trying get-pip.py fallback...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $dst=Join-Path $env:TEMP 'get-pip.py'; Invoke-WebRequest -Uri 'https://bootstrap.pypa.io/get-pip.py' -OutFile $dst"
 %PY_CMD% "%TEMP%\get-pip.py" >nul 2>nul
+call :refresh_path
 %PY_CMD% -m pip --version >nul 2>nul
 if not errorlevel 1 (
   echo [OK] pip was installed successfully via fallback.
