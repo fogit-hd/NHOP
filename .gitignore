@@ -6,6 +6,7 @@ Data/AIPresenter/Temp/
 Data/AIPresenter/Scripts/__pycache__/
 Data/AIPresenter/Tools/*.exe
 Data/AIPresenter/Output/*.mp4
+/%CD%/
 
 ################################################################################
 # Added by UiPath Studio
