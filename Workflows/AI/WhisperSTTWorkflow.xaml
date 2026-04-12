@@ -1,0 +1,115 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="WhisperSTTWorkflow" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_AudioFilePath" Type="InArgument(x:String)" />
+    <x:Property Name="in_OpenAIKey" Type="InArgument(x:String)" />
+    <x:Property Name="out_TranscriptionRaw" Type="OutArgument(x:String)" />
+  </x:Members>
+  <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Whisper STT Workflow" sap:VirtualizedContainerService.HintSize="550,220" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="str_ScriptPath" />
+      <Variable x:TypeArguments="x:String" Name="str_ResultPath" />
+      <Variable x:TypeArguments="x:String" Name="str_AudioPathFile" />
+      <Variable x:TypeArguments="x:String" Name="str_ApiKeyFile" />
+      <Variable x:TypeArguments="x:String" Default="pyw" Name="str_PythonExe" />
+      <Variable x:TypeArguments="x:Boolean" Name="bln_ResultExists" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <Assign DisplayName="Set script path" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ScriptPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","whisper_stt.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set result path (latest)" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ResultPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","whisper_result.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set audio-path input file" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_7">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_AudioPathFile]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","whisper_audio_path.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set api-key input file" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_8">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ApiKeyFile]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","whisper_key.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write whisper audio path input" FileName="[str_AudioPathFile]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" Text="[in_AudioFilePath]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write whisper API key input" FileName="[str_ApiKeyFile]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_2" Text="[in_OpenAIKey]" />
+    <ui:StartProcess WorkingDirectory="{x:Null}" Arguments="[&quot;&quot;&quot;&quot; + str_ScriptPath + &quot;&quot;&quot; --output-path &quot;&quot;&quot; + str_ResultPath + &quot;&quot;&quot;&quot;]" DisplayName="Run Whisper Python script" FileName="[str_PythonExe]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_1" />
+    <Delay DisplayName="Wait script output file" Duration="00:00:06" sap:VirtualizedContainerService.HintSize="508,90.4" sap2010:WorkflowViewState.IdRef="Delay_1" />
+    <Assign DisplayName="Check result file exists" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_5">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[bln_ResultExists]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[System.IO.File.Exists(str_ResultPath)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <If Condition="[bln_ResultExists]" DisplayName="Read result if exists" sap:VirtualizedContainerService.HintSize="508,108.8" sap2010:WorkflowViewState.IdRef="If_1">
+      <If.Then>
+        <ui:ReadTextFile File="{x:Null}" Content="[out_TranscriptionRaw]" DisplayName="Read Whisper result" FileName="[str_ResultPath]" sap:VirtualizedContainerService.HintSize="508,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+      </If.Then>
+      <If.Else>
+        <Assign DisplayName="Set missing result message" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_6">
+          <Assign.To>
+            <OutArgument x:TypeArguments="x:String">[out_TranscriptionRaw]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="x:String">["Whisper result file was not created: " + str_ResultPath]</InArgument>
+          </Assign.Value>
+        </Assign>
+      </If.Else>
+    </If>
+    <Assign DisplayName="Fallback result" sap:VirtualizedContainerService.HintSize="508,82.4" sap2010:WorkflowViewState.IdRef="Assign_4">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_TranscriptionRaw]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(out_TranscriptionRaw), "No transcription returned.", out_TranscriptionRaw)]</InArgument>
+      </Assign.Value>
+    </Assign>
+  </Sequence>
+</Activity>

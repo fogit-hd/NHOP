@@ -1,0 +1,571 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="AIPresenter_SlideIteration" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="slideItem" Type="InArgument(x:String)" />
+    <x:Property Name="bln_UseWindowsDefaultMic" Type="InOutArgument(x:Boolean)" />
+    <x:Property Name="str_GptComposedSlides" Type="InArgument(x:String)" />
+    <x:Property Name="str_GlobalSlideContext" Type="InArgument(x:String)" />
+    <x:Property Name="str_OpenDefaultAppScript" Type="InArgument(x:String)" />
+    <x:Property Name="str_SegmentsManifestPath" Type="InArgument(x:String)" />
+    <x:Property Name="str_BuildSlideVideoScript" Type="InArgument(x:String)" />
+    <x:Property Name="str_PlayVideoScript" Type="InArgument(x:String)" />
+    <x:Property Name="str_AskSlideQuestionScript" Type="InArgument(x:String)" />
+    <x:Property Name="str_PythonwExe" Type="InArgument(x:String)" />
+    <x:Property Name="str_PythonExe" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ElevenLabsKey" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_VoiceId" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_PlayResponseAudioScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_NarrationAudioPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="int_QaSlideOrdinal" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="int_TotalSlides" Type="InArgument(x:Int32)" />
+    <x:Property Name="dict_Headers" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="str_ElevenResponseRaw" Type="InOutArgument(x:String)" />
+    <x:Property Name="int_PlayResponseShellResult" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="str_AIResponse" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_AudioPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_CurrentSlideContent" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ElevenJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegArgLine" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegRecordArgFile" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegRecordExeFile" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_FfmpegRecordPidFile" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_GptJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_GptUserContent" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_MicrophoneName" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_OpenAIKey" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_RecordInputArgs" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ResolvedMicFile" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_ResolveMicScriptPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_SlidePrompt" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_StartFfmpegScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_StopFfmpegScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_WavInputPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_WhisperJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="str_WhisperResponse" Type="InOutArgument(x:String)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="64">
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Runtime.InteropServices</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Text.RegularExpressions</x:String>
+      <x:String>System.Windows.Forms</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>UiPath.Platform.Activities</x:String>
+      <x:String>System.Globalization</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="80">
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.ComponentModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>System.Configuration.ConfigurationManager</AssemblyReference>
+      <AssemblyReference>System.Console</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System.Private.Uri</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+      <AssemblyReference>System.Security.Permissions</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.Windows.Forms</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities.Design</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UIAutomationCore</AssemblyReference>
+      <AssemblyReference>UiPath.Workflow</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.EventBasedAsync</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Primitives</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <!-- Root Sequence = widest variable scope in this .xaml; workflow Arguments (x:Members) are also in scope for expressions. -->
+  <Sequence DisplayName="Slide iteration" sap:VirtualizedContainerService.HintSize="800,200" sap2010:WorkflowViewState.IdRef="Sequence_SlideIter">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="str_CurrentSlideTitle" />
+      <Variable x:TypeArguments="x:String" Name="str_AbsSlideImagePath" />
+      <Variable x:TypeArguments="x:String" Name="str_RelSlidePath" />
+      <Variable x:TypeArguments="x:String" Name="str_SlideNarrationText" />
+      <Variable x:TypeArguments="x:Double" Default="0" Name="dbl_PadSeconds" />
+      <Variable x:TypeArguments="x:String" Default="" Name="str_SlideQuestionChoice" />
+      <Variable x:TypeArguments="x:String" Default="" Name="str_GptFromFile" />
+      <Variable x:TypeArguments="x:String" Name="str_GptContentPath" />
+      <Variable x:TypeArguments="x:String" Name="str_SlideSegmentMp4" />
+      <Variable x:TypeArguments="x:String" Name="str_SlideQuestionResultFile" />
+      <Variable x:TypeArguments="x:String" Name="str_FfplayPidFile" />
+      <Variable x:TypeArguments="x:String" Name="str_PreviousFfplayPid" />
+      <Variable x:TypeArguments="x:String" Name="str_CurrentFfplayPid" />
+      <Variable x:TypeArguments="x:String" Name="str_WavDurationScript" />
+      <Variable x:TypeArguments="x:String" Name="str_WavDurationResultFile" />
+      <Variable x:TypeArguments="x:String" Name="str_TempDuration" />
+      <Variable x:TypeArguments="x:Double" Name="dbl_NarrationDuration" />
+    </Sequence.Variables>
+            <Assign DisplayName="Path for last ffplay PID" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_PidFilePath">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_FfplayPidFile]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "AIPresenter", "Temp", "last_ffplay_pid.txt")]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <If Condition="[System.IO.File.Exists(str_FfplayPidFile)]" DisplayName="Read previous ffplay PID if exists" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ReadPreviousPid">
+              <If.Then>
+                <ui:ReadTextFile File="{x:Null}" Content="[str_PreviousFfplayPid]" DisplayName="Read last_ffplay_pid.txt" FileName="[str_FfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_PreviousPid" />
+              </If.Then>
+            </If>
+            <Assign DisplayName="Path to wav_duration_seconds.py" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_WavDurationScriptPath">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_WavDurationScript]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "AIPresenter", "Scripts", "wav_duration_seconds.py")]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Path for wav duration result file" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_WavDurationResultPath">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_WavDurationResultFile]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "AIPresenter", "Temp", "narration_duration.txt")]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Path to gpt_slide_content.txt" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_GptContentPath">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_GptContentPath]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Input","gpt_slide_content.txt")]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <If Condition="[System.IO.File.Exists(str_GptContentPath)]" DisplayName="Load composed script from disk" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ReadGptFile">
+              <If.Then>
+                <ui:ReadTextFile File="{x:Null}" Content="[str_GptFromFile]" DisplayName="Read gpt_slide_content.txt" FileName="[str_GptContentPath]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_GptSlideContent" />
+              </If.Then>
+              <If.Else>
+                <Assign DisplayName="No gpt file on disk" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_EmptyGptFile">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[str_GptFromFile]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[""]</InArgument>
+                  </Assign.Value>
+                </Assign>
+              </If.Else>
+            </If>
+            <Assign DisplayName="Slide ordinal (+1 per row)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_QaSlideOrdinal">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:Int32">[int_QaSlideOrdinal]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:Int32">[int_QaSlideOrdinal + 1]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <If Condition="[slideItem.Split(Convert.ToChar(9)).Length &lt; 4]" DisplayName="Validate TSV row (4 tab columns)" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateSlideTsv">
+              <If.Then>
+                <Throw DisplayName="Bad slides_iterate row" Exception="[New Exception(&quot;slides_iterate.tsv: each line needs 4 tab-separated fields. Re-run slides_from_csv.py.&quot;)]" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Throw_BadSlideTsv" />
+              </If.Then>
+            </If>
+            <Assign DisplayName="Current slide title (from CSV)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideTitleFromTsv">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_CurrentSlideTitle]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[slideItem.Split(Convert.ToChar(9))(1)]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Slide photo absolute path" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_AbsSlidePath">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_AbsSlideImagePath]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[slideItem.Split(Convert.ToChar(9))(2)]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Slide photo relative path (project root)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_RelSlidePathTsv">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_RelSlidePath]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[slideItem.Split(Convert.ToChar(9))(3)]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Slice narration for this slide (gpt_slide_content.txt)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideNarrationFromComposed">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_SlideNarrationText]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(If(String.IsNullOrWhiteSpace(str_GptFromFile), str_GptComposedSlides, str_GptFromFile)), "", System.Text.RegularExpressions.Regex.Match(If(String.IsNullOrWhiteSpace(str_GptFromFile), str_GptComposedSlides, str_GptFromFile), "(?m)^===\s*SLIDE\s*\|\s*" &amp; CInt(slideItem.Split(Convert.ToChar(9))(0).Trim).ToString &amp; "\s*\|.*?===\s*\r?\n([\s\S]*?)(?=^(?:===\s*SLIDE\s*\|)|\Z)").Groups(1).Value.Trim)]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="GPT/Q&amp;A context (narration + slide meta)" sap:VirtualizedContainerService.HintSize="850.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_3">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[str_CurrentSlideContent]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(str_GlobalSlideContext), str_GlobalSlideContext &amp; Environment.NewLine &amp; Environment.NewLine, "") &amp; "[Slide " &amp; slideItem.Split(Convert.ToChar(9))(0).Trim &amp; ": " &amp; str_CurrentSlideTitle &amp; "]" &amp; Environment.NewLine &amp; "Slide narration (from GPT):" &amp; Environment.NewLine &amp; str_SlideNarrationText &amp; Environment.NewLine &amp; Environment.NewLine &amp; "Image (relative): " &amp; str_RelSlidePath &amp; Environment.NewLine &amp; "Image (absolute): " &amp; str_AbsSlideImagePath]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <If Condition="[Not String.IsNullOrWhiteSpace(str_SlideNarrationText)]" DisplayName="Has narration text for TTS?" sap:VirtualizedContainerService.HintSize="781.6,520" sap2010:WorkflowViewState.IdRef="If_HasNarrationForTts">
+                <If.Then>
+                  <Sequence DisplayName="TTS narration branch" sap:VirtualizedContainerService.HintSize="780,520" sap2010:WorkflowViewState.IdRef="Sequence_TtsNarrationBranch">
+                  <Assign DisplayName="ElevenLabs Headers (narration)" sap:VirtualizedContainerService.HintSize="780,174.4" sap2010:WorkflowViewState.IdRef="Assign_ElevenHeadersNarr">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[dict_Headers]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[New Dictionary(Of String,String) From {{"xi-api-key",str_ElevenLabsKey},{"accept","audio/wav"},{"Content-Type","application/json"}}]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign DisplayName="ElevenLabs Body (narration)" sap:VirtualizedContainerService.HintSize="780,174.4" sap2010:WorkflowViewState.IdRef="Assign_ElevenBodyNarr">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[str_ElevenJsonBody]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">["{""text"":""" &amp; str_SlideNarrationText.Replace("""","\""") &amp; """,""model_id"":""eleven_multilingual_v2""}"]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke ElevenLabs TTS (slide narration)" sap:VirtualizedContainerService.HintSize="780,176" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_TTSNarr" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AI\ElevenLabsTTSWorkflow.xaml">
+                    <ui:InvokeWorkflowFile.Arguments>
+                      <InArgument x:TypeArguments="x:String" x:Key="in_TextToSpeak">[str_SlideNarrationText]</InArgument>
+                      <InArgument x:TypeArguments="x:String" x:Key="in_ElevenLabsKey">[str_ElevenLabsKey]</InArgument>
+                      <InArgument x:TypeArguments="x:String" x:Key="in_VoiceId">[str_VoiceId]</InArgument>
+                      <InArgument x:TypeArguments="x:String" x:Key="in_OutputAudioPath">[str_NarrationAudioPath]</InArgument>
+                      <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseRaw">[str_ElevenResponseRaw]</OutArgument>
+                    </ui:InvokeWorkflowFile.Arguments>
+                  </ui:InvokeWorkflowFile>
+                  <If Condition="[Not String.IsNullOrWhiteSpace(str_ElevenResponseRaw) AndAlso Not str_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso System.IO.File.Exists(str_NarrationAudioPath)]" DisplayName="If TTS OK, get duration for delay" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_GetAudioDuration">
+                    <If.Then>
+                      <Sequence DisplayName="Get duration and set delay" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_GetDuration">
+                        <ui:WriteTextFile File="{x:Null}" DisplayName="Reset narration duration file" FileName="[str_WavDurationResultFile]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetWavDurationResult" Text="0" />
+                        <Assign DisplayName="Run wav_duration_seconds.py (wait)" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_RunWavDurationScriptWait">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + " " + Chr(34) + str_WavDurationScript + Chr(34) + " --wav " + Chr(34) + str_NarrationAudioPath + Chr(34) + " --out " + Chr(34) + str_WavDurationResultFile + Chr(34) + " --ffmpeg " + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                        <Delay Duration="00:00:00.150" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_WaitForDurationFile" />
+                        <Assign DisplayName="Set duration from file or default" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_SetDurationFromFileOrDefault">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:Double">[dbl_NarrationDuration]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:Double">[If(System.IO.File.Exists(str_WavDurationResultFile), Convert.ToDouble(System.IO.File.ReadAllText(str_WavDurationResultFile).Trim, System.Globalization.CultureInfo.InvariantCulture), 5.0)]</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                      </Sequence>
+                    </If.Then>
+                </If>
+                <If Condition="[Not String.IsNullOrWhiteSpace(str_ElevenResponseRaw) AndAlso Not str_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso System.IO.File.Exists(str_NarrationAudioPath)]" DisplayName="Mux slide MP4 + play (duration = narration)" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_PlayNarrationOk">
+                  <If.Then>
+                    <Sequence DisplayName="Image+audio segment then play" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_MuxAndPlaySlide">
+                      <If Condition="[System.IO.File.Exists(str_AbsSlideImagePath)]" DisplayName="Slide image for mux?" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ImageForMux">
+                        <If.Then>
+                          <Sequence DisplayName="Build segment + play" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_BuildSegmentPlay">
+                            <Assign DisplayName="Per-slide segment MP4 path" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideSegmentPath">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="x:String">[str_SlideSegmentMp4]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","segments","slide_" &amp; CInt(slideItem.Split(Convert.ToChar(9))(0).Trim).ToString("D3") &amp; ".mp4")]</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                            <Assign DisplayName="ffmpeg: image + WAV → segment (append manifest)" sap:VirtualizedContainerService.HintSize="780,88" sap2010:WorkflowViewState.IdRef="Assign_ShellBuildSlideMux">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + " " + Chr(34) + str_BuildSlideVideoScript + Chr(34) + " --image " + Chr(34) + str_AbsSlideImagePath + Chr(34) + " --audio " + Chr(34) + str_NarrationAudioPath + Chr(34) + " --out " + Chr(34) + str_SlideSegmentMp4 + Chr(34) + " --ffmpeg " + Chr(34) + str_FfmpegPath + Chr(34) + " --append-manifest " + Chr(34) + str_SegmentsManifestPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                            <Delay DisplayName="Wait for mux file" Duration="00:00:00.250" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_AfterMux" />
+                            <If Condition="[System.IO.File.Exists(str_SlideSegmentMp4)]" DisplayName="Segment file created?" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_SegmentExists">
+                              <If.Then>
+                                <Sequence DisplayName="Cleanup previous PID then play segment" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_PlaySegmentAndKillPreviousPid">
+                                  <If Condition="[False]" DisplayName="If previous PID exists, kill it" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_KillPreviousPid">
+                                    <If.Then>
+                                      <ui:StartProcess Arguments="[&quot;/F /PID &quot; + str_PreviousFfplayPid.Trim()]" DisplayName="Kill Previous Slide Video" FileName="taskkill.exe" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_KillPrevious" WorkingDirectory="[Environment.CurrentDirectory]" />
+                                    </If.Then>
+                                  </If>
+                                  <ui:WriteTextFile File="{x:Null}" DisplayName="Reset current ffplay PID file" FileName="[str_FfplayPidFile]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetCurrentFfplayPid" Text="" />
+                                  <ui:StartProcess Arguments="[&quot;&quot;&quot;&quot; + str_PlayVideoScript + &quot;&quot;&quot; --path &quot;&quot;&quot; + str_SlideSegmentMp4 + &quot;&quot;&quot; --ffmpeg &quot;&quot;&quot; + str_FfmpegPath + &quot;&quot;&quot; --pid-file &quot;&quot;&quot; + str_FfplayPidFile + &quot;&quot;&quot; --no-autoexit&quot;]" DisplayName="Play slide segment (non-blocking, pyw)" FileName="[str_PythonwExe]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_PlaySlideSegment" WorkingDirectory="[Environment.CurrentDirectory]" />
+                                  <Delay DisplayName="Let next slide window appear" Duration="00:00:00.350" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_LetNextSlideAppear" />
+                                  <If Condition="[System.IO.File.Exists(str_FfplayPidFile)]" DisplayName="Read current PID after launch" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ReadCurrentPidAfterLaunch">
+                                    <If.Then>
+                                      <ui:ReadTextFile File="{x:Null}" Content="[str_CurrentFfplayPid]" DisplayName="Read current ffplay PID" FileName="[str_FfplayPidFile]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_CurrentPidAfterLaunch" />
+                                    </If.Then>
+                                    <If.Else>
+                                      <Assign DisplayName="Current PID unavailable" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_CurrentPidUnavailable">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="x:String">[str_CurrentFfplayPid]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="x:String">[""]</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                    </If.Else>
+                                  </If>
+                                  <If Condition="[Not String.IsNullOrWhiteSpace(str_PreviousFfplayPid) AndAlso Not String.IsNullOrWhiteSpace(str_CurrentFfplayPid) AndAlso str_PreviousFfplayPid.Trim() &lt;&gt; str_CurrentFfplayPid.Trim()]" DisplayName="Close previous slide after next appears" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ClosePreviousAfterNextShown">
+                                    <If.Then>
+                                      <Assign DisplayName="Close previous slide (hidden shell)" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ClosePreviousAfterNextShown">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(&quot;taskkill.exe /F /PID &quot; + str_PreviousFfplayPid.Trim(), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                    </If.Then>
+                                  </If>
+                                </Sequence>
+                              </If.Then>
+                              <If.Else>
+                                <Sequence DisplayName="Mux failed — play WAV only" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_FallbackWav">
+                                  <ui:LogMessage DisplayName="Segment mux failed — play WAV" sap:VirtualizedContainerService.HintSize="780,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_MuxFail" Level="Warn" Message="[&quot;build_slide_video did not produce segment; playing narration WAV only. Check ffmpeg_path and ffplay.exe.&quot;]" />
+                                  <Assign DisplayName="Play narration WAV fallback" sap:VirtualizedContainerService.HintSize="780,88" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWavFallback">
+                                    <Assign.To>
+                                      <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                                    </Assign.To>
+                                    <Assign.Value>
+                                      <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + &quot; &quot; + Chr(34) + str_PlayResponseAudioScript + Chr(34) + &quot; --wav &quot; + Chr(34) + str_NarrationAudioPath + Chr(34) + &quot; --ffmpeg &quot; + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                                    </Assign.Value>
+                                  </Assign>
+                                </Sequence>
+                              </If.Else>
+                            </If>
+                          </Sequence>
+                        </If.Then>
+                        <If.Else>
+                          <Sequence DisplayName="Mux failed — play WAV only" sap:VirtualizedContainerService.HintSize="376.8,641.6" sap2010:WorkflowViewState.IdRef="Sequence_FallbackWav_NoImagePath">
+                            <sap:WorkflowViewStateService.ViewState>
+                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                              </scg:Dictionary>
+                            </sap:WorkflowViewStateService.ViewState>
+                            <ui:LogMessage DisplayName="Segment mux failed — play WAV" sap:VirtualizedContainerService.HintSize="333.6,92.8" sap2010:WorkflowViewState.IdRef="LogMessage_MuxFail_NoImagePath" Level="Warn" Message="[&quot;build_slide_video did not produce segment; playing narration WAV only. Check ffmpeg_path and ffplay.exe.&quot;]" />
+                            <Assign DisplayName="Play narration WAV fallback" sap:VirtualizedContainerService.HintSize="333.6,81.6" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWavFallback_NoImagePath">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + " " + Chr(34) + str_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + str_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                          </Sequence>
+                        </If.Else>
+                      </If>
+                    </Sequence>
+                  </If.Then>
+                  <If.Else>
+                    <Sequence DisplayName="No image for slide" sap:VirtualizedContainerService.HintSize="376.8,356.8" sap2010:WorkflowViewState.IdRef="Sequence_NoImage">
+                      <sap:WorkflowViewStateService.ViewState>
+                        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                        </scg:Dictionary>
+                      </sap:WorkflowViewStateService.ViewState>
+                      <ui:LogMessage DisplayName="Log: No image for slide" sap:VirtualizedContainerService.HintSize="333.6,92.8" sap2010:WorkflowViewState.IdRef="LogMessage_NoImage" Level="Info" Message="[&quot;No image for slide, playing audio only.&quot;]" />
+                      <Assign DisplayName="Play narration WAV" sap:VirtualizedContainerService.HintSize="333.6,81.6" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWav">
+                        <Assign.To>
+                          <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                        </Assign.To>
+                        <Assign.Value>
+                          <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + " " + Chr(34) + str_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + str_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                        </Assign.Value>
+                      </Assign>
+                    </Sequence>
+                  </If.Else>
+                </If>
+              </Sequence>
+            </If.Then>
+            <If.Else>
+              <ui:LogMessage DisplayName="No narration text — skip slide TTS" sap:VirtualizedContainerService.HintSize="781.6,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_NoNarrationText" Level="Error" Message="[&quot;No TTS: gpt_slide_content.txt missing/empty or no block === SLIDE | &quot; + CInt(slideItem.Split(Convert.ToChar(9))(0).Trim).ToString + &quot; | ... ===. Run Init (pipeline_extract_and_compose.py), set ElevenLabs keys in ai_settings.json, check Output panel.&quot;]" />
+            </If.Else>
+          </If>
+    <Assign DisplayName="Wait AI voice duration" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_PadSeconds">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Double">[dbl_PadSeconds]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Double">[If(dbl_NarrationDuration &gt; 0, dbl_NarrationDuration, 5.0)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Delay DisplayName="Wait AI voice to finish" Duration="[TimeSpan.FromSeconds(dbl_PadSeconds)]" sap:VirtualizedContainerService.HintSize="850.4,90.4" sap2010:WorkflowViewState.IdRef="Delay_AfterNarration" />
+    <If Condition="[False]" DisplayName="Close slide playback window after voice (disabled)" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_CloseSlideAfterVoice">
+      <If.Then>
+        <Sequence DisplayName="Read PID and close current slide" sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_CloseSlideAfterVoice">
+          <ui:ReadTextFile File="{x:Null}" Content="[str_PreviousFfplayPid]" DisplayName="Read current ffplay PID" FileName="[str_FfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_CurrentFfplayPid" />
+          <If Condition="[Not String.IsNullOrWhiteSpace(str_PreviousFfplayPid)]" DisplayName="PID available for close" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_HasFfplayPidForClose">
+            <If.Then>
+              <ui:StartProcess Arguments="[&quot;/F /PID &quot; + str_PreviousFfplayPid.Trim()]" DisplayName="Close current slide window" FileName="taskkill.exe" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_CloseCurrentSlide" WorkingDirectory="[Environment.CurrentDirectory]" />
+            </If.Then>
+          </If>
+        </Sequence>
+      </If.Then>
+    </If>
+    <Assign DisplayName="Wait 2s before question popup" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_QuestionPopupDelaySeconds">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Double">[dbl_PadSeconds]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Double">[2.0]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Delay DisplayName="Delay before question popup" Duration="[TimeSpan.FromSeconds(dbl_PadSeconds)]" sap:VirtualizedContainerService.HintSize="850.4,90.4" sap2010:WorkflowViewState.IdRef="Delay_BeforeQuestionPopup" />
+    <ui:InterruptibleDoWhile CurrentIndex="{x:Null}" DisplayName="Q&amp;A Loop" sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="InterruptibleDoWhile_QA" Condition="[str_SlideQuestionChoice.Trim.ToLower.StartsWith(&quot;y&quot;)]">
+      <ui:InterruptibleDoWhile.Body>
+        <Sequence DisplayName="Ask and Process Question" sap:VirtualizedContainerService.HintSize="800,200" sap2010:WorkflowViewState.IdRef="Sequence_AskAndProcess">
+          <Assign DisplayName="Path: slide yes/no result file" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideQuestionResultPath">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[str_SlideQuestionResultFile]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","slide_yesno_result.txt")]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Show slide question (compact corner dialog, pythonw)" sap:VirtualizedContainerService.HintSize="850.4,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_BeforeSlideQuestion" Level="Info" Message="[&quot;After slide playback — compact Yes/No prompt (corner, English). Requires an interactive desktop.&quot;]" />
+          <Assign DisplayName="Run ask_slide_question.py (blocking, hidden shell)" sap:VirtualizedContainerService.HintSize="850.4,88" sap2010:WorkflowViewState.IdRef="Assign_RunAskSlideQuestion">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + &quot; &quot; + Chr(34) + str_AskSlideQuestionScript + Chr(34) + &quot; --result-file &quot; + Chr(34) + str_SlideQuestionResultFile + Chr(34) + &quot; --anchor-pid-file &quot; + Chr(34) + str_FfplayPidFile + Chr(34) + &quot; --title &quot; + Chr(34) + If(int_TotalSlides &gt; 0 AndAlso int_QaSlideOrdinal &gt;= (int_TotalSlides - 1), &quot;Presentation questions&quot;, &quot;Slide question&quot;) + Chr(34) + &quot; --message &quot; + Chr(34) + If(int_TotalSlides &gt; 0 AndAlso int_QaSlideOrdinal &gt;= (int_TotalSlides - 1), &quot;After the full presentation, do you have any questions?&quot;, &quot;Do you have a question about this slide?&quot;) + Chr(34), Microsoft.VisualBasic.AppWinStyle.NormalFocus, True))]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <If Condition="[System.IO.File.Exists(str_SlideQuestionResultFile)]" DisplayName="Read yes/no from result file" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ReadSlideQuestionResult">
+            <If.Then>
+              <ui:ReadTextFile File="{x:Null}" Content="[str_SlideQuestionChoice]" DisplayName="Read slide_yesno_result.txt" FileName="[str_SlideQuestionResultFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_SlideYesNo" />
+            </If.Then>
+            <If.Else>
+              <Assign DisplayName="Default to No if result missing" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideQuestionDefaultNo">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_SlideQuestionChoice]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">["no"]</InArgument>
+                </Assign.Value>
+              </Assign>
+            </If.Else>
+          </If>
+          <If Condition="[If(String.IsNullOrWhiteSpace(str_SlideQuestionChoice), &quot;&quot;, str_SlideQuestionChoice).Trim.ToLower.StartsWith(&quot;y&quot;)]" DisplayName="User wants slide Q&amp;A" sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="If_SlideWantsQA">
+            <If.Then>
+              <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke slide Q&amp;A (record, Whisper, GPT, TTS)" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Invoke_SlideQAFromIteration" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_SlideQAInteractive.xaml">
+                <ui:InvokeWorkflowFile.Arguments>
+                  <InOutArgument x:TypeArguments="x:Boolean" x:Key="bln_UseWindowsDefaultMic">[bln_UseWindowsDefaultMic]</InOutArgument>
+                  <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="dict_Headers">[dict_Headers]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:Int32" x:Key="int_PlayResponseShellResult">[int_PlayResponseShellResult]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_AIResponse">[str_AIResponse]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_AudioPath">[str_AudioPath]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_CurrentSlideContent">[str_CurrentSlideContent]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenJsonBody">[str_ElevenJsonBody]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenLabsKey">[str_ElevenLabsKey]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenResponseRaw">[str_ElevenResponseRaw]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegArgLine">[str_FfmpegArgLine]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegPath">[str_FfmpegPath]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordArgFile">[str_FfmpegRecordArgFile]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordExeFile">[str_FfmpegRecordExeFile]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordPidFile">[str_FfmpegRecordPidFile]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_GptJsonBody">[str_GptJsonBody]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_GptUserContent">[str_GptUserContent]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_MicrophoneName">[str_MicrophoneName]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_OpenAIKey">[str_OpenAIKey]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_PlayResponseAudioScript">[str_PlayResponseAudioScript]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_PythonExe">[str_PythonExe]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_RecordInputArgs">[str_RecordInputArgs]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_ResolvedMicFile">[str_ResolvedMicFile]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_ResolveMicScriptPath">[str_ResolveMicScriptPath]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_SlidePrompt">[str_SlidePrompt]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_StartFfmpegScript">[str_StartFfmpegScript]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_StopFfmpegScript">[str_StopFfmpegScript]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_VoiceId">[str_VoiceId]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_WavInputPath">[str_WavInputPath]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_WhisperJsonBody">[str_WhisperJsonBody]</InOutArgument>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="str_WhisperResponse">[str_WhisperResponse]</InOutArgument>
+                </ui:InvokeWorkflowFile.Arguments>
+              </ui:InvokeWorkflowFile>
+            </If.Then>
+          </If>
+        </Sequence>
+      </ui:InterruptibleDoWhile.Body>
+    </ui:InterruptibleDoWhile>
+    <If Condition="[int_TotalSlides &gt; 0 AndAlso int_QaSlideOrdinal &gt;= (int_TotalSlides - 1) AndAlso Not If(String.IsNullOrWhiteSpace(str_SlideQuestionChoice), &quot;&quot;, str_SlideQuestionChoice).Trim.ToLower.StartsWith(&quot;y&quot;)]" DisplayName="Final slide: NO selected - close slide and finish" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_FinalSlideNoCloseAndFinish">
+      <If.Then>
+        <Sequence DisplayName="Close final slide playback" sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_CloseFinalSlidePlayback">
+          <If Condition="[System.IO.File.Exists(str_FfplayPidFile)]" DisplayName="Read current ffplay PID" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ReadFinalFfplayPid">
+            <If.Then>
+              <ui:ReadTextFile File="{x:Null}" Content="[str_CurrentFfplayPid]" DisplayName="Read current ffplay PID (final slide)" FileName="[str_FfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_FinalCurrentFfplayPid" />
+            </If.Then>
+            <If.Else>
+              <Assign DisplayName="No ffplay PID file" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_NoFinalFfplayPid">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[str_CurrentFfplayPid]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[""]</InArgument>
+                </Assign.Value>
+              </Assign>
+            </If.Else>
+          </If>
+          <If Condition="[Not String.IsNullOrWhiteSpace(str_CurrentFfplayPid)]" DisplayName="Kill final slide window by PID" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_KillFinalSlideByPid">
+            <If.Then>
+              <Assign DisplayName="Close final slide (hidden shell)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_CloseFinalSlideByPid">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(&quot;taskkill.exe /F /PID &quot; + str_CurrentFfplayPid.Trim(), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                </Assign.Value>
+              </Assign>
+            </If.Then>
+          </If>
+          <ui:WriteTextFile File="{x:Null}" DisplayName="Clear ffplay PID file (final slide)" FileName="[str_FfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ClearFinalFfplayPid" Text="" />
+        </Sequence>
+      </If.Then>
+    </If>
+  </Sequence>
+</Activity>

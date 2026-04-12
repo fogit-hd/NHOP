@@ -1,0 +1,13 @@
+﻿{
+  "openai_api_key": "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",
+  "elevenlabs_api_key": "sk_dd4dca78ecf169930616e03ed8c3aedaa209d72df7992c1c",
+  "elevenlabs_voice_id": "MSTXKMn9FnlWU5dcB066",
+  "microphone_name": "default",
+  "ffmpeg_path": "Data\\AIPresenter\\Tools\\ffmpeg.exe",
+  "openai_model": "gpt-4o",
+  "openai_vision_model": "gpt-4o",
+  "whisper_model": "whisper-1",
+  "audio_input_path": "Data\\AIPresenter\\Temp\\output.wav",
+  "audio_output_path": "Data\\AIPresenter\\Temp\\response.wav",
+  "slide_video_path": ""
+}

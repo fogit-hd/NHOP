@@ -1,0 +1,151 @@
+================================================================================
+  Python setup for NHOP AI Presenter (Windows)
+================================================================================
+
+This project uses Python for (UiPath invokes `pyw` for no console window):
+  - resolve_default_microphone.py  — default mic name when ai_settings has
+    "microphone_name": "default" (requires pycaw).
+  - whisper_stt.py                 — OpenAI Whisper transcription (stdlib).
+  - gpt_response.py                — OpenAI Chat Completions for slide Q&A (stdlib).
+  - elevenlabs_tts.py              — ElevenLabs TTS to WAV (stdlib).
+  - start_ffmpeg_record.py / stop_ffmpeg_record.py — record/stop ffmpeg without
+    a visible console (stdlib + ctypes on Windows).
+  - play_response_audio.py — plays response.wav and blocks until the end (uses
+    ffplay.exe next to ffmpeg.exe if present: copy both from the same ffmpeg build).
+  - open_default_app.py — opens a slide/video file with the default Windows app
+    (os.startfile), used instead of cmd.exe /c start.
+  - slides_from_csv.py — ensures empty Data\AIPresenter\Input\slides.txt,
+    Data\AIPresenter\Input\gpt_slide_content.txt, and Temp\gpt_slide.txt exist
+    if missing; reads slides.csv
+    (slide_index, slide_title, slide_path relative to project root), sorts by
+    index, writes Temp\slides_iterate.tsv for the Q&A loop.
+
+--------------------------------------------------------------------------------
+0. Windows: avoid “Is this file from a trusted source?” on slide images
+--------------------------------------------------------------------------------
+
+  Slide photos copied from a zip or downloaded from the web carry “Mark of the
+  Web.” Windows may prompt before opening them. The presenter runs
+  `Unblock-File` on each path automatically in open_default_app.py before
+  `os.startfile`.
+
+  To clear MOTW for the whole folder once (PowerShell, from project root):
+
+    Get-ChildItem -Path "Data\AIPresenter\Input\photos" -Recurse -File | Unblock-File
+
+  Or unblock a single file:  Unblock-File -LiteralPath "full\path\to\slide_03.jpg"
+
+--------------------------------------------------------------------------------
+1. Install Python 3 (if not already installed)
+--------------------------------------------------------------------------------
+
+  Option A — Recommended on Windows: install from https://www.python.org/downloads/
+    During setup, enable "Add python.exe to PATH" if you want the `python` command.
+
+  Option B — Microsoft Store: search for "Python 3.x" and install.
+
+  After installation, open PowerShell or Command Prompt and verify:
+
+    py --version
+
+  The `py` launcher works even when `python` is not on PATH.
+
+--------------------------------------------------------------------------------
+2. Upgrade pip (optional but recommended)
+--------------------------------------------------------------------------------
+
+  From the project root (or any folder):
+
+    py -m pip install --upgrade pip
+
+  If you see a warning that pip.exe is installed in a Scripts folder "not on PATH",
+  you can ignore it as long as you always use:
+
+    py -m pip <command>
+
+  That avoids needing pip.exe on PATH.
+
+--------------------------------------------------------------------------------
+3. Install project Python dependencies
+--------------------------------------------------------------------------------
+
+  From the NHOP Project root directory, run:
+
+    py -m pip install -r Data\AIPresenter\Scripts\requirements-aipresenter.txt
+
+  This installs:
+    - pycaw (and its dependencies: comtypes, psutil) for default microphone name
+      resolution used by resolve_default_microphone.py.
+
+  Verify:
+
+    py -c "import pycaw; print('pycaw OK')"
+
+--------------------------------------------------------------------------------
+4. UiPath runtime notes
+--------------------------------------------------------------------------------
+
+  -   Workflows call the Python launcher as `pyw` by default (no console window
+  during presentation). `pyw` is installed next to `py` when you install Python from
+  python.org. If `pyw` is missing, set the workflow variable to `py` or the full
+  path to pythonw.exe on that machine.
+
+  - Run the robot from a context where the same user has installed packages with
+    `py -m pip` (per-user installs apply to that Windows account).
+
+--------------------------------------------------------------------------------
+5. resolved_microphone_name.txt (Temp folder)
+--------------------------------------------------------------------------------
+
+  When ai_settings.json has "microphone_name": "default", the workflow runs
+  resolve_default_microphone.py before each recording and overwrites:
+
+    Data\AIPresenter\Temp\resolved_microphone_name.txt
+
+  That file is a runtime cache of the current Windows default capture device name.
+  Do not treat it as fixed configuration; do not commit it to source control if you
+  use Git (see .gitignore).
+
+--------------------------------------------------------------------------------
+6. FFmpeg recording helpers (Python, stdlib)
+--------------------------------------------------------------------------------
+
+  Recording uses Python (same as Whisper / mic resolve), invoked with pyw:
+
+    Data\AIPresenter\Scripts\start_ffmpeg_record.py  — starts ffmpeg with
+      CREATE_NO_WINDOW (no console window).
+    Data\AIPresenter\Scripts\stop_ffmpeg_record.py   — stops ffmpeg with soft
+      taskkill / Ctrl+C attach, then force if needed, so output.wav can flush.
+
+  No extra pip packages. Runtime files under Data\AIPresenter\Temp\
+  (ffmpeg_record_*.txt) are generated each run; see .gitignore.
+
+--------------------------------------------------------------------------------
+6. Pipeline: Vision extract + GPT slide script (AIInteractivePresenter Init)
+--------------------------------------------------------------------------------
+
+  After slides_from_csv.py builds slides_iterate.tsv, UiPath runs:
+
+    pyw Data\AIPresenter\Scripts\pipeline_extract_and_compose.py --root "<project>"
+
+  This reads Data\AIPresenter\Input\slides.csv, calls OpenAI Vision on each
+  image, appends each slide block to a single file
+  Data\AIPresenter\Temp\extracted_slides_raw.txt (flushed after each slide),
+  then calls GPT with Data\AIPresenter\Input\presentation_master_prompt.txt
+  to produce a single composed script:
+  Data\AIPresenter\Input\gpt_slide_content.txt (=== SLIDE | n | title ===
+  blocks). UiPath slices that file per slide; no per-slide narration files.
+
+  Requires valid openai_api_key in Data\AIPresenter\Config\ai_settings.json.
+  Optional: openai_vision_model (default gpt-4o).
+
+--------------------------------------------------------------------------------
+7. Quick checklist
+--------------------------------------------------------------------------------
+
+  [ ] py --version works in a terminal
+  [ ] py -m pip install -r Data\AIPresenter\Scripts\requirements-aipresenter.txt
+  [ ] py -c "import pycaw; print('ok')"
+  [ ] Run the UiPath workflow again
+
+================================================================================

@@ -1,0 +1,376 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="AIPresenter_MainFlow" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="arr_Slides" Type="InArgument(s:String[])" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>AIPresenter_MainFlow_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="64">
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Runtime.InteropServices</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Text.RegularExpressions</x:String>
+      <x:String>System.Windows.Forms</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>UiPath.Platform.Activities</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="80">
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic.Core</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.ComponentModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>System.Configuration.ConfigurationManager</AssemblyReference>
+      <AssemblyReference>System.Console</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System.Private.Uri</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+      <AssemblyReference>System.Security.Permissions</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.Windows.Forms</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities.Design</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UIAutomationCore</AssemblyReference>
+      <AssemblyReference>UiPath.Workflow</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.EventBasedAsync</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Primitives</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <!-- Single root Sequence: Variables and activities are direct siblings (Data Manager / BC30451). -->
+  <Sequence DisplayName="AIPresenter Main Flow" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_MainFlow">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="str_SpeechText" />
+      <Variable x:TypeArguments="x:String" Name="str_AIResponse" />
+      <Variable x:TypeArguments="x:String" Default="Data\AIPresenter\Temp\response.wav" Name="str_AudioPath" />
+      <Variable x:TypeArguments="scg:Dictionary(x:String, x:String)" Name="dict_Headers" />
+      <Variable x:TypeArguments="x:String" Default="YOUR_OPENAI_API_KEY" Name="str_OpenAIKey" />
+      <Variable x:TypeArguments="x:String" Default="YOUR_ELEVENLABS_API_KEY" Name="str_ElevenLabsKey" />
+      <Variable x:TypeArguments="x:String" Default="YOUR_VOICE_ID" Name="str_VoiceId" />
+      <Variable x:TypeArguments="x:String" Default="Microphone Name" Name="str_MicrophoneName" />
+      <Variable x:TypeArguments="x:String" Default="ffmpeg" Name="str_FfmpegPath" />
+      <Variable x:TypeArguments="x:String" Name="str_CurrentSlideContent" />
+      <Variable x:TypeArguments="x:String" Name="str_SlideVideoPath" />
+      <Variable x:TypeArguments="x:String" Name="str_WhisperJsonBody" />
+      <Variable x:TypeArguments="x:String" Name="str_GptJsonBody" />
+      <Variable x:TypeArguments="x:String" Name="str_ElevenJsonBody" />
+      <Variable x:TypeArguments="x:String" Name="str_WhisperResponse" />
+      <Variable x:TypeArguments="x:String" Name="str_GptResponseRaw" />
+      <Variable x:TypeArguments="x:String" Name="str_ElevenResponseRaw" />
+      <Variable x:TypeArguments="x:String" Default="Data\AIPresenter\Temp\output.wav" Name="str_WavInputPath" />
+      <Variable x:TypeArguments="x:String" Name="str_RecordInputArgs" />
+      <Variable x:TypeArguments="x:String" Name="str_FfmpegArgLine" />
+      <Variable x:TypeArguments="x:String" Name="str_FfmpegRecordExeFile" />
+      <Variable x:TypeArguments="x:String" Name="str_FfmpegRecordArgFile" />
+      <Variable x:TypeArguments="x:String" Name="str_FfmpegRecordPidFile" />
+      <Variable x:TypeArguments="x:String" Name="str_StartFfmpegScript" />
+      <Variable x:TypeArguments="x:String" Name="str_StopFfmpegScript" />
+      <Variable x:TypeArguments="x:String" Name="str_SlidePrompt" />
+      <Variable x:TypeArguments="x:String" Name="str_GptUserContent" />
+      <Variable x:TypeArguments="x:String" Name="str_UserQuestionChoice" />
+      <Variable x:TypeArguments="x:String" Name="str_ResolveMicScriptPath" />
+      <Variable x:TypeArguments="x:String" Name="str_ResolvedMicFile" />
+      <Variable x:TypeArguments="x:String" Name="str_OpenDefaultAppScript" />
+      <Variable x:TypeArguments="x:String" Name="str_PlayResponseAudioScript" />
+      <Variable x:TypeArguments="x:String" Name="str_PlayVideoScript" />
+      <Variable x:TypeArguments="x:String" Default="pythonw.exe" Name="str_PythonExe" />
+      <Variable x:TypeArguments="x:String" Default="pythonw.exe" Name="str_PythonwExe" />
+      <Variable x:TypeArguments="x:Int32" Name="int_PlayResponseShellResult" />
+      <Variable x:TypeArguments="x:Int32" Name="int_PlaySlideVideoShellResult" />
+      <Variable x:TypeArguments="x:String" Name="str_GlobalSlideContext" />
+      <Variable x:TypeArguments="x:String" Name="str_SlidesFromCsvScript" />
+      <Variable x:TypeArguments="x:String" Name="str_SlidesIterateTsv" />
+      <Variable x:TypeArguments="x:Int32" Name="int_SlidesCsvShellResult" />
+      <Variable x:TypeArguments="x:Int32" Name="int_PipelineShellResult" />
+      <Variable x:TypeArguments="x:String" Name="str_PipelineScript" />
+      <Variable x:TypeArguments="x:String" Name="str_SlideNarrationText" />
+      <Variable x:TypeArguments="x:String" Name="str_GptComposedSlides" />
+      <Variable x:TypeArguments="x:String" Name="str_NarrationAudioPath" />
+      <Variable x:TypeArguments="x:String" Name="str_CurrentSlideTitle" />
+      <Variable x:TypeArguments="x:String" Name="str_RelSlidePath" />
+      <Variable x:TypeArguments="x:String" Name="str_AbsSlideImagePath" />
+      <Variable x:TypeArguments="x:Int32" Default="-1" Name="int_QaSlideOrdinal" />
+      <Variable x:TypeArguments="x:Int32" Name="int_TotalSlides" />
+      <Variable x:TypeArguments="x:Boolean" Default="False" Name="bln_UseWindowsDefaultMic" />
+      <Variable x:TypeArguments="x:String" Name="str_SegmentsManifestPath" />
+      <Variable x:TypeArguments="x:String" Name="str_PresentationFullVideoPath" />
+      <Variable x:TypeArguments="x:String" Name="str_BuildSlideVideoScript" />
+      <Variable x:TypeArguments="x:String" Name="str_ConcatPresentationScript" />
+      <Variable x:TypeArguments="x:String" Name="str_ResetSegmentsScript" />
+      <Variable x:TypeArguments="x:String" Name="str_AskSlideQuestionScript" />
+    </Sequence.Variables>
+    <Assign DisplayName="Select no-console Python launcher" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_SelectPythonwExe">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_PythonwExe]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),&quot;Microsoft&quot;,&quot;WindowsApps&quot;,&quot;pythonw.exe&quot;)), &quot;pythonw.exe&quot;, &quot;pyw&quot;)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Use same launcher for hidden Python calls" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_UsePythonwAsPythonExe">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_PythonExe]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[str_PythonwExe]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Init and prepare (config, pipeline, slides)" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_InitPrepare" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_InitAndPrepare.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InOutArgument x:TypeArguments="x:Boolean" x:Key="bln_UseWindowsDefaultMic">[bln_UseWindowsDefaultMic]</InOutArgument>
+        <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="dict_Headers">[dict_Headers]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:Int32" x:Key="int_PipelineShellResult">[int_PipelineShellResult]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:Int32" x:Key="int_SlidesCsvShellResult">[int_SlidesCsvShellResult]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_AudioPath">[str_AudioPath]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenLabsKey">[str_ElevenLabsKey]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegPath">[str_FfmpegPath]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_GlobalSlideContext">[str_GlobalSlideContext]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_GptComposedSlides">[str_GptComposedSlides]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_MicrophoneName">[str_MicrophoneName]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_NarrationAudioPath">[str_NarrationAudioPath]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_OpenAIKey">[str_OpenAIKey]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_OpenDefaultAppScript">[str_OpenDefaultAppScript]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_PlayResponseAudioScript">[str_PlayResponseAudioScript]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_PlayVideoScript">[str_PlayVideoScript]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_PipelineScript">[str_PipelineScript]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_PythonExe">[str_PythonExe]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_ResolveMicScriptPath">[str_ResolveMicScriptPath]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_ResolvedMicFile">[str_ResolvedMicFile]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_SlidePrompt">[str_SlidePrompt]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_SlideVideoPath">[str_SlideVideoPath]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_SlidesFromCsvScript">[str_SlidesFromCsvScript]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_SlidesIterateTsv">[str_SlidesIterateTsv]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_VoiceId">[str_VoiceId]</InOutArgument>
+        <InOutArgument x:TypeArguments="x:String" x:Key="str_WavInputPath">[str_WavInputPath]</InOutArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+    <Assign DisplayName="Paths: segment manifest + final MP4 + scripts" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_SegmentPathsBundle">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_SegmentsManifestPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","segments_manifest.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Path: presentation_full.mp4 output" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PresentationFullVideoPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_PresentationFullVideoPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Output","presentation_full.mp4")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Script: build_slide_video.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_BuildSlideVideoScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_BuildSlideVideoScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","build_slide_video.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Script: concat_presentation_videos.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ConcatPresentationScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ConcatPresentationScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","concat_presentation_videos.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Script: reset_presentation_segments.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ResetSegmentsScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_ResetSegmentsScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","reset_presentation_segments.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Script: ask_slide_question.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_AskSlideQuestionScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[str_AskSlideQuestionScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","ask_slide_question.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Reset segment folder + manifest (new run)" sap:VirtualizedContainerService.HintSize="600,88" sap2010:WorkflowViewState.IdRef="Assign_RunResetSegments">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonExe + Chr(34) + " " + Chr(34) + str_ResetSegmentsScript + Chr(34) + " --root " + Chr(34) + Environment.CurrentDirectory + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Count total slides in iterate TSV" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_CountTotalSlides">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[int_TotalSlides]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[If(System.IO.File.Exists(str_SlidesIterateTsv), System.IO.File.ReadAllLines(str_SlidesIterateTsv).Count(Function(l) Not String.IsNullOrWhiteSpace(l)), 0)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:ForEach x:TypeArguments="x:String" CurrentIndex="{x:Null}" DisplayName="Slide loop (slides.csv order)" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="ForEach_Slides" Values="[If(System.IO.File.Exists(str_SlidesIterateTsv), System.IO.File.ReadAllLines(str_SlidesIterateTsv).Where(Function(l) Not String.IsNullOrWhiteSpace(l)).ToArray(), New String() {})]">
+      <ui:ForEach.Body>
+        <ActivityAction x:TypeArguments="x:String">
+          <ActivityAction.Argument>
+            <DelegateInArgument x:TypeArguments="x:String" Name="slideItem" />
+          </ActivityAction.Argument>
+          <Sequence DisplayName="Invoke slide iteration (scope)" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_ForEachSlideInvoke">
+            <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Process one slide (image + narration)" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_SlideIteration" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_SlideIteration.xaml">
+              <ui:InvokeWorkflowFile.Arguments>
+                <InArgument x:TypeArguments="x:String" x:Key="slideItem">[slideItem]</InArgument>
+                <InOutArgument x:TypeArguments="x:Boolean" x:Key="bln_UseWindowsDefaultMic">[bln_UseWindowsDefaultMic]</InOutArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="str_GptComposedSlides">[str_GptComposedSlides]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="str_GlobalSlideContext">[str_GlobalSlideContext]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="str_OpenDefaultAppScript">[str_OpenDefaultAppScript]</InArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_PythonExe">[str_PythonExe]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenLabsKey">[str_ElevenLabsKey]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_VoiceId">[str_VoiceId]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegPath">[str_FfmpegPath]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_PlayResponseAudioScript">[str_PlayResponseAudioScript]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_NarrationAudioPath">[str_NarrationAudioPath]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:Int32" x:Key="int_QaSlideOrdinal">[int_QaSlideOrdinal]</InOutArgument>
+                <InArgument x:TypeArguments="x:Int32" x:Key="int_TotalSlides">[int_TotalSlides]</InArgument>
+                <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="dict_Headers">[dict_Headers]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenResponseRaw">[str_ElevenResponseRaw]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:Int32" x:Key="int_PlayResponseShellResult">[int_PlayResponseShellResult]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_AIResponse">[str_AIResponse]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_AudioPath">[str_AudioPath]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_CurrentSlideContent">[str_CurrentSlideContent]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenJsonBody">[str_ElevenJsonBody]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegArgLine">[str_FfmpegArgLine]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordArgFile">[str_FfmpegRecordArgFile]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordExeFile">[str_FfmpegRecordExeFile]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordPidFile">[str_FfmpegRecordPidFile]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_GptJsonBody">[str_GptJsonBody]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_GptUserContent">[str_GptUserContent]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_MicrophoneName">[str_MicrophoneName]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_OpenAIKey">[str_OpenAIKey]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_RecordInputArgs">[str_RecordInputArgs]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_ResolvedMicFile">[str_ResolvedMicFile]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_ResolveMicScriptPath">[str_ResolveMicScriptPath]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_SlidePrompt">[str_SlidePrompt]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_StartFfmpegScript">[str_StartFfmpegScript]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_StopFfmpegScript">[str_StopFfmpegScript]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_WavInputPath">[str_WavInputPath]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_WhisperJsonBody">[str_WhisperJsonBody]</InOutArgument>
+                <InOutArgument x:TypeArguments="x:String" x:Key="str_WhisperResponse">[str_WhisperResponse]</InOutArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="str_SegmentsManifestPath">[str_SegmentsManifestPath]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="str_BuildSlideVideoScript">[str_BuildSlideVideoScript]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="str_PlayVideoScript">[str_PlayVideoScript]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="str_AskSlideQuestionScript">[str_AskSlideQuestionScript]</InArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="str_PythonwExe">[str_PythonwExe]</InArgument>
+              </ui:InvokeWorkflowFile.Arguments>
+            </ui:InvokeWorkflowFile>
+          </Sequence>
+        </ActivityAction>
+      </ui:ForEach.Body>
+    </ui:ForEach>
+    <If Condition="[System.IO.File.Exists(str_SegmentsManifestPath) AndAlso (New System.IO.FileInfo(str_SegmentsManifestPath)).Length &gt; 3]" DisplayName="Concat segments into one presentation_full.mp4?" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="If_ConcatPresentation">
+      <If.Then>
+        <Sequence DisplayName="FFmpeg concat all slide segments" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_ConcatPresentation">
+          <Assign DisplayName="Run concat_presentation_videos.py (Shell /Wait)" sap:VirtualizedContainerService.HintSize="600,88" sap2010:WorkflowViewState.IdRef="Assign_RunConcatPresentation">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Int32">[int_PlayResponseShellResult]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonExe + Chr(34) + " " + Chr(34) + str_ConcatPresentationScript + Chr(34) + " --manifest " + Chr(34) + str_SegmentsManifestPath + Chr(34) + " --out " + Chr(34) + str_PresentationFullVideoPath + Chr(34) + " --ffmpeg " + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Final video path" sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_FinalPresentationMp4" Level="Info" Message="[&quot;Full presentation video (if concat succeeded): &quot; + str_PresentationFullVideoPath]" />
+        </Sequence>
+      </If.Then>
+    </If>
+    <If Condition="[int_TotalSlides &lt;= 0]" DisplayName="Run AfterPresentation fallback only when no slides found" sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_RunAfterPresentationFallbackOnlyNoSlides">
+      <If.Then>
+        <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="After slides: video then Q&amp;A" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_AfterPresentation" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_AfterPresentation.xaml">
+          <ui:InvokeWorkflowFile.Arguments>
+            <InOutArgument x:TypeArguments="x:Boolean" x:Key="bln_UseWindowsDefaultMic">[bln_UseWindowsDefaultMic]</InOutArgument>
+            <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="dict_Headers">[dict_Headers]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:Int32" x:Key="int_PipelineShellResult">[int_PipelineShellResult]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:Int32" x:Key="int_PlayResponseShellResult">[int_PlayResponseShellResult]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:Int32" x:Key="int_PlaySlideVideoShellResult">[int_PlaySlideVideoShellResult]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:Int32" x:Key="int_QaSlideOrdinal">[int_QaSlideOrdinal]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:Int32" x:Key="int_SlidesCsvShellResult">[int_SlidesCsvShellResult]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_AIResponse">[str_AIResponse]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_AudioPath">[str_AudioPath]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_CurrentSlideContent">[str_CurrentSlideContent]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenJsonBody">[str_ElevenJsonBody]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenLabsKey">[str_ElevenLabsKey]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_ElevenResponseRaw">[str_ElevenResponseRaw]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegArgLine">[str_FfmpegArgLine]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegPath">[str_FfmpegPath]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordArgFile">[str_FfmpegRecordArgFile]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordExeFile">[str_FfmpegRecordExeFile]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_FfmpegRecordPidFile">[str_FfmpegRecordPidFile]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_GptComposedSlides">[str_GptComposedSlides]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_GptJsonBody">[str_GptJsonBody]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_GptUserContent">[str_GptUserContent]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_MicrophoneName">[str_MicrophoneName]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_OpenAIKey">[str_OpenAIKey]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_PlayResponseAudioScript">[str_PlayResponseAudioScript]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_PlayVideoScript">[str_PlayVideoScript]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_PythonExe">[str_PythonExe]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_RecordInputArgs">[str_RecordInputArgs]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_ResolvedMicFile">[str_ResolvedMicFile]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_ResolveMicScriptPath">[str_ResolveMicScriptPath]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_SlidePrompt">[str_SlidePrompt]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_SlideVideoPath">[str_SlideVideoPath]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_StartFfmpegScript">[str_StartFfmpegScript]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_StopFfmpegScript">[str_StopFfmpegScript]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_UserQuestionChoice">[str_UserQuestionChoice]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_VoiceId">[str_VoiceId]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_WavInputPath">[str_WavInputPath]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_WhisperJsonBody">[str_WhisperJsonBody]</InOutArgument>
+            <InOutArgument x:TypeArguments="x:String" x:Key="str_WhisperResponse">[str_WhisperResponse]</InOutArgument>
+          </ui:InvokeWorkflowFile.Arguments>
+        </ui:InvokeWorkflowFile>
+      </If.Then>
+    </If>
+  </Sequence>
+</Activity>
