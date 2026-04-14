@@ -314,25 +314,52 @@ if errorlevel 1 (
   exit /b 0
 )
 
-%PY_CMD% -c "import pycaw" >nul 2>nul
-if not errorlevel 1 (
-  echo [OK] Required package pycaw is already installed. No download is needed.
+echo [ACTION] Verifying and installing Python packages from requirements file...
+set "PIP_LOG=%TEMP%\nhop_pip_requirements.log"
+if exist "%PIP_LOG%" del /f /q "%PIP_LOG%" >nul 2>nul
+
+%PY_CMD% -m pip install --disable-pip-version-check --quiet --upgrade pip >"%PIP_LOG%" 2>&1
+if errorlevel 1 (
+  echo [WARN] pip upgrade returned a non-zero exit code. Continuing with requirements install...
+)
+
+%PY_CMD% -m pip install --disable-pip-version-check --quiet -r "%REQ_FILE%" >>"%PIP_LOG%" 2>&1
+if errorlevel 1 (
+  echo [ERROR] Python package installation failed.
+  echo [INFO] pip details:
+  type "%PIP_LOG%"
+  set "HAS_FAILURE=1"
   echo.
   exit /b 0
 )
 
-echo [MISSING] Required Python packages are missing.
-echo [ACTION] Installing from requirements file...
-%PY_CMD% -m pip install --upgrade pip
-%PY_CMD% -m pip install -r "%REQ_FILE%"
 call :refresh_path
+if exist "%PIP_LOG%" del /f /q "%PIP_LOG%" >nul 2>nul
+
 %PY_CMD% -c "import pycaw" >nul 2>nul
-if not errorlevel 1 (
-  echo [OK] Required Python packages installed successfully.
-) else (
-  echo [ERROR] Python package installation failed.
+if errorlevel 1 (
+  echo [ERROR] pycaw is still not importable in the selected Python interpreter.
   set "HAS_FAILURE=1"
+  echo.
+  exit /b 0
 )
+
+%PY_CMD% -c "import pptx" >nul 2>nul
+if errorlevel 1 (
+  echo [ERROR] python-pptx is still not importable in the selected Python interpreter.
+  set "HAS_FAILURE=1"
+  echo.
+  exit /b 0
+)
+
+set "PPTX_VER="
+for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import pptx; print(pptx.__version__)" 2^>nul`) do (
+  set "PPTX_VER=%%V"
+)
+if not defined PPTX_VER set "PPTX_VER=unknown"
+
+echo [OK] Python requirements are satisfied.
+echo [OK] python-pptx import check passed (version !PPTX_VER!).
 echo.
 exit /b 0
 
