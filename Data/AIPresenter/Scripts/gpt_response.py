@@ -11,6 +11,9 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 
+SUPPORTED_HANDBOOK_SUFFIXES = {".txt", ".md", ".csv", ".json"}
+
+
 def read_text(path: Path) -> str:
     if not path.exists():
         return ""
@@ -39,9 +42,95 @@ def write_outputs(
         p.write_text(text, encoding="utf-8")
 
 
+def resolve_handbook_files(project_root: Path, cfg: dict, override_path: str) -> list[Path]:
+    paths_cfg = cfg.get("paths") or {}
+    configured = (
+        override_path.strip()
+        or str(paths_cfg.get("handbook_file") or "").strip()
+        or str(paths_cfg.get("handbook_path") or "").strip()
+    )
+
+    if configured:
+        candidate = Path(configured)
+        if not candidate.is_absolute():
+            candidate = (project_root / candidate).resolve()
+        if candidate.is_file():
+            return [candidate]
+        if candidate.is_dir():
+            file_candidates = sorted(
+                [
+                    p
+                    for p in candidate.rglob("*")
+                    if p.is_file() and p.suffix.lower() in SUPPORTED_HANDBOOK_SUFFIXES
+                ]
+            )
+            if file_candidates:
+                return file_candidates
+        return []
+
+    default_txt = project_root / "Data" / "AIPresenter" / "FPT-handbook.txt"
+    if default_txt.exists() and default_txt.is_file():
+        return [default_txt]
+
+    default_dir = project_root / "Data" / "AIPresenter" / "FPT-handbook"
+    if default_dir.exists() and default_dir.is_dir():
+        file_candidates = sorted(
+            [
+                p
+                for p in default_dir.rglob("*")
+                if p.is_file() and p.suffix.lower() in SUPPORTED_HANDBOOK_SUFFIXES
+            ]
+        )
+        if file_candidates:
+            return file_candidates
+    return []
+
+
+def load_handbook_content(project_root: Path, cfg: dict, override_path: str) -> tuple[list[Path], str]:
+    handbook_files = resolve_handbook_files(project_root, cfg, override_path)
+    if not handbook_files:
+        return [], ""
+
+    content_blocks: list[str] = []
+    for handbook_path in handbook_files:
+        try:
+            content = handbook_path.read_text(encoding="utf-8", errors="replace").strip()
+        except OSError:
+            continue
+        if not content:
+            continue
+        content_blocks.append(f"[FILE: {handbook_path.name}]\n{content}")
+
+    if not content_blocks:
+        return handbook_files, ""
+
+    max_chars_cfg = (
+        cfg.get("openai", {})
+        .get("gpt", {})
+        .get("handbook_max_chars", 120000)
+    )
+    try:
+        max_chars = max(2000, int(max_chars_cfg))
+    except (TypeError, ValueError):
+        max_chars = 120000
+
+    combined = "\n\n".join(content_blocks)
+    if len(combined) > max_chars:
+        combined = (
+            combined[:max_chars]
+            + "\n\n[Handbook content truncated due to size limit for this run.]"
+        )
+    return handbook_files, combined
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-path", default="")
+    parser.add_argument(
+        "--handbook-file",
+        default="",
+        help="Optional handbook file or folder path (folder mode loads all supported files)",
+    )
     args = parser.parse_args()
 
     script_dir = Path(__file__).resolve().parent
@@ -84,8 +173,37 @@ def main() -> None:
         system_prompt = (
             prompt_path.read_text(encoding="utf-8", errors="replace").strip()
             if prompt_path.exists()
-            else "You are an AI interactive presenter."
+            else "You are an AI interactive presenter. Your name is NEO."
         )
+
+        handbook_files, handbook_content = load_handbook_content(project_root, cfg, args.handbook_file)
+        (run_dir / "gpt_handbook_source.txt").write_text(
+            "\n".join(str(p) for p in handbook_files) if handbook_files else "[no handbook found]",
+            encoding="utf-8",
+        )
+        if handbook_content:
+            (run_dir / "gpt_handbook_used.txt").write_text(handbook_content, encoding="utf-8")
+
+        if handbook_content:
+            system_prompt = (
+                f"{system_prompt}\n\n"
+                "Your name is NEO.\n"
+                "You MUST strictly follow the rules and information in the provided handbook to answer user questions.\n"
+                "Treat uploaded handbook files as the primary policy source for compliance-related answers.\n"
+                "The user is an employee in an internal process, so your answers must be professional and align with the company's policies.\n"
+                "Emphasize important points like dates, deadlines, and penalties mentioned in the slides or the handbook.\n\n"
+                "HANDBOOK CONTENT:\n"
+                "-------------------\n"
+                f"{handbook_content}\n"
+                "-------------------\n"
+            )
+        else:
+            system_prompt = (
+                f"{system_prompt}\n\n"
+                "Your name is NEO.\n"
+                "No handbook file was loaded for this run. Answer using slide content and available context only.\n"
+            )
+
         system_prompt_text = system_prompt + "\nAlways respond in English only."
 
         slide_text = repair_mojibake_utf8(slide)
@@ -98,9 +216,11 @@ def main() -> None:
         local_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         time_context = f"Current local datetime (system): {local_now}"
         user_content = (
-            f"{time_context}\n\nSlide content:\n{slide_text}\n\nUser question:\n{question_text}\n\n"
-            "Please answer primarily based on the slide content above. If the slide does not contain "
-            "the needed information, say that briefly, then provide the best helpful answer."
+            f"{time_context}\n\n"
+            f"Slide content:\n{slide_text}\n\n"
+            f"User question:\n{question_text}\n\n"
+            "Please provide a clear, informative, and trustworthy answer based on the slide content and the company handbook. "
+            "If the information is not in the slides or handbook, state that clearly."
         )
 
         payload = {
