@@ -1,2 +1,0 @@
-Place slide photos here. List them in ..\slides.csv using paths relative to the project root, for example:
-Data\AIPresenter\Input\photos\slide_01.jpg

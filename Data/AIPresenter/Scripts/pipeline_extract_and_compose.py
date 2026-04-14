@@ -1,11 +1,16 @@
 """
-Read slides.csv → for each image, OpenAI Vision → append to ONE file
-(Data/AIPresenter/Temp/extracted_slides_raw.txt; flushed after each slide).
-Then GPT (presentation_master_prompt.txt) → ONE composed file
-(Data/AIPresenter/Input/gpt_slide_content.txt). No per-slide narration files.
+Build composed narration from slide sources.
+
+Priority:
+1) slides.csv + slide images (legacy behavior)
+2) .pptx file in Data/AIPresenter/Input (or configured path)
+
+Writes:
+- Data/AIPresenter/Temp/extracted_slides_raw.txt
+- Data/AIPresenter/Input/gpt_slide_content.txt
 
 Run from project folder:
-  py Data\\AIPresenter\\Scripts\\pipeline_extract_and_compose.py --root "%CD%"
+    py Data\\AIPresenter\\Scripts\\pipeline_extract_and_compose.py --root "%CD%"
 """
 from __future__ import annotations
 
@@ -101,6 +106,160 @@ def parse_slides_blocks(gpt_text: str) -> list[tuple[int, str, str]]:
     return sorted(found, key=lambda x: x[0])
 
 
+def resolve_pptx_path(root: str, cfg: dict) -> str:
+    configured = (
+        (cfg.get("presentation_pptx_path") or "").strip()
+        or (cfg.get("pptx_input_path") or "").strip()
+        or (cfg.get("slide_pptx_path") or "").strip()
+    )
+    if configured:
+        candidate = configured if os.path.isabs(configured) else os.path.join(root, configured)
+        candidate = os.path.normpath(candidate)
+        if os.path.isfile(candidate):
+            return candidate
+        return ""
+
+    input_dir = os.path.join(root, "Data", "AIPresenter", "Input")
+    if not os.path.isdir(input_dir):
+        return ""
+
+    for name in sorted(os.listdir(input_dir)):
+        low = name.lower()
+        if low.endswith(".pptx") and not low.startswith("~$"):
+            candidate = os.path.normpath(os.path.join(input_dir, name))
+            if os.path.isfile(candidate):
+                return candidate
+    return ""
+
+
+def extract_shape_text(shape) -> str:
+    parts: list[str] = []
+
+    if getattr(shape, "has_text_frame", False) and shape.has_text_frame:
+        for para in shape.text_frame.paragraphs:
+            line = (para.text or "").strip()
+            if line:
+                parts.append(line)
+
+    if getattr(shape, "has_table", False) and shape.has_table:
+        for row in shape.table.rows:
+            row_cells: list[str] = []
+            for cell in row.cells:
+                cell_text = " ".join((cell.text or "").split())
+                if cell_text:
+                    row_cells.append(cell_text)
+            if row_cells:
+                parts.append(" | ".join(row_cells))
+
+    return "\n".join(parts).strip()
+
+
+def load_slides_from_pptx(pptx_path: str) -> list[tuple[int, str, str]]:
+    try:
+        from pptx import Presentation
+    except Exception as e:
+        raise RuntimeError(
+            "python-pptx is required for PPTX mode. Install dependencies and retry."
+        ) from e
+
+    presentation = Presentation(pptx_path)
+    rows: list[tuple[int, str, str]] = []
+    for idx, slide in enumerate(presentation.slides, start=1):
+        title = ""
+        try:
+            if slide.shapes.title is not None:
+                title = (slide.shapes.title.text or "").strip()
+        except Exception:
+            title = ""
+        if not title:
+            title = f"Slide {idx}"
+
+        text_chunks: list[str] = []
+        for shape in slide.shapes:
+            chunk = extract_shape_text(shape)
+            if chunk:
+                text_chunks.append(chunk)
+
+        notes_text = ""
+        try:
+            if slide.has_notes_slide and slide.notes_slide is not None:
+                frame = slide.notes_slide.notes_text_frame
+                if frame is not None:
+                    notes_text = (frame.text or "").strip()
+        except Exception:
+            notes_text = ""
+
+        body_parts: list[str] = []
+        if text_chunks:
+            body_parts.append("Slide text:\n" + "\n".join(text_chunks))
+        if notes_text:
+            body_parts.append("Presenter notes:\n" + notes_text)
+        if not body_parts:
+            body_parts.append("[No extractable text found on this slide.]")
+
+        rows.append((idx, title, "\n\n".join(body_parts).strip()))
+    return rows
+
+
+def load_rows_from_csv(root: str, csv_path: str) -> list[tuple[int, str, str]]:
+    rows: list[tuple[int, str, str]] = []
+    if not os.path.isfile(csv_path):
+        return rows
+
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if not row:
+                continue
+            idx_s = (row.get("slide_index") or "").strip()
+            title = (row.get("slide_title") or "").strip()
+            rel = (row.get("slide_path") or "").strip().strip('"')
+            if not idx_s or not rel:
+                continue
+            idx = int(idx_s)
+            abs_img = rel if os.path.isabs(rel) else os.path.normpath(os.path.join(root, rel))
+            rows.append((idx, title, abs_img))
+
+    rows.sort(key=lambda x: x[0])
+    return rows
+
+
+def build_raw_from_images(
+    api_key: str,
+    vision_model: str,
+    rows: list[tuple[int, str, str]],
+    raw_out: str,
+) -> str:
+    raw_text_parts: list[str] = []
+    with open(raw_out, "w", encoding="utf-8") as raw_fp:
+        for idx, title, abs_img in rows:
+            label = f"{idx} - {title}"
+            if not os.path.isfile(abs_img):
+                block = f"=== SLIDE {idx} ({title}) ===\n[Image file not found: {abs_img}]\n"
+                raw_fp.write(block)
+                raw_fp.flush()
+                raw_text_parts.append(block)
+                print(f"WARN missing image: {abs_img}", file=sys.stderr)
+                continue
+            extracted = vision_extract(api_key, vision_model, abs_img, label)
+            block = f"=== SLIDE {idx} ({title}) ===\n{extracted}\n"
+            raw_fp.write(block)
+            raw_fp.flush()
+            raw_text_parts.append(block)
+    return "".join(raw_text_parts)
+
+
+def build_raw_from_pptx(rows: list[tuple[int, str, str]], raw_out: str) -> str:
+    raw_text_parts: list[str] = []
+    with open(raw_out, "w", encoding="utf-8") as raw_fp:
+        for idx, title, extracted in rows:
+            block = f"=== SLIDE {idx} ({title}) ===\n{extracted}\n"
+            raw_fp.write(block)
+            raw_fp.flush()
+            raw_text_parts.append(block)
+    return "".join(raw_text_parts)
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--root", default=os.getcwd())
@@ -126,10 +285,6 @@ def main() -> None:
         print("Missing valid openai_api_key in ai_settings.json", file=sys.stderr)
         sys.exit(1)
 
-    if not os.path.isfile(csv_path):
-        print("slides.csv not found", file=sys.stderr)
-        sys.exit(1)
-
     if not os.path.isfile(master_prompt_path):
         print("presentation_master_prompt.txt not found", file=sys.stderr)
         sys.exit(1)
@@ -137,44 +292,58 @@ def main() -> None:
     with open(master_prompt_path, encoding="utf-8") as f:
         master_prompt = f.read().strip()
 
-    rows: list[tuple[int, str, str]] = []
-    with open(csv_path, newline="", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if not row:
-                continue
-            idx_s = (row.get("slide_index") or "").strip()
-            title = (row.get("slide_title") or "").strip()
-            rel = (row.get("slide_path") or "").strip().strip('"')
-            if not idx_s or not rel:
-                continue
-            idx = int(idx_s)
-            abs_img = rel if os.path.isabs(rel) else os.path.normpath(os.path.join(root, rel))
-            rows.append((idx, title, abs_img))
+    configured_pptx_setting = (
+        (cfg.get("presentation_pptx_path") or "").strip()
+        or (cfg.get("pptx_input_path") or "").strip()
+        or (cfg.get("slide_pptx_path") or "").strip()
+    )
+    prefer_pptx = bool(configured_pptx_setting)
 
-    rows.sort(key=lambda x: x[0])
-    raw_text_parts: list[str] = []
-    with open(raw_out, "w", encoding="utf-8") as raw_fp:
-        for idx, title, abs_img in rows:
-            label = f"{idx} — {title}"
-            if not os.path.isfile(abs_img):
-                block = f"=== SLIDE {idx} ({title}) ===\n[Image file not found: {abs_img}]\n"
-                raw_fp.write(block)
-                raw_fp.flush()
-                raw_text_parts.append(block)
-                print(f"WARN missing image: {abs_img}", file=sys.stderr)
-                continue
-            try:
-                extracted = vision_extract(api_key, vision_model, abs_img, label)
-            except (urllib.error.HTTPError, urllib.error.URLError, KeyError, OSError) as e:
-                print(f"Vision failed slide {idx}: {e}", file=sys.stderr)
-                sys.exit(2)
-            block = f"=== SLIDE {idx} ({title}) ===\n{extracted}\n"
-            raw_fp.write(block)
-            raw_fp.flush()
-            raw_text_parts.append(block)
+    csv_rows = load_rows_from_csv(root, csv_path)
+    pptx_path = resolve_pptx_path(root, cfg)
+    if prefer_pptx and not pptx_path:
+        print(
+            "Configured PPTX path not found. Check presentation_pptx_path/pptx_input_path/slide_pptx_path.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
-    raw_text = "".join(raw_text_parts)
+    raw_text = ""
+    source_mode = ""
+    if prefer_pptx and pptx_path:
+        try:
+            pptx_rows = load_slides_from_pptx(pptx_path)
+        except Exception as e:
+            print(f"PPTX parse failed: {e}", file=sys.stderr)
+            sys.exit(2)
+        raw_text = build_raw_from_pptx(pptx_rows, raw_out)
+        source_mode = f"pptx:{os.path.basename(pptx_path)}"
+    elif csv_rows:
+        try:
+            raw_text = build_raw_from_images(api_key, vision_model, csv_rows, raw_out)
+            source_mode = "csv-images"
+        except (urllib.error.HTTPError, urllib.error.URLError, KeyError, OSError) as e:
+            print(f"Vision extraction failed: {e}", file=sys.stderr)
+            sys.exit(2)
+    elif pptx_path:
+        try:
+            pptx_rows = load_slides_from_pptx(pptx_path)
+        except Exception as e:
+            print(f"PPTX parse failed: {e}", file=sys.stderr)
+            sys.exit(2)
+        raw_text = build_raw_from_pptx(pptx_rows, raw_out)
+        source_mode = f"pptx:{os.path.basename(pptx_path)}"
+    else:
+        print(
+            "No slide source found. Provide slides.csv or a .pptx in Data/AIPresenter/Input "
+            "(or set presentation_pptx_path in ai_settings.json).",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    if not raw_text.strip():
+        print("No slide content extracted from source.", file=sys.stderr)
+        sys.exit(2)
 
     user_block = (
         "RAW DATA (slide order):\n\n"
@@ -199,7 +368,7 @@ def main() -> None:
             file=sys.stderr,
         )
 
-    print(f"OK raw={raw_out} gpt={gpt_out} slide_blocks={len(slides_parsed)}")
+    print(f"OK source={source_mode} raw={raw_out} gpt={gpt_out} slide_blocks={len(slides_parsed)}")
     sys.exit(0)
 
 
