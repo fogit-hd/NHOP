@@ -383,6 +383,16 @@
         <InArgument x:TypeArguments="x:Int32">[System.Int32.Parse(str_SlidesCsvExitText.Trim())]</InArgument>
       </Assign.Value>
     </Assign>
+    <If Condition="[int_SlidesCsvShellResult &lt;&gt; 0]" DisplayName="slides_from_pptx must succeed" sap:VirtualizedContainerService.HintSize="416,108.8" sap2010:WorkflowViewState.IdRef="If_SlidesFromPptxOk">
+      <If.Then>
+        <Throw DisplayName="slides_from_pptx failed" Exception="[New Exception(&quot;slides_from_pptx.py failed (exit code &quot; + int_SlidesCsvShellResult.ToString + &quot;). &quot; + If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;Check PPTX source path/folder, PPTX open permission, and run-order file entries.&quot;))]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_SlidesFromPptxFailed" />
+      </If.Then>
+    </If>
+    <If Condition="[int_SlidesCsvShellResult = 0 AndAlso (Not System.IO.File.Exists(str_SlidesIterateTsv) OrElse System.IO.File.ReadAllLines(str_SlidesIterateTsv).Count(Function(l) Not String.IsNullOrWhiteSpace(l)) = 0)]" DisplayName="Fail if no slides extracted" sap:VirtualizedContainerService.HintSize="416,108.8" sap2010:WorkflowViewState.IdRef="If_EmptySlidesIterateTsv">
+      <If.Then>
+        <Throw DisplayName="No slides extracted from PPTX source" Exception="[New Exception(&quot;No slides were extracted. Ensure at least one .pptx exists in Data\\AIPresenter\\Input\\pptx_file_here (or configure presentation_pptx_path), and that the PPTX file can be opened.&quot;)]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_EmptySlidesIterateTsv" />
+      </If.Then>
+    </If>
     <Assign DisplayName="Load global notes from slides.txt (optional)" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_GlobalSlideContext">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[str_GlobalSlideContext]</OutArgument>
@@ -410,7 +420,7 @@
     </Assign>
     <If Condition="[int_PipelineShellResult &lt;&gt; 0]" DisplayName="Pipeline must succeed" sap:VirtualizedContainerService.HintSize="416,108.8" sap2010:WorkflowViewState.IdRef="If_PipelineOk">
       <If.Then>
-        <Throw DisplayName="pipeline_extract_and_compose failed" Exception="[New Exception(&quot;pipeline_extract_and_compose.py failed (exit code &quot; + int_PipelineShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_PipelineFailed" />
+        <Throw DisplayName="pipeline_extract_and_compose failed" Exception="[New Exception(&quot;pipeline_extract_and_compose.py failed (exit code &quot; + int_PipelineShellResult.ToString + &quot;). &quot; + If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;Check API key, PPTX source readability, and run-order entries.&quot;))]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_PipelineFailed" />
       </If.Then>
     </If>
     <Delay DisplayName="Wait for pipeline file flush" Duration="00:00:01" sap:VirtualizedContainerService.HintSize="416,90.4" sap2010:WorkflowViewState.IdRef="Delay_AfterPipeline" />

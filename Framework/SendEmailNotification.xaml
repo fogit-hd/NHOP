@@ -117,8 +117,12 @@
           <Literal x:TypeArguments="x:String" Value="" />
         </Variable.Default>
       </Variable>
-      <Variable x:TypeArguments="x:String" Default="smtp.gmail.com" Name="str_SmtpServer" />
-      <Variable x:TypeArguments="x:Int32" Default="587" Name="int_SmtpPort" />
+      <Variable x:TypeArguments="x:String" Name="str_SmtpServer">
+        <Variable.Default>
+          <Literal x:TypeArguments="x:String" Value="" />
+        </Variable.Default>
+      </Variable>
+      <Variable x:TypeArguments="x:Int32" Name="int_SmtpPort" />
       <Variable x:TypeArguments="x:String" Name="str_EmailSubject" />
       <Variable x:TypeArguments="x:String" Name="str_EmailBody" />
       <Variable x:TypeArguments="x:String" Name="str_ErrorSummary" />
@@ -183,7 +187,7 @@
         <OutArgument x:TypeArguments="x:String">[str_RecipientEmail]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("FailureEmail_Recipient") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("FailureEmail_Recipient"))), Convert.ToString(in_Config("FailureEmail_Recipient")), str_RecipientEmail)]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_Recipient") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_Recipient"))), Convert.ToString(in_Config("Email_Recipient")), str_RecipientEmail)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: sender email" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigSenderEmail">
@@ -191,7 +195,7 @@
         <OutArgument x:TypeArguments="x:String">[str_SenderEmail]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("FailureEmail_Sender") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("FailureEmail_Sender"))), Convert.ToString(in_Config("FailureEmail_Sender")), str_SenderEmail)]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_Sender") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_Sender"))), Convert.ToString(in_Config("Email_Sender")), str_SenderEmail)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: sender password" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigSenderPassword">
@@ -199,7 +203,7 @@
         <OutArgument x:TypeArguments="x:String">[str_SenderPassword]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("FailureEmail_SenderPassword") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("FailureEmail_SenderPassword"))), Convert.ToString(in_Config("FailureEmail_SenderPassword")), str_SenderPassword)]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SenderPassword") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SenderPassword"))), Convert.ToString(in_Config("Email_SenderPassword")), str_SenderPassword)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: SMTP server" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigSmtpServer">
@@ -207,7 +211,7 @@
         <OutArgument x:TypeArguments="x:String">[str_SmtpServer]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("FailureEmail_SmtpServer") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("FailureEmail_SmtpServer"))), Convert.ToString(in_Config("FailureEmail_SmtpServer")), str_SmtpServer)]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SmtpServer") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SmtpServer"))), Convert.ToString(in_Config("Email_SmtpServer")), str_SmtpServer)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: SMTP port" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigSmtpPort">
@@ -215,7 +219,7 @@
         <OutArgument x:TypeArguments="x:Int32">[int_SmtpPort]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:Int32">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("FailureEmail_SmtpPort") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("FailureEmail_SmtpPort"))) AndAlso IsNumeric(Convert.ToString(in_Config("FailureEmail_SmtpPort"))), Convert.ToInt32(in_Config("FailureEmail_SmtpPort")), int_SmtpPort)]</InArgument>
+        <InArgument x:TypeArguments="x:Int32">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SmtpPort") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SmtpPort"))) AndAlso IsNumeric(Convert.ToString(in_Config("Email_SmtpPort"))), Convert.ToInt32(in_Config("Email_SmtpPort")), int_SmtpPort)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Normalize sender email" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeFailureSender">
@@ -260,7 +264,7 @@
           </sap:WorkflowViewStateService.ViewState>
           <If Condition="[String.IsNullOrWhiteSpace(str_SenderEmail) OrElse String.IsNullOrWhiteSpace(str_RecipientEmail) OrElse String.IsNullOrWhiteSpace(str_SenderPassword) OrElse str_SenderPassword.Equals(&quot;ADD_APP_PASSWORD_HERE&quot;, StringComparison.OrdinalIgnoreCase)]" DisplayName="Validate sender/recipient/password from Config" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_ValidateFailureEmailConfig">
             <If.Then>
-              <Throw DisplayName="Missing FailureEmail config" Exception="[New Exception(&quot;Missing email configuration in Data\Config.xlsx (Settings). Required keys: FailureEmail_Sender, FailureEmail_Recipient, FailureEmail_SenderPassword.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_MissingFailureEmailConfig" />
+              <Throw DisplayName="Missing Email config" Exception="[New Exception(&quot;Missing email configuration in Data\Config.xlsx (Settings). Required keys: Email_Sender, Email_Recipient, Email_SenderPassword.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_MissingFailureEmailConfig" />
             </If.Then>
           </If>
           <ui:LogMessage DisplayName="Log SMTP settings (safe)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_FailureMailConfigPreview" Level="Info" Message="[&quot;Preparing email notification via SMTP. Server=&quot; + str_SmtpServer + &quot;:&quot; + int_SmtpPort.ToString + &quot;, Sender=&quot; + str_SenderEmail + &quot;, Recipient=&quot; + str_RecipientEmail]" />
@@ -298,7 +302,7 @@
                   <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                 </scg:Dictionary>
               </sap:WorkflowViewStateService.ViewState>
-              <ui:LogMessage DisplayName="Log message (Email notification step failed)" sap:VirtualizedContainerService.HintSize="416,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_SendMailFailed" Level="Warn" Message="[&quot;Send email notification step failed: &quot; + exception.Message + If(exception.InnerException Is Nothing OrElse String.IsNullOrWhiteSpace(exception.InnerException.Message), &quot;&quot;, &quot; | Inner: &quot; + exception.InnerException.Message) + If(exception.Message IsNot Nothing AndAlso (exception.Message.Contains(&quot;5.7.9&quot;) OrElse exception.Message.ToLower().Contains(&quot;application-specific password required&quot;)), &quot; Gmail SMTP requires an App Password. Set FailureEmail_SenderPassword to a 16-character Gmail App Password (no spaces) and use FailureEmail_SmtpServer=smtp.gmail.com, FailureEmail_SmtpPort=587 in Data\\Config.xlsx.&quot;, &quot; Configure FailureEmail_* keys in Data\\Config.xlsx (Settings sheet).&quot;)]" />
+              <ui:LogMessage DisplayName="Log message (Email notification step failed)" sap:VirtualizedContainerService.HintSize="416,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_SendMailFailed" Level="Warn" Message="[&quot;Send email notification step failed: &quot; + exception.Message + If(exception.InnerException Is Nothing OrElse String.IsNullOrWhiteSpace(exception.InnerException.Message), &quot;&quot;, &quot; | Inner: &quot; + exception.InnerException.Message) + If(exception.Message IsNot Nothing AndAlso (exception.Message.Contains(&quot;5.7.9&quot;) OrElse exception.Message.ToLower().Contains(&quot;application-specific password required&quot;)), &quot; Gmail SMTP requires an App Password. Set Email_SenderPassword to a 16-character Gmail App Password (no spaces) and use Email_SmtpServer=smtp.gmail.com, Email_SmtpPort=587 in Data\\Config.xlsx.&quot;, &quot; Configure Email_* keys in Data\\Config.xlsx (Settings sheet).&quot;)]" />
             </Sequence>
           </ActivityAction>
         </Catch>

@@ -127,7 +127,8 @@ def main() -> None:
 
     wav = _resolve_under_project(args.wav)
     if not wav.is_file():
-        sys.exit(0)
+        print(f"WAV file not found: {wav}", file=sys.stderr)
+        sys.exit(2)
 
     ffmpeg_exe = _resolve_ffmpeg_exe(args.ffmpeg)
 
