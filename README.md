@@ -39,12 +39,12 @@
 4. Implement Process.xaml workflow and invoke other workflows related to the process being automated
 
 
-### Failure Email Configuration (Config.xlsx) ###
+### Notification Email Configuration (Config.xlsx) ###
 
 Set these keys in Data/Config.xlsx (Settings sheet) so each user can change sender/recipient without editing XAML:
 
-- FailureEmail_Sender
-- FailureEmail_Recipient
-- FailureEmail_SenderPassword
-- FailureEmail_SmtpServer (for Gmail: smtp.gmail.com)
-- FailureEmail_SmtpPort (for Gmail: 587)
+- Email_Sender
+- Email_Recipient
+- Email_SenderPassword
+- Email_SmtpServer (for Gmail: smtp.gmail.com)
+- Email_SmtpPort (for Gmail: 587)
