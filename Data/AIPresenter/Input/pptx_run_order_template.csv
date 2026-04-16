@@ -1,0 +1,3 @@
+run_order,pptx_path,enabled
+1,Data/AIPresenter/Input/pptx_file_here/Employee-Benefits-v1.1-1.pptx,TRUE
+2,Data/AIPresenter/Input/pptx_file_here/Code-of-Employee-Discipline-v1.1.pptx,TRUE

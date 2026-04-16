@@ -352,14 +352,43 @@ if errorlevel 1 (
   exit /b 0
 )
 
+%PY_CMD% -c "import openpyxl" >nul 2>nul
+if errorlevel 1 (
+  echo [WARN] openpyxl is not importable after requirements install. Trying direct install...
+  %PY_CMD% -m pip install --disable-pip-version-check --quiet "openpyxl>=3.1.5" >>"%PIP_LOG%" 2>&1
+  if errorlevel 1 (
+    echo [ERROR] openpyxl direct install failed.
+    echo [INFO] pip details:
+    type "%PIP_LOG%"
+    set "HAS_FAILURE=1"
+    echo.
+    exit /b 0
+  )
+
+  %PY_CMD% -c "import openpyxl" >nul 2>nul
+  if errorlevel 1 (
+    echo [ERROR] openpyxl is still not importable in the selected Python interpreter.
+    set "HAS_FAILURE=1"
+    echo.
+    exit /b 0
+  )
+)
+
 set "PPTX_VER="
 for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import pptx; print(pptx.__version__)" 2^>nul`) do (
   set "PPTX_VER=%%V"
 )
 if not defined PPTX_VER set "PPTX_VER=unknown"
 
+set "OPENPYXL_VER="
+for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import openpyxl; print(openpyxl.__version__)" 2^>nul`) do (
+  set "OPENPYXL_VER=%%V"
+)
+if not defined OPENPYXL_VER set "OPENPYXL_VER=unknown"
+
 echo [OK] Python requirements are satisfied.
 echo [OK] python-pptx import check passed (version !PPTX_VER!).
+echo [OK] openpyxl import check passed (version !OPENPYXL_VER!).
 echo.
 exit /b 0
 
