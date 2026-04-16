@@ -220,12 +220,12 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","play_video_blocking.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Set slides_from_csv.py path" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlidesFromCsvScript">
+    <Assign DisplayName="Set slides_from_pptx.py path" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlidesFromCsvScript">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[str_SlidesFromCsvScript]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","slides_from_csv.py")]</InArgument>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","slides_from_pptx.py")]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Set slides_iterate.tsv path" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlidesIterateTsvPath">
@@ -339,7 +339,7 @@
         <OutArgument x:TypeArguments="x:String">[str_SlidePrompt]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">["You are an AI interactive presenter. Answer clearly and concisely based on the slide content and the user's question."]</InArgument>
+        <InArgument x:TypeArguments="x:String">["You are an AI presentation narrator. Create clear and concise narration based on the slide content."]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Paths for run_python_with_exitfile.cmd" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_PythonExitHelperPaths">
@@ -350,12 +350,12 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","run_python_with_exitfile.cmd")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="slides_csv exitcode file path" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_SlidesCsvExitPath">
+    <Assign DisplayName="slides_pptx exitcode file path" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_SlidesCsvExitPath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[str_SlidesCsvExitFile]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","slides_csv_exitcode.txt")]</InArgument>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","slides_pptx_exitcode.txt")]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="pipeline exitcode file path" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_PipelineExitPath">
@@ -366,7 +366,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","pipeline_exitcode.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Run slides_from_csv (Shell waits; exit code via .cmd file)" sap:VirtualizedContainerService.HintSize="416,88" sap2010:WorkflowViewState.IdRef="Assign_RunSlidesFromCsvShell">
+    <Assign DisplayName="Run slides_from_pptx (Shell waits; exit code via .cmd file)" sap:VirtualizedContainerService.HintSize="416,88" sap2010:WorkflowViewState.IdRef="Assign_RunSlidesFromCsvShell">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Int32">[int_IgnoredShellPid]</OutArgument>
       </Assign.To>
@@ -374,8 +374,8 @@
         <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_RunPythonExitBat + Chr(34) + " " + Chr(34) + str_PythonExe + Chr(34) + " " + Chr(34) + str_SlidesFromCsvScript + Chr(34) + " " + Chr(34) + Environment.CurrentDirectory + Chr(34) + " " + Chr(34) + str_SlidesCsvExitFile + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:ReadTextFile File="{x:Null}" Content="[str_SlidesCsvExitText]" DisplayName="Read slides_csv exit code" FileName="[str_SlidesCsvExitFile]" sap:VirtualizedContainerService.HintSize="416,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_SlidesCsvExit" />
-    <Assign DisplayName="Build slides_iterate.tsv from slides.csv (exit code)" sap:VirtualizedContainerService.HintSize="416,88" sap2010:WorkflowViewState.IdRef="Assign_RunSlidesFromCsv">
+    <ui:ReadTextFile File="{x:Null}" Content="[str_SlidesCsvExitText]" DisplayName="Read slides_pptx exit code" FileName="[str_SlidesCsvExitFile]" sap:VirtualizedContainerService.HintSize="416,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_SlidesCsvExit" />
+    <Assign DisplayName="Build slides_iterate.tsv from PPTX/CSV source (exit code)" sap:VirtualizedContainerService.HintSize="416,88" sap2010:WorkflowViewState.IdRef="Assign_RunSlidesFromCsv">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Int32">[int_SlidesCsvShellResult]</OutArgument>
       </Assign.To>
@@ -410,7 +410,7 @@
     </Assign>
     <If Condition="[int_PipelineShellResult &lt;&gt; 0]" DisplayName="Pipeline must succeed" sap:VirtualizedContainerService.HintSize="416,108.8" sap2010:WorkflowViewState.IdRef="If_PipelineOk">
       <If.Then>
-        <Throw DisplayName="pipeline_extract_and_compose failed" Exception="[New Exception(&quot;pipeline_extract_and_compose.py failed (exit code &quot; + int_PipelineShellResult.ToString + &quot;). Check API key, slides.csv or PPTX input, and logs.&quot;)]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_PipelineFailed" />
+        <Throw DisplayName="pipeline_extract_and_compose failed" Exception="[New Exception(&quot;pipeline_extract_and_compose.py failed (exit code &quot; + int_PipelineShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_PipelineFailed" />
       </If.Then>
     </If>
     <Delay DisplayName="Wait for pipeline file flush" Duration="00:00:01" sap:VirtualizedContainerService.HintSize="416,90.4" sap2010:WorkflowViewState.IdRef="Delay_AfterPipeline" />
@@ -424,7 +424,7 @@
     </Assign>
     <If Condition="[int_PipelineShellResult = 0 AndAlso String.IsNullOrWhiteSpace(str_GptComposedSlides)]" DisplayName="Fail if composed file empty after OK pipeline" sap:VirtualizedContainerService.HintSize="416,108.8" sap2010:WorkflowViewState.IdRef="If_WarnEmptyGptContent">
       <If.Then>
-        <Throw DisplayName="gpt_slide_content empty after pipeline" Exception="[New Exception(&quot;gpt_slide_content.txt is empty after pipeline exit 0. Run pipeline_extract_and_compose.py from the project folder with --root set to CurrentDirectory; check stderr for API key, slides.csv or PPTX input, and image paths if CSV mode is used. Ensure presentation_master_prompt.txt asks for === SLIDE | n | title === blocks.&quot;)]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_EmptyGptSlideContent" />
+        <Throw DisplayName="gpt_slide_content empty after pipeline" Exception="[New Exception(&quot;gpt_slide_content.txt is empty after pipeline exit 0. Run pipeline_extract_and_compose.py from the project folder with --root set to CurrentDirectory; check stderr for API key, PPTX input (including Input\\pptx_file_here), or CSV fallback input. Ensure presentation_master_prompt.txt asks for === SLIDE | n | title === blocks.&quot;)]" sap:VirtualizedContainerService.HintSize="416,82.4" sap2010:WorkflowViewState.IdRef="Throw_EmptyGptSlideContent" />
       </If.Then>
     </If>
 </Sequence>

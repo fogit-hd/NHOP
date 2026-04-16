@@ -2,8 +2,12 @@
 Build composed narration from slide sources.
 
 Priority:
-1) slides.csv + slide images (legacy behavior)
-2) .pptx file in Data/AIPresenter/Input (or configured path)
+1) Configured .pptx path in Data/AIPresenter/Config/ai_settings.json
+2) Ordered .pptx list in Data/AIPresenter/Input/pptx_run_order.xlsx
+    or Data/AIPresenter/Input/pptx_run_order_template.csv
+3) First .pptx in Data/AIPresenter/Input/pptx_file_here
+4) First .pptx in Data/AIPresenter/Input
+5) slides.csv + slide images (legacy fallback)
 
 Writes:
 - Data/AIPresenter/Temp/extracted_slides_raw.txt
@@ -23,6 +27,12 @@ import re
 import sys
 import urllib.error
 import urllib.request
+from typing import Any
+
+RUN_ORDER_DEFAULT = os.path.join("Data", "AIPresenter", "Input", "pptx_run_order.xlsx")
+RUN_ORDER_TEMPLATE_CSV_DEFAULT = os.path.join(
+    "Data", "AIPresenter", "Input", "pptx_run_order_template.csv"
+)
 
 
 def load_json(path: str) -> dict:
@@ -106,30 +116,275 @@ def parse_slides_blocks(gpt_text: str) -> list[tuple[int, str, str]]:
     return sorted(found, key=lambda x: x[0])
 
 
-def resolve_pptx_path(root: str, cfg: dict) -> str:
+def find_first_pptx(folder: str) -> str:
+    if not os.path.isdir(folder):
+        return ""
+    for name in sorted(os.listdir(folder)):
+        low = name.lower()
+        if low.endswith(".pptx") and not low.startswith("~$"):
+            candidate = os.path.normpath(os.path.join(folder, name))
+            if os.path.isfile(candidate):
+                return candidate
+    return ""
+
+
+def parse_enabled(value: Any) -> bool:
+    if value is None:
+        return True
+    text = str(value).strip().lower()
+    if text == "":
+        return True
+    return text not in {"0", "false", "no", "n", "off", "disabled"}
+
+
+def resolve_pptx_candidate(root: str, input_dir: str, raw_path: str) -> str:
+    value = (raw_path or "").strip().strip('"')
+    if not value:
+        return ""
+
+    candidates: list[str] = []
+    if os.path.isabs(value):
+        candidates.append(value)
+    else:
+        candidates.append(os.path.join(root, value))
+        candidates.append(os.path.join(input_dir, "pptx_file_here", value))
+        candidates.append(os.path.join(input_dir, value))
+
+    for candidate in candidates:
+        normalized = os.path.normpath(candidate)
+        base_name = os.path.basename(normalized).lower()
+        if base_name.startswith("~$") or not base_name.endswith(".pptx"):
+            continue
+        if os.path.isfile(normalized):
+            return normalized
+    return ""
+
+
+def read_pptx_run_order(root: str, input_dir: str, queue_path: str) -> tuple[list[str], int]:
+    if not os.path.isfile(queue_path):
+        return [], 0
+
+    try:
+        from openpyxl import load_workbook
+    except Exception:
+        print(
+            "WARN pptx_run_order.xlsx found but openpyxl is missing. "
+            "Install dependencies to use ordered multi-PPTX mode.",
+            file=sys.stderr,
+        )
+        return [], 0
+
+    try:
+        workbook = load_workbook(queue_path, data_only=True, read_only=True)
+        sheet = workbook.active
+    except Exception as e:
+        print(f"WARN Could not read PPTX run-order file: {queue_path} ({e})", file=sys.stderr)
+        return [], 0
+
+    header_row = None
+    for values in sheet.iter_rows(min_row=1, max_row=1, values_only=True):
+        header_row = list(values)
+        break
+
+    if not header_row:
+        return [], 0
+
+    def norm_header(value: Any) -> str:
+        return str(value or "").strip().lower().replace(" ", "_")
+
+    headers = [norm_header(v) for v in header_row]
+    path_aliases = {"pptx_path", "file_path", "path", "pptx", "file", "filename", "pptx_file"}
+    order_aliases = {"run_order", "order", "stt", "index", "priority"}
+    enabled_aliases = {"enabled", "is_enabled", "active", "use"}
+
+    path_idx = next((i for i, h in enumerate(headers) if h in path_aliases), -1)
+    order_idx = next((i for i, h in enumerate(headers) if h in order_aliases), -1)
+    enabled_idx = next((i for i, h in enumerate(headers) if h in enabled_aliases), -1)
+
+    if path_idx < 0:
+        print(
+            "WARN pptx_run_order.xlsx does not contain a path column. "
+            "Expected one of: pptx_path, file_path, path, pptx.",
+            file=sys.stderr,
+        )
+        return [], 0
+
+    items: list[tuple[int, str]] = []
+    rows_with_path = 0
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        values = list(row)
+
+        raw_path = ""
+        if path_idx < len(values) and values[path_idx] is not None:
+            raw_path = str(values[path_idx]).strip()
+        if not raw_path:
+            continue
+
+        rows_with_path += 1
+
+        enabled = True
+        if enabled_idx >= 0 and enabled_idx < len(values):
+            enabled = parse_enabled(values[enabled_idx])
+        if not enabled:
+            continue
+
+        order_value = rows_with_path
+        if order_idx >= 0 and order_idx < len(values) and values[order_idx] not in (None, ""):
+            try:
+                order_value = int(float(str(values[order_idx]).strip()))
+            except ValueError:
+                order_value = rows_with_path
+
+        resolved = resolve_pptx_candidate(root, input_dir, raw_path)
+        if not resolved:
+            print(f"WARN queue path not found: {raw_path}", file=sys.stderr)
+            continue
+
+        items.append((order_value, resolved))
+
+    items.sort(key=lambda it: (it[0], it[1].lower()))
+    ordered_paths: list[str] = []
+    seen: set[str] = set()
+    for _, path in items:
+        key = path.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        ordered_paths.append(path)
+
+    return ordered_paths, rows_with_path
+
+
+def read_pptx_run_order_csv(root: str, input_dir: str, queue_path: str) -> tuple[list[str], int]:
+    if not os.path.isfile(queue_path):
+        return [], 0
+
+    try:
+        with open(queue_path, newline="", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            if not reader.fieldnames:
+                return [], 0
+
+            def norm_header(value: Any) -> str:
+                return str(value or "").strip().lower().replace(" ", "_")
+
+            path_aliases = {"pptx_path", "file_path", "path", "pptx", "file", "filename", "pptx_file"}
+            order_aliases = {"run_order", "order", "stt", "index", "priority"}
+            enabled_aliases = {"enabled", "is_enabled", "active", "use"}
+
+            header_pairs = [(name, norm_header(name)) for name in reader.fieldnames]
+            path_key = next((name for name, h in header_pairs if h in path_aliases), None)
+            order_key = next((name for name, h in header_pairs if h in order_aliases), None)
+            enabled_key = next((name for name, h in header_pairs if h in enabled_aliases), None)
+
+            if not path_key:
+                print(
+                    "WARN pptx run-order CSV does not contain a path column. "
+                    "Expected one of: pptx_path, file_path, path, pptx.",
+                    file=sys.stderr,
+                )
+                return [], 0
+
+            items: list[tuple[int, str]] = []
+            rows_with_path = 0
+            for row in reader:
+                raw_path = str((row.get(path_key) if row else "") or "").strip()
+                if not raw_path:
+                    continue
+
+                rows_with_path += 1
+
+                enabled = True
+                if enabled_key:
+                    enabled = parse_enabled(row.get(enabled_key) if row else None)
+                if not enabled:
+                    continue
+
+                order_value = rows_with_path
+                if order_key:
+                    order_raw = (row.get(order_key) if row else None)
+                    if order_raw not in (None, ""):
+                        try:
+                            order_value = int(float(str(order_raw).strip()))
+                        except ValueError:
+                            order_value = rows_with_path
+
+                resolved = resolve_pptx_candidate(root, input_dir, raw_path)
+                if not resolved:
+                    print(f"WARN queue path not found: {raw_path}", file=sys.stderr)
+                    continue
+
+                items.append((order_value, resolved))
+
+        items.sort(key=lambda it: (it[0], it[1].lower()))
+        ordered_paths: list[str] = []
+        seen: set[str] = set()
+        for _, path in items:
+            key = path.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            ordered_paths.append(path)
+
+        return ordered_paths, rows_with_path
+    except Exception as e:
+        print(f"WARN Could not read PPTX run-order CSV: {queue_path} ({e})", file=sys.stderr)
+        return [], 0
+
+
+def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
     configured = (
         (cfg.get("presentation_pptx_path") or "").strip()
         or (cfg.get("pptx_input_path") or "").strip()
         or (cfg.get("slide_pptx_path") or "").strip()
     )
-    if configured:
-        candidate = configured if os.path.isabs(configured) else os.path.join(root, configured)
-        candidate = os.path.normpath(candidate)
-        if os.path.isfile(candidate):
-            return candidate
-        return ""
-
     input_dir = os.path.join(root, "Data", "AIPresenter", "Input")
-    if not os.path.isdir(input_dir):
-        return ""
 
-    for name in sorted(os.listdir(input_dir)):
-        low = name.lower()
-        if low.endswith(".pptx") and not low.startswith("~$"):
-            candidate = os.path.normpath(os.path.join(input_dir, name))
-            if os.path.isfile(candidate):
-                return candidate
-    return ""
+    if configured:
+        candidate = resolve_pptx_candidate(root, input_dir, configured)
+        return [candidate] if candidate else []
+
+    queue_setting = (cfg.get("pptx_run_order_file") or "").strip()
+    queue_candidates: list[str] = []
+    if queue_setting:
+        queue_candidates.append(
+            os.path.normpath(queue_setting)
+            if os.path.isabs(queue_setting)
+            else os.path.normpath(os.path.join(root, queue_setting))
+        )
+    else:
+        queue_candidates.append(os.path.join(root, RUN_ORDER_DEFAULT))
+        queue_candidates.append(os.path.join(root, RUN_ORDER_TEMPLATE_CSV_DEFAULT))
+
+    queue_rows_detected = 0
+    for queue_path in queue_candidates:
+        ext = os.path.splitext(queue_path)[1].lower()
+        if ext == ".csv":
+            queue_paths, queue_rows = read_pptx_run_order_csv(root, input_dir, queue_path)
+        else:
+            queue_paths, queue_rows = read_pptx_run_order(root, input_dir, queue_path)
+
+        if queue_paths:
+            return queue_paths
+        queue_rows_detected = max(queue_rows_detected, queue_rows)
+
+    if queue_rows_detected > 0:
+        print(
+            "WARN PPTX run-order file exists but no valid entries were resolved. "
+            "Falling back to folder auto-detection.",
+            file=sys.stderr,
+        )
+
+    preferred_dir = os.path.join(input_dir, "pptx_file_here")
+    preferred_candidate = find_first_pptx(preferred_dir)
+    if preferred_candidate:
+        return [preferred_candidate]
+
+    fallback_candidate = find_first_pptx(input_dir)
+    if fallback_candidate:
+        return [fallback_candidate]
+
+    return []
 
 
 def extract_shape_text(shape) -> str:
@@ -154,7 +409,7 @@ def extract_shape_text(shape) -> str:
     return "\n".join(parts).strip()
 
 
-def load_slides_from_pptx(pptx_path: str) -> list[tuple[int, str, str]]:
+def load_slides_from_pptx(pptx_path: str, start_index: int = 1) -> list[tuple[int, str, str]]:
     try:
         from pptx import Presentation
     except Exception as e:
@@ -164,7 +419,8 @@ def load_slides_from_pptx(pptx_path: str) -> list[tuple[int, str, str]]:
 
     presentation = Presentation(pptx_path)
     rows: list[tuple[int, str, str]] = []
-    for idx, slide in enumerate(presentation.slides, start=1):
+    for local_idx, slide in enumerate(presentation.slides, start=1):
+        idx = start_index + (local_idx - 1)
         title = ""
         try:
             if slide.shapes.title is not None:
@@ -172,7 +428,7 @@ def load_slides_from_pptx(pptx_path: str) -> list[tuple[int, str, str]]:
         except Exception:
             title = ""
         if not title:
-            title = f"Slide {idx}"
+            title = f"Slide {local_idx}"
 
         text_chunks: list[str] = []
         for shape in slide.shapes:
@@ -297,11 +553,9 @@ def main() -> None:
         or (cfg.get("pptx_input_path") or "").strip()
         or (cfg.get("slide_pptx_path") or "").strip()
     )
-    prefer_pptx = bool(configured_pptx_setting)
-
     csv_rows = load_rows_from_csv(root, csv_path)
-    pptx_path = resolve_pptx_path(root, cfg)
-    if prefer_pptx and not pptx_path:
+    pptx_paths = resolve_pptx_paths(root, cfg)
+    if configured_pptx_setting and not pptx_paths:
         print(
             "Configured PPTX path not found. Check presentation_pptx_path/pptx_input_path/slide_pptx_path.",
             file=sys.stderr,
@@ -310,14 +564,24 @@ def main() -> None:
 
     raw_text = ""
     source_mode = ""
-    if prefer_pptx and pptx_path:
+    if pptx_paths:
         try:
-            pptx_rows = load_slides_from_pptx(pptx_path)
+            all_pptx_rows: list[tuple[int, str, str]] = []
+            next_index = 1
+            for pptx_path in pptx_paths:
+                deck_rows = load_slides_from_pptx(pptx_path, start_index=next_index)
+                all_pptx_rows.extend(deck_rows)
+                next_index += len(deck_rows)
         except Exception as e:
             print(f"PPTX parse failed: {e}", file=sys.stderr)
             sys.exit(2)
-        raw_text = build_raw_from_pptx(pptx_rows, raw_out)
-        source_mode = f"pptx:{os.path.basename(pptx_path)}"
+
+        raw_text = build_raw_from_pptx(all_pptx_rows, raw_out)
+        source_mode = f"pptx:{len(pptx_paths)} file(s)"
+        print(
+            "INFO pptx order: " + ", ".join(os.path.basename(path) for path in pptx_paths),
+            file=sys.stderr,
+        )
     elif csv_rows:
         try:
             raw_text = build_raw_from_images(api_key, vision_model, csv_rows, raw_out)
@@ -325,14 +589,6 @@ def main() -> None:
         except (urllib.error.HTTPError, urllib.error.URLError, KeyError, OSError) as e:
             print(f"Vision extraction failed: {e}", file=sys.stderr)
             sys.exit(2)
-    elif pptx_path:
-        try:
-            pptx_rows = load_slides_from_pptx(pptx_path)
-        except Exception as e:
-            print(f"PPTX parse failed: {e}", file=sys.stderr)
-            sys.exit(2)
-        raw_text = build_raw_from_pptx(pptx_rows, raw_out)
-        source_mode = f"pptx:{os.path.basename(pptx_path)}"
     else:
         print(
             "No slide source found. Provide slides.csv or a .pptx in Data/AIPresenter/Input "
