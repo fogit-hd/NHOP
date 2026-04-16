@@ -278,6 +278,21 @@
                       <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseRaw">[str_ElevenResponseRaw]</OutArgument>
                     </ui:InvokeWorkflowFile.Arguments>
                   </ui:InvokeWorkflowFile>
+                  <If Condition="[String.IsNullOrWhiteSpace(str_ElevenResponseRaw)]" DisplayName="Validate TTS response not empty" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateTtsResponseEmpty">
+                    <If.Then>
+                      <Throw DisplayName="TTS response missing" Exception="[New Exception(&quot;ElevenLabs TTS returned empty response. Check API connectivity and Data\\AIPresenter\\Temp\\tts_result.txt.&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_TtsResponseEmpty" />
+                    </If.Then>
+                  </If>
+                  <If Condition="[Not String.IsNullOrWhiteSpace(str_ElevenResponseRaw) AndAlso str_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;)]" DisplayName="Fail when ElevenLabs returns TTS_ERROR" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateTtsError">
+                    <If.Then>
+                      <Throw DisplayName="ElevenLabs TTS failed" Exception="[New Exception(&quot;ElevenLabs TTS failed: &quot; + str_ElevenResponseRaw)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_TtsErrorResponse" />
+                    </If.Then>
+                  </If>
+                  <If Condition="[Not String.IsNullOrWhiteSpace(str_ElevenResponseRaw) AndAlso Not str_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso (Not System.IO.File.Exists(str_NarrationAudioPath) OrElse (New System.IO.FileInfo(str_NarrationAudioPath)).Length &lt;= 0)]" DisplayName="Validate generated narration WAV" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateNarrationWav">
+                    <If.Then>
+                      <Throw DisplayName="Narration WAV missing or empty" Exception="[New Exception(&quot;Narration WAV was not created/opened: &quot; + str_NarrationAudioPath + &quot;. Check ElevenLabs output path and file permission.&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_NarrationWavMissing" />
+                    </If.Then>
+                  </If>
                   <If Condition="[Not String.IsNullOrWhiteSpace(str_ElevenResponseRaw) AndAlso Not str_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso System.IO.File.Exists(str_NarrationAudioPath)]" DisplayName="If TTS OK, get duration for delay" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_GetAudioDuration">
                     <If.Then>
                       <Sequence DisplayName="Get duration and set delay" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_GetDuration">
@@ -376,6 +391,11 @@
                                       <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + &quot; &quot; + Chr(34) + str_PlayResponseAudioScript + Chr(34) + &quot; --wav &quot; + Chr(34) + str_NarrationAudioPath + Chr(34) + &quot; --ffmpeg &quot; + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                                     </Assign.Value>
                                   </Assign>
+                                  <If Condition="[int_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate WAV fallback playback" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateWavFallbackPlayback">
+                                    <If.Then>
+                                      <Throw DisplayName="WAV fallback playback failed" Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + str_NarrationAudioPath + &quot; (exit code &quot; + int_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_WavFallbackPlaybackFailed" />
+                                    </If.Then>
+                                  </If>
                                 </Sequence>
                               </If.Else>
                             </If>
@@ -397,6 +417,11 @@
                                 <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + " " + Chr(34) + str_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + str_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                               </Assign.Value>
                             </Assign>
+                            <If Condition="[int_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate WAV fallback playback" sap:VirtualizedContainerService.HintSize="333.6,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateWavFallbackPlayback_NoImagePath">
+                              <If.Then>
+                                <Throw DisplayName="WAV fallback playback failed" Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + str_NarrationAudioPath + &quot; (exit code &quot; + int_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="333.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_WavFallbackPlaybackFailed_NoImagePath" />
+                              </If.Then>
+                            </If>
                           </Sequence>
                         </If.Else>
                       </If>
@@ -418,13 +443,18 @@
                           <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonwExe + Chr(34) + " " + Chr(34) + str_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + str_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                         </Assign.Value>
                       </Assign>
+                      <If Condition="[int_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate narration WAV playback" sap:VirtualizedContainerService.HintSize="333.6,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateNarrationWavPlayback">
+                        <If.Then>
+                          <Throw DisplayName="Narration WAV playback failed" Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + str_NarrationAudioPath + &quot; (exit code &quot; + int_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="333.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_NarrationWavPlaybackFailed" />
+                        </If.Then>
+                      </If>
                     </Sequence>
                   </If.Else>
                 </If>
               </Sequence>
             </If.Then>
             <If.Else>
-              <ui:LogMessage DisplayName="No narration text — skip slide TTS" sap:VirtualizedContainerService.HintSize="781.6,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_NoNarrationText" Level="Error" Message="[&quot;No TTS: gpt_slide_content.txt missing/empty or no block === SLIDE | &quot; + CInt(slideItem.Split(Convert.ToChar(9))(0).Trim).ToString + &quot; | ... ===. Run Init (pipeline_extract_and_compose.py), set ElevenLabs keys in ai_settings.json, check Output panel.&quot;]" />
+              <Throw DisplayName="No narration text for current slide" Exception="[New Exception(&quot;No TTS narration for slide &quot; + CInt(slideItem.Split(Convert.ToChar(9))(0).Trim).ToString + &quot;. &quot; + If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;PPTX source mismatch detected:&quot; + Environment.NewLine + System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;gpt_slide_content.txt is missing/empty or missing === SLIDE | n | title === block.&quot;))]" sap:VirtualizedContainerService.HintSize="781.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_NoNarrationText" />
             </If.Else>
           </If>
     <Assign DisplayName="Wait AI voice duration" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_PadSeconds">

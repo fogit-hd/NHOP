@@ -102,14 +102,14 @@
                 <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
               </ActivityAction.Argument>
               <Sequence DisplayName="Catch" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_HandleFailFastStop">
-                <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Send failure notification now" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_SendFailureNotificationImmediate" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Framework\SendEmailNotification.xaml">
+                <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Send email notification now" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_SendFailureNotificationImmediate" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Framework\SendEmailNotification.xaml">
                   <ui:InvokeWorkflowFile.Arguments>
                     <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="in_Config">[in_Config]</InArgument>
                     <InArgument x:TypeArguments="s:Exception" x:Key="in_SystemException">[exception]</InArgument>
                     <InArgument x:TypeArguments="x:String" x:Key="in_TransactionID">[""]</InArgument>
                   </ui:InvokeWorkflowFile.Arguments>
                 </ui:InvokeWorkflowFile>
-                <Throw DisplayName="Stop process after notification" Exception="[New Exception(&quot;Critical run failure. The process was stopped. Please check the failure notification email for details.&quot;)]" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Throw_StopAfterNotification" />
+                <Throw DisplayName="Stop process after notification" Exception="[New BusinessRuleException(&quot;Critical run exception. The process was stopped after sending notification. Please check the notification email for details.&quot;)]" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Throw_StopAfterNotification" />
               </Sequence>
             </ActivityAction>
           </Catch>
