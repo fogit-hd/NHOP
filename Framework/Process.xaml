@@ -108,7 +108,7 @@
     </ui:LogMessage>
     <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke AIInteractivePresenter workflow" sap:VirtualizedContainerService.HintSize="449.6,114.4" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_100" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="AIInteractivePresenter.xaml">
       <ui:InvokeWorkflowFile.Arguments>
-        <InArgument x:TypeArguments="s:String[]" x:Key="arr_Slides">[{&quot;Slide test 1&quot;,&quot;Slide test 2&quot;}]</InArgument>
+        <InArgument x:TypeArguments="s:String[]" x:Key="in_Slides">[{&quot;Slide test 1&quot;,&quot;Slide test 2&quot;}]</InArgument>
         <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="in_Config">[in_Config]</InArgument>
       </ui:InvokeWorkflowFile.Arguments>
     </ui:InvokeWorkflowFile>

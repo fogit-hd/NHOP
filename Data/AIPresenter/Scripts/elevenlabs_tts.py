@@ -76,6 +76,11 @@ def main() -> None:
         if not out_audio_path.is_absolute():
             out_audio_path = project_root / output_audio
         out_audio_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            if out_audio_path.exists():
+                out_audio_path.unlink()
+        except OSError:
+            pass
 
         cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
         template = cfg["elevenlabs"]["endpoint_template"]

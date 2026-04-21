@@ -24,7 +24,9 @@ import json
 import os
 import re
 import sys
+import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Any
 
@@ -32,9 +34,21 @@ RUN_ORDER_DEFAULT = os.path.join("Data", "AIPresenter", "Input", "pptx_run_order
 RUN_ORDER_TEMPLATE_CSV_DEFAULT = os.path.join(
     "Data", "AIPresenter", "Input", "pptx_run_order_template.csv"
 )
+NARRATION_MODE_CSV_DEFAULT = os.path.join(
+    "Data", "AIPresenter", "Input", "slide_narration_mode.csv"
+)
+SLIDE_INDEX_MAP_CSV_DEFAULT = os.path.join(
+    "Data", "AIPresenter", "Input", "slide_index_mapping.csv"
+)
+SLIDES_ITERATE_TSV_DEFAULT = os.path.join(
+    "Data", "AIPresenter", "Temp", "slides_iterate.tsv"
+)
 PPTX_SOURCE_ERROR_FILE = os.path.join(
     "Data", "AIPresenter", "Temp", "pptx_source_resolution_error.txt"
 )
+DEFAULT_OCR_PASSES = 2
+MAX_OCR_PASSES = 3
+READING_ORDER_ROW_MARGIN_EMU = 40000
 
 
 def load_json(path: str) -> dict:
@@ -49,16 +63,38 @@ def http_post_json(url: str, headers: dict, payload: dict) -> dict:
         return json.loads(resp.read().decode("utf-8"))
 
 
-def vision_extract(api_key: str, model: str, image_path: str, slide_label: str) -> str:
+def parse_ocr_passes(value: Any, default_value: int = DEFAULT_OCR_PASSES) -> int:
+    try:
+        parsed = int(float(str(value).strip()))
+    except (TypeError, ValueError):
+        parsed = default_value
+    if parsed < 1:
+        return 1
+    if parsed > MAX_OCR_PASSES:
+        return MAX_OCR_PASSES
+    return parsed
+
+
+def _encode_image_for_vision(image_path: str) -> tuple[str, str]:
     with open(image_path, "rb") as f:
         b64 = base64.b64encode(f.read()).decode("ascii")
     ext = os.path.splitext(image_path)[1].lower()
     mime = "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png" if ext == ".png" else "image/jpeg"
+    return mime, b64
+
+
+def _vision_extract_single_pass(
+    api_key: str,
+    model: str,
+    mime: str,
+    b64: str,
+    slide_label: str,
+    prompt_text: str,
+    max_tokens: int,
+) -> str:
     user_text = (
         f"Slide: {slide_label}\n"
-        "Extract all legible text from the image in a sensible reading order. "
-        "Briefly describe charts, diagrams, and illustrations (skip per-cell table OCR if unreadable). "
-        "Output in clear English."
+        f"{prompt_text}"
     )
     payload = {
         "model": model,
@@ -69,12 +105,15 @@ def vision_extract(api_key: str, model: str, image_path: str, slide_label: str) 
                     {"type": "text", "text": user_text},
                     {
                         "type": "image_url",
-                        "image_url": {"url": f"data:{mime};base64,{b64}"},
+                        "image_url": {
+                            "url": f"data:{mime};base64,{b64}",
+                            "detail": "high",
+                        },
                     },
                 ],
             }
         ],
-        "max_tokens": 4096,
+        "max_tokens": max_tokens,
         "temperature": 0.2,
     }
     headers = {
@@ -85,6 +124,233 @@ def vision_extract(api_key: str, model: str, image_path: str, slide_label: str) 
     return out["choices"][0]["message"]["content"].strip()
 
 
+def _ocr_text_to_lines(text: str) -> list[str]:
+    lines: list[str] = []
+    for raw in str(text or "").splitlines():
+        line = " ".join(raw.split()).strip()
+        if not line:
+            continue
+        if _is_no_text_ocr_result(line):
+            continue
+        if line.lower().startswith("slide:"):
+            continue
+        lines.append(line)
+    return lines
+
+
+def _merge_ocr_pass_outputs(pass_outputs: list[str]) -> str:
+    merged: list[str] = []
+    seen: set[str] = set()
+
+    for text in pass_outputs:
+        if _is_no_text_ocr_result(text):
+            continue
+        for line in _ocr_text_to_lines(text):
+            key = _normalize_for_match(line)
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            merged.append(line)
+
+    if not merged:
+        return "[No readable text detected]"
+
+    return "\n".join(merged)
+
+
+def _cleanup_temp_paths(paths: list[str]) -> None:
+    for path in paths:
+        try:
+            if path and os.path.isfile(path):
+                os.remove(path)
+        except OSError:
+            pass
+
+
+def _build_ocr_retry_tiles(image_path: str) -> list[str]:
+    """Build enlarged overlapping tiles to improve tiny-text OCR on dense slides."""
+    try:
+        from PIL import Image
+    except Exception:
+        return []
+
+    tile_paths: list[str] = []
+    try:
+        with Image.open(image_path) as img:
+            rgb = img.convert("RGB")
+            width, height = rgb.size
+            if width < 800 or height < 450:
+                return []
+
+            tile_w = max(int(width * 0.62), 1)
+            tile_h = max(int(height * 0.62), 1)
+            origins = [
+                (0, 0),
+                (max(width - tile_w, 0), 0),
+                (0, max(height - tile_h, 0)),
+                (max(width - tile_w, 0), max(height - tile_h, 0)),
+                (max((width - tile_w) // 2, 0), max((height - tile_h) // 2, 0)),
+            ]
+
+            unique_origins: list[tuple[int, int]] = []
+            seen: set[tuple[int, int]] = set()
+            for ox, oy in origins:
+                key = (ox, oy)
+                if key in seen:
+                    continue
+                seen.add(key)
+                unique_origins.append(key)
+
+            resampling = getattr(Image, "Resampling", Image)
+            lanczos = getattr(resampling, "LANCZOS", getattr(Image, "LANCZOS", 1))
+
+            for ox, oy in unique_origins:
+                right = min(width, ox + tile_w)
+                bottom = min(height, oy + tile_h)
+                tile = rgb.crop((ox, oy, right, bottom))
+                if tile.width <= 0 or tile.height <= 0:
+                    continue
+
+                enlarged = tile.resize((max(tile.width * 2, tile.width), max(tile.height * 2, tile.height)), lanczos)
+                fd, tmp_path = tempfile.mkstemp(prefix="ocr_tile_", suffix=".png")
+                os.close(fd)
+                enlarged.save(tmp_path, format="PNG")
+                tile_paths.append(tmp_path)
+    except Exception as e:
+        print(f"WARN OCR tile preparation failed for {image_path}: {e}", file=sys.stderr)
+        _cleanup_temp_paths(tile_paths)
+        return []
+
+    return tile_paths
+
+
+def vision_extract(
+    api_key: str,
+    model: str,
+    image_path: str,
+    slide_label: str,
+    max_passes: int = 1,
+) -> str:
+    mime, b64 = _encode_image_for_vision(image_path)
+    passes = parse_ocr_passes(max_passes, default_value=1)
+
+    strict_prompt = (
+        "Extract only the visible text in reading order. "
+        "Include visible URLs/hyperlinks exactly as shown. "
+        "Do not summarize, interpret, or add external information. "
+        "If no readable text is visible, return exactly: [No readable text detected]."
+    )
+    dense_prompt = (
+        "Second OCR pass for dense slides: prioritize tiny text, table cells, chart labels, "
+        "footnotes, and callout text when legible. "
+        "Return only visible text, one item per line. "
+        "Include visible URLs/hyperlinks exactly as shown. "
+        "Do not summarize, interpret, or add external information. "
+        "If no readable text is visible, return exactly: [No readable text detected]."
+    )
+    org_chart_prompt = (
+        "Third OCR pass for very dense slides (org charts, names, role titles, and bullet lists). "
+        "Extract all visible names, titles, labels, and bullet text in reading order. "
+        "Return only visible text. Do not summarize. "
+        "If no readable text is visible, return exactly: [No readable text detected]."
+    )
+
+    outputs: list[str] = [
+        _vision_extract_single_pass(
+            api_key=api_key,
+            model=model,
+            mime=mime,
+            b64=b64,
+            slide_label=slide_label,
+            prompt_text=strict_prompt,
+            max_tokens=4096,
+        )
+    ]
+
+    if passes >= 2:
+        outputs.append(
+            _vision_extract_single_pass(
+                api_key=api_key,
+                model=model,
+                mime=mime,
+                b64=b64,
+                slide_label=slide_label,
+                prompt_text=dense_prompt,
+                max_tokens=6144,
+            )
+        )
+
+    if passes >= 3:
+        outputs.append(
+            _vision_extract_single_pass(
+                api_key=api_key,
+                model=model,
+                mime=mime,
+                b64=b64,
+                slide_label=slide_label,
+                prompt_text=org_chart_prompt,
+                max_tokens=6144,
+            )
+        )
+
+    return _merge_ocr_pass_outputs(outputs)
+
+
+def vision_extract_with_tiling_retry(
+    api_key: str,
+    model: str,
+    image_path: str,
+    slide_label: str,
+    max_passes: int = 1,
+) -> str:
+    primary = vision_extract(
+        api_key=api_key,
+        model=model,
+        image_path=image_path,
+        slide_label=slide_label,
+        max_passes=max_passes,
+    )
+    if not _is_no_text_ocr_result(primary):
+        return primary
+
+    tile_paths = _build_ocr_retry_tiles(image_path)
+    if not tile_paths:
+        return primary
+
+    tile_prompt = (
+        "OCR retry for a zoomed tile from a dense slide. "
+        "Extract only visible text (names, titles, labels, bullets) in reading order. "
+        "Do not summarize. If no readable text is visible, return exactly: [No readable text detected]."
+    )
+
+    outputs: list[str] = [primary]
+    try:
+        for tile_idx, tile_path in enumerate(tile_paths, start=1):
+            try:
+                mime, b64 = _encode_image_for_vision(tile_path)
+                outputs.append(
+                    _vision_extract_single_pass(
+                        api_key=api_key,
+                        model=model,
+                        mime=mime,
+                        b64=b64,
+                        slide_label=f"{slide_label} [tile {tile_idx}]",
+                        prompt_text=tile_prompt,
+                        max_tokens=4096,
+                    )
+                )
+            except Exception as e:
+                print(f"WARN OCR tile pass failed for {slide_label} tile {tile_idx}: {e}", file=sys.stderr)
+    finally:
+        _cleanup_temp_paths(tile_paths)
+
+    merged = _merge_ocr_pass_outputs(outputs)
+    if not _is_no_text_ocr_result(merged):
+        print(f"INFO OCR tile retry recovered text for slide {slide_label}.", file=sys.stderr)
+        return merged
+    return primary
+
+
 def chat_completion(api_key: str, model: str, system: str, user: str) -> str:
     payload = {
         "model": model,
@@ -92,7 +358,7 @@ def chat_completion(api_key: str, model: str, system: str, user: str) -> str:
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
-        "temperature": 0.4,
+        "temperature": 0.2,
         "max_tokens": 8192,
     }
     headers = {
@@ -116,6 +382,869 @@ def parse_slides_blocks(gpt_text: str) -> list[tuple[int, str, str]]:
         body = m.group(3).strip()
         found.append((idx, title, body))
     return sorted(found, key=lambda x: x[0])
+
+
+def parse_raw_slide_blocks(raw_text: str) -> dict[int, tuple[str, str]]:
+    """Return {index: (title, raw_body)} from === SLIDE n (title) === blocks."""
+    pattern = re.compile(
+        r"===\s*SLIDE\s*(\d+)\s*\((.*?)\)\s*===\s*(.*?)(?=\n===\s*SLIDE\s*\d+\s*\(|\Z)",
+        re.DOTALL | re.IGNORECASE,
+    )
+    out: dict[int, tuple[str, str]] = {}
+    for m in pattern.finditer(raw_text):
+        idx = int(m.group(1))
+        title = (m.group(2) or "").strip()
+        body = (m.group(3) or "").strip()
+        out[idx] = (title, body)
+    return out
+
+
+URL_TOKEN_RE = re.compile(r"(?i)\b(?:https?://|www\.)[^\s<>()\[\]{}\"']+")
+
+
+def _strip_url_tail(token: str) -> str:
+    return str(token or "").rstrip(".,;:!?)]}\"'")
+
+
+def _extract_urls(text: str) -> list[str]:
+    urls: list[str] = []
+    seen: set[str] = set()
+    for match in URL_TOKEN_RE.finditer(str(text or "")):
+        token = _strip_url_tail(match.group(0).strip())
+        if not token:
+            continue
+        key = token.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        urls.append(token)
+    return urls
+
+
+def _domain_from_url(token: str) -> str:
+    candidate = str(token or "").strip()
+    if not candidate:
+        return ""
+
+    if not re.match(r"(?i)^[a-z][a-z0-9+.-]*://", candidate):
+        candidate = "https://" + candidate
+
+    try:
+        parsed = urllib.parse.urlparse(candidate)
+    except Exception:
+        return ""
+
+    host = (parsed.netloc or parsed.path or "").strip().lower()
+    if not host:
+        return ""
+    if "@" in host:
+        host = host.split("@", 1)[1]
+    if ":" in host:
+        host = host.split(":", 1)[0]
+    host = host.strip(".")
+    if host.startswith("www."):
+        host = host[4:]
+    return host
+
+
+def _is_government_domain(domain: str) -> bool:
+    token = str(domain or "").strip().lower()
+    if not token:
+        return False
+    if token.endswith(".gov") or ".gov." in token:
+        return True
+    if token.endswith(".gob") or ".gob." in token:
+        return True
+    if token.endswith(".gouv") or ".gouv." in token:
+        return True
+    if re.search(r"(^|\.)go\.[a-z]{2,}$", token):
+        return True
+    return False
+
+
+def _friendly_site_label(domain: str) -> str:
+    token = str(domain or "").strip().lower()
+    if not token:
+        return "the referenced website"
+
+    primary = token.split(".", 1)[0]
+    primary = re.sub(r"[^a-z0-9]+", " ", primary, flags=re.IGNORECASE).strip()
+    if primary and primary not in {"www", "com", "org", "net", "gov"}:
+        return f"the {primary.title()} website"
+    return f"the {token} website"
+
+
+def _strip_hyperlink_lines(text: str) -> str:
+    cleaned = str(text or "")
+    # Drop standalone "Hyperlink: ..." lines and inline label remnants.
+    cleaned = re.sub(r"(?im)^\s*hyperlink\s*:\s*.*(?:\r?\n)?", "", cleaned)
+    cleaned = re.sub(r"(?i)\bhyperlink\s*:\s*", "", cleaned)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
+def _replace_urls_with_site_labels(text: str) -> str:
+    def _replace(match: re.Match[str]) -> str:
+        token = _strip_url_tail(match.group(0))
+        domain = _domain_from_url(token)
+        return _friendly_site_label(domain)
+
+    replaced = URL_TOKEN_RE.sub(_replace, str(text or ""))
+    replaced = re.sub(r"[ \t]{2,}", " ", replaced)
+    replaced = re.sub(r"\n{3,}", "\n\n", replaced)
+    return replaced.strip()
+
+
+def _build_link_summary(raw_body: str) -> str:
+    urls = _extract_urls(raw_body)
+    if not urls:
+        return ""
+
+    domains: list[str] = []
+    seen: set[str] = set()
+    for url in urls:
+        domain = _domain_from_url(url)
+        if not domain:
+            continue
+        if domain in seen:
+            continue
+        seen.add(domain)
+        domains.append(domain)
+
+    if any(_is_government_domain(domain) for domain in domains):
+        return "This link points to an official government website and related official information."
+    if domains:
+        return (
+            f"This link appears to direct viewers to {_friendly_site_label(domains[0])} "
+            "for additional information related to this slide."
+        )
+    return "This slide includes a reference link for additional information."
+
+
+def enforce_hyperlink_summary_coverage(
+    composed_text: str,
+    raw_blocks: dict[int, tuple[str, str]],
+) -> str:
+    """Ensure narration does not read raw URLs and adds short hyperlink purpose summaries."""
+    parsed = parse_slides_blocks(composed_text)
+    if not parsed:
+        return composed_text
+
+    out_blocks: list[str] = []
+    for idx, composed_title, composed_body in parsed:
+        raw_title, raw_body = raw_blocks.get(idx, (composed_title, ""))
+        title = _sanitize_slide_title(composed_title or raw_title or f"Slide {idx}")
+
+        body = _strip_hyperlink_lines(composed_body)
+        body = _replace_urls_with_site_labels(body)
+
+        link_summary = _build_link_summary(raw_body)
+        if link_summary:
+            lowered = body.lower()
+            has_link_summary = (
+                "this link" in lowered
+                or "official government website" in lowered
+                or "reference link" in lowered
+            )
+            if not has_link_summary:
+                if body and not re.search(r"[.!?]\s*$", body):
+                    body += "."
+                body = (body + " " + link_summary).strip()
+
+        if not body:
+            body = "This slide is primarily visual, and no readable text was extracted."
+
+        out_blocks.append(f"=== SLIDE | {idx} | {title} ===\n{body}".rstrip())
+
+    return "\n\n".join(out_blocks).strip()
+
+
+def _normalize_for_match(text: str) -> str:
+    lowered = str(text or "").lower()
+    lowered = re.sub(r"[^a-z0-9]+", " ", lowered)
+    return " ".join(lowered.split()).strip()
+
+
+UNAVAILABLE_BODY_PATTERNS = (
+    "content for this slide is currently unavailable",
+    "let me move to the next point",
+)
+
+
+def _dedupe_repeated_half(line: str) -> str:
+    tokens = str(line or "").split()
+    if len(tokens) >= 4 and len(tokens) % 2 == 0:
+        half = len(tokens) // 2
+        if tokens[:half] == tokens[half:]:
+            return " ".join(tokens[:half])
+    return str(line or "")
+
+
+def _is_title_fragment(line_norm: str, title_norm: str) -> bool:
+    if not line_norm or not title_norm:
+        return False
+    if line_norm == title_norm:
+        return False
+    if len(line_norm.split()) < 2:
+        return False
+    padded_title = f" {title_norm} "
+    padded_line = f" {line_norm} "
+    return padded_line in padded_title
+
+
+def _extract_raw_lines_for_full_mode(raw_body: str, slide_title: str) -> list[str]:
+    title_norm = _normalize_for_match(slide_title)
+    picked: list[str] = []
+    seen: set[str] = set()
+
+    for raw_line in str(raw_body or "").splitlines():
+        line = " ".join(str(raw_line).replace("\t", " ").split()).strip()
+        line = _dedupe_repeated_half(line).strip()
+        if not line:
+            continue
+
+        line_norm = _normalize_for_match(line)
+        if not line_norm:
+            continue
+
+        if line_norm in {"slide text", "presenter notes", "internal"}:
+            continue
+
+        if line_norm == title_norm:
+            continue
+
+        if _is_title_fragment(line_norm, title_norm):
+            continue
+
+        if "no extractable text found on this slide" in line_norm:
+            continue
+
+        if "image file not found" in line_norm:
+            continue
+
+        if len(line) < 3:
+            continue
+
+        if re.fullmatch(r"\d{1,3}", line):
+            continue
+
+        if line_norm in seen:
+            continue
+
+        seen.add(line_norm)
+        picked.append(line)
+
+    return picked
+
+
+def _sanitize_slide_title(title: str) -> str:
+    cleaned = re.sub(r"[\t\r\n\x0b\x0c]+", " ", str(title or ""))
+    cleaned = " ".join(cleaned.split())
+    cleaned = cleaned.replace("=", " ")
+    cleaned = " ".join(cleaned.split()).strip()
+    return cleaned or "Untitled Slide"
+
+
+def _contains_unavailable_placeholder(body: str) -> bool:
+    lowered = str(body or "").strip().lower()
+    if not lowered:
+        return False
+    return any(token in lowered for token in UNAVAILABLE_BODY_PATTERNS)
+
+
+def _strip_unavailable_placeholder(body: str) -> str:
+    text = str(body or "")
+    text = re.sub(
+        r"(?i)it seems the content for this slide is currently unavailable\.?\s*",
+        "",
+        text,
+    )
+    text = re.sub(r"(?i)let me move to the next point\.?\s*", "", text)
+    return text.strip()
+
+
+def _is_raw_content_missing(raw_body: str) -> bool:
+    lowered = str(raw_body or "").lower()
+    if "[no extractable text found on this slide.]" in lowered:
+        return True
+    if "[image file not found:" in lowered:
+        return True
+    return len(_extract_raw_lines_for_full_mode(raw_body, "")) == 0
+
+
+def _as_sentence(line: str) -> str:
+    cleaned = " ".join(str(line or "").split()).strip()
+    if not cleaned:
+        return ""
+    if cleaned.endswith(":"):
+        cleaned = cleaned.rstrip(":").rstrip()
+    if re.search(r"[.!?]$", cleaned):
+        return cleaned
+    return cleaned + "."
+
+
+def _count_sentences(text: str) -> int:
+    parts = re.findall(r"[^.!?]+(?:[.!?]+|$)", str(text or ""))
+    return sum(1 for part in parts if part.strip())
+
+
+def _split_repeated_numbered_items(line: str) -> str:
+    text = str(line or "")
+    matches = list(re.finditer(r"(?<!\w)(\d+\.)\s+", text))
+    if len(matches) < 2:
+        return text
+
+    parts: list[str] = []
+    last = 0
+    for idx, match in enumerate(matches):
+        if idx == 0:
+            continue
+        start = match.start()
+        head = text[last:start].rstrip(" ;,")
+        if head:
+            parts.append(head)
+        last = start
+
+    tail = text[last:].strip()
+    if tail:
+        parts.append(tail)
+
+    return "; ".join(part for part in parts if part).strip() or text
+
+
+def _prepare_raw_lines_for_narration(raw_lines: list[str]) -> list[str]:
+    normalized: list[str] = []
+    seen: set[str] = set()
+
+    for raw_line in raw_lines:
+        line = " ".join(str(raw_line or "").split()).strip()
+        line = _dedupe_repeated_half(line).strip()
+        line = _split_repeated_numbered_items(line).strip()
+        if not line:
+            continue
+        key = _normalize_for_match(line)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        normalized.append(line)
+
+    merged: list[str] = []
+    continuation_starts = (
+        "below ",
+        "subject to ",
+        "provided ",
+        "including ",
+        "except ",
+        "otherwise ",
+        "that ",
+        "which ",
+    )
+
+    for line in normalized:
+        if not merged:
+            merged.append(line)
+            continue
+
+        current = line.strip()
+        previous = merged[-1].strip()
+        current_lower = current.lower()
+        is_continuation = (
+            current[:1].islower()
+            or current.startswith("(")
+            or any(current_lower.startswith(prefix) for prefix in continuation_starts)
+        )
+
+        if len(previous) <= 24 and previous.endswith(":"):
+            merged[-1] = f"{previous} {current}".strip()
+            continue
+
+        if is_continuation:
+            merged[-1] = f"{previous} {current}".strip()
+            continue
+
+        merged.append(current)
+
+    return merged
+
+
+def _is_list_heavy_raw_lines(raw_lines: list[str]) -> bool:
+    if len(raw_lines) < 5:
+        return False
+
+    structured = 0
+    for line in raw_lines:
+        compact = " ".join(str(line or "").split()).strip()
+        if not compact:
+            continue
+        if re.match(r"^(?:\d+[\.\)]|[A-Za-z]\.|[-*•])\s*", compact):
+            structured += 1
+            continue
+        if ":" in compact:
+            structured += 1
+            continue
+        if len(compact) <= 90:
+            structured += 1
+
+    return structured >= max(4, len(raw_lines) // 2)
+
+
+def _choose_detail_prefix(lines: list[str]) -> str:
+    joined = " ".join(lines[:3]).lower()
+    if re.search(
+        r"\b(requirements?|required|documents?|claim|form|certificate|proof|statement|id|ids)\b",
+        joined,
+    ):
+        return "Required details include"
+    if re.search(
+        r"\b(process|review|send|notify|screen|endorse|approve|credit|email)\b",
+        joined,
+    ):
+        return "The process includes"
+    return "Key details include"
+
+
+def _compose_faithful_body(raw_lines: list[str], mode: str) -> str:
+    normalized_lines = _prepare_raw_lines_for_narration(raw_lines)
+    if not normalized_lines:
+        return ""
+
+    if mode == "short":
+        chosen = normalized_lines[:2]
+        return " ".join(part for part in (_as_sentence(line) for line in chosen) if part).strip()
+
+    if len(normalized_lines) <= 4:
+        return " ".join(
+            part for part in (_as_sentence(line) for line in normalized_lines) if part
+        ).strip()
+
+    sentences: list[str] = []
+    remaining = list(normalized_lines)
+
+    first_line = normalized_lines[0]
+    first_is_explanatory = (
+        len(first_line) > 85
+        or first_line.rstrip().endswith(":")
+        or re.search(
+            r"\b(following|required|eligible|benefit|provide|submit|include|must|can be|will be)\b",
+            first_line,
+            re.IGNORECASE,
+        )
+        is not None
+    )
+
+    first = _as_sentence(first_line) if first_is_explanatory else ""
+    if first:
+        sentences.append(first)
+        remaining = normalized_lines[1:]
+
+    if not remaining:
+        return " ".join(sentences).strip()
+
+    chunk_size = 4 if len(remaining) > 6 else 3
+    first_prefix = _choose_detail_prefix(remaining)
+    for offset in range(0, len(remaining), chunk_size):
+        chunk = remaining[offset: offset + chunk_size]
+        if not chunk:
+            continue
+        chunk_text = "; ".join(" ".join(item.split()) for item in chunk).strip()
+        if chunk_text:
+            if offset == 0:
+                label = first_prefix
+            else:
+                label = "Additional details include"
+            sentences.append(f"{label}: {chunk_text}.")
+
+    return " ".join(sentences).strip()
+
+
+def enforce_full_mode_coverage(
+    composed_text: str,
+    raw_blocks: dict[int, tuple[str, str]],
+    mode_map: dict[int, str],
+) -> str:
+    """Repair placeholder outputs and keep narration tightly bound to slide raw content."""
+    parsed = parse_slides_blocks(composed_text)
+    composed_by_idx: dict[int, tuple[str, str]] = {
+        idx: (title, body) for idx, title, body in parsed
+    }
+
+    if not raw_blocks:
+        return composed_text
+
+    out_blocks: list[str] = []
+    for idx in sorted(raw_blocks.keys()):
+        raw_title, raw_body = raw_blocks[idx]
+        composed_title, composed_body = composed_by_idx.get(idx, (raw_title, ""))
+        title = _sanitize_slide_title(composed_title or raw_title or f"Slide {idx}")
+        mode = mode_map.get(idx, "full")
+        raw_lines = _extract_raw_lines_for_full_mode(raw_body, raw_title)
+        raw_missing = _is_raw_content_missing(raw_body)
+
+        source_body = (composed_body or "").strip()
+        body = _strip_unavailable_placeholder(source_body)
+        body = re.sub(
+            r"(?is)\bto ensure full coverage of this slide, the listed details are:\s*.*$",
+            "",
+            body,
+        ).strip()
+
+        needs_rebuild = False
+        if raw_missing:
+            if not body:
+                body = "This slide is primarily visual, and no readable text was extracted."
+        else:
+            if not body:
+                needs_rebuild = True
+            if _contains_unavailable_placeholder(source_body):
+                needs_rebuild = True
+
+            raw_len = len(" ".join(raw_lines))
+            sentence_count = _count_sentences(body)
+            list_heavy = _is_list_heavy_raw_lines(raw_lines)
+            if mode != "short":
+                if body and raw_len > 260 and len(body) < max(120, int(raw_len * 0.33)):
+                    needs_rebuild = True
+                if body and raw_len > 0 and len(body) > int(raw_len * 1.8):
+                    needs_rebuild = True
+                if body and list_heavy:
+                    min_sentences = 3 if len(raw_lines) >= 8 else 2
+                    if sentence_count < min_sentences:
+                        needs_rebuild = True
+            elif body and len(body) > max(240, int(raw_len * 1.3)):
+                needs_rebuild = True
+
+            if needs_rebuild:
+                body = _compose_faithful_body(raw_lines, mode)
+
+        if not body:
+            body = "This slide is primarily visual, and no readable text was extracted."
+
+        out_blocks.append(f"=== SLIDE | {idx} | {title} ===\n{body}".rstrip())
+
+    return "\n\n".join(out_blocks).strip()
+
+
+def parse_narration_mode(value: Any) -> tuple[str, bool]:
+    """Return (mode, is_known). mode is one of: full, short."""
+    token = str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
+    if token in {"", "full", "detailed", "long", "normal", "default"}:
+        return "full", True
+    if token in {"short", "brief", "summary", "concise", "ngan", "short_summary"}:
+        return "short", True
+    return "full", False
+
+
+def normalize_header(value: Any) -> str:
+    return str(value or "").strip().lower().replace(" ", "_")
+
+
+def normalize_pptx_key(value: Any) -> str:
+    return str(value or "").strip().strip('"').replace("\\", "/").lower()
+
+
+def candidate_pptx_keys(value: Any) -> list[str]:
+    token = normalize_pptx_key(value)
+    if not token:
+        return []
+
+    base = os.path.basename(token)
+    candidates = [token]
+    if base and base != token:
+        candidates.append(base)
+    return candidates
+
+
+def build_pptx_slide_lookup(
+    root: str,
+    rows: list[tuple[int, str, str, str, int]],
+) -> dict[tuple[str, int], int]:
+    """Map (pptx_key, local_slide_index) -> global_slide_index."""
+    lookup: dict[tuple[str, int], int] = {}
+
+    for global_idx, _title, _text, pptx_path, local_idx in rows:
+        keys: list[str] = []
+
+        normalized_abs = normalize_pptx_key(pptx_path)
+        if normalized_abs:
+            keys.extend(candidate_pptx_keys(normalized_abs))
+
+        try:
+            rel = normalize_pptx_key(os.path.relpath(pptx_path, root))
+            if rel:
+                keys.extend(candidate_pptx_keys(rel))
+        except ValueError:
+            pass
+
+        seen: set[str] = set()
+        for key in keys:
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            lookup[(key, local_idx)] = global_idx
+
+    return lookup
+
+
+def build_slide_index_source_meta(
+    rows: list[tuple[int, str, str, str, int]],
+) -> dict[int, tuple[str, int]]:
+    meta: dict[int, tuple[str, int]] = {}
+    for global_idx, _title, _text, pptx_path, local_idx in rows:
+        meta[global_idx] = (os.path.basename(pptx_path), local_idx)
+    return meta
+
+
+def write_slide_index_mapping_csv(
+    root: str,
+    output_csv_path: str,
+    rows: list[tuple[int, str, str, str, int]],
+) -> None:
+    os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
+    with open(output_csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "global_slide_index",
+            "pptx_file",
+            "file_slide_index",
+            "pptx_path",
+            "slide_title",
+        ])
+
+        for global_idx, title, _text, pptx_path, local_idx in rows:
+            try:
+                rel_path = os.path.relpath(pptx_path, root).replace("\\", "/")
+            except ValueError:
+                rel_path = pptx_path.replace("\\", "/")
+
+            writer.writerow([
+                global_idx,
+                os.path.basename(pptx_path),
+                local_idx,
+                rel_path,
+                title,
+            ])
+
+
+def read_slide_narration_mode_csv(
+    csv_path: str,
+    pptx_slide_lookup: dict[tuple[str, int], int] | None = None,
+) -> tuple[dict[int, str], list[str]]:
+    """Load per-slide narration mode config from CSV.
+
+    Supported target selectors per row:
+    - slide_index (global, preferred when present)
+    - OR pptx_file + file_slide_index (resolved via slide_index_mapping)
+
+    Required:
+    - mode: full | short
+    """
+    mode_map: dict[int, str] = {}
+    warnings: list[str] = []
+
+    if not os.path.isfile(csv_path):
+        return mode_map, warnings
+
+    try:
+        with open(csv_path, newline="", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            if not reader.fieldnames:
+                warnings.append(
+                    "WARN slide_narration_mode.csv is empty. All slides will use FULL narration mode."
+                )
+                return mode_map, warnings
+
+            header_pairs = [(name, normalize_header(name)) for name in reader.fieldnames]
+            index_aliases = {
+                "slide_index",
+                "index",
+                "slide",
+                "slide_no",
+                "slide_number",
+                "global_slide_index",
+                "global_index",
+            }
+            mode_aliases = {"mode", "narration_mode", "script_mode", "style"}
+            file_aliases = {
+                "pptx_file",
+                "pptx",
+                "file",
+                "file_name",
+                "filename",
+                "pptx_path",
+                "source_file",
+                "source_pptx",
+            }
+            local_index_aliases = {
+                "file_slide_index",
+                "pptx_slide_index",
+                "slide_in_file",
+                "local_slide_index",
+                "local_index",
+                "source_slide_index",
+            }
+
+            index_key = next((name for name, h in header_pairs if h in index_aliases), None)
+            mode_key = next((name for name, h in header_pairs if h in mode_aliases), None)
+            file_key = next((name for name, h in header_pairs if h in file_aliases), None)
+            local_index_key = next((name for name, h in header_pairs if h in local_index_aliases), None)
+
+            has_global_selector = bool(index_key)
+            has_file_selector = bool(file_key and local_index_key)
+
+            if not mode_key or (not has_global_selector and not has_file_selector):
+                warnings.append(
+                    "WARN slide_narration_mode.csv missing required columns. "
+                    "Expected mode plus slide_index OR pptx_file + file_slide_index."
+                )
+                return mode_map, warnings
+
+            for row_num, row in enumerate(reader, start=2):
+                if not row:
+                    continue
+
+                selector_present = any(str(v or "").strip() for v in row.values())
+                if not selector_present:
+                    continue
+
+                resolved_slide_idx: int | None = None
+
+                idx_raw = str(row.get(index_key) or "").strip() if index_key else ""
+                if idx_raw:
+                    try:
+                        resolved_slide_idx = int(float(idx_raw))
+                    except ValueError:
+                        warnings.append(
+                            f"WARN slide_narration_mode.csv line {row_num}: invalid slide_index '{idx_raw}', skipped."
+                        )
+                        continue
+
+                if resolved_slide_idx is None and has_file_selector:
+                    file_raw = str(row.get(file_key) or "").strip() if file_key else ""
+                    local_raw = str(row.get(local_index_key) or "").strip() if local_index_key else ""
+
+                    if file_raw or local_raw:
+                        if not file_raw or not local_raw:
+                            warnings.append(
+                                f"WARN slide_narration_mode.csv line {row_num}: "
+                                "provide both pptx_file and file_slide_index."
+                            )
+                            continue
+
+                        try:
+                            local_idx = int(float(local_raw))
+                        except ValueError:
+                            warnings.append(
+                                f"WARN slide_narration_mode.csv line {row_num}: invalid file_slide_index '{local_raw}', skipped."
+                            )
+                            continue
+
+                        if not pptx_slide_lookup:
+                            warnings.append(
+                                f"WARN slide_narration_mode.csv line {row_num}: "
+                                "cannot resolve pptx_file/file_slide_index because no PPTX source map is available."
+                            )
+                            continue
+
+                        hit_idx: int | None = None
+                        for key in candidate_pptx_keys(file_raw):
+                            hit_idx = pptx_slide_lookup.get((key, local_idx))
+                            if hit_idx is not None:
+                                break
+
+                        if hit_idx is None:
+                            warnings.append(
+                                f"WARN slide_narration_mode.csv line {row_num}: "
+                                f"could not match pptx_file='{file_raw}' and file_slide_index='{local_raw}'."
+                            )
+                            continue
+
+                        resolved_slide_idx = hit_idx
+
+                if resolved_slide_idx is None:
+                    continue
+
+                if resolved_slide_idx <= 0:
+                    warnings.append(
+                        f"WARN slide_narration_mode.csv line {row_num}: slide index must be >= 1, skipped."
+                    )
+                    continue
+
+                mode_raw = row.get(mode_key)
+                mode, known = parse_narration_mode(mode_raw)
+                if not known:
+                    warnings.append(
+                        f"WARN slide_narration_mode.csv line {row_num}: unknown mode '{mode_raw}', defaulted to full."
+                    )
+
+                mode_map[resolved_slide_idx] = mode
+    except Exception as e:
+        warnings.append(f"WARN Could not read slide_narration_mode.csv: {e}")
+
+    return mode_map, warnings
+
+
+def build_runtime_narration_rules(mode_map: dict[int, str]) -> str:
+    short_indices = sorted(idx for idx, mode in mode_map.items() if mode == "short")
+
+    lines = [
+        "RUNTIME OVERRIDE (STRICT, HIGH PRIORITY):",
+        "- Keep slide raw content as the primary source of facts.",
+        "- You may add up to 1-2 short contextual sentences per slide to sound human and natural.",
+        "- Any added context must be generic and relevant, without fabricated details.",
+        "- Do NOT invent policy details, numbers, dates, commitments, or examples not explicitly present.",
+        "- Keep narration concise and professional; avoid excessive promotional expansion.",
+        "- Keep speech natural like a normal presenter, with varied but simple connective phrasing.",
+        "- Vary sentence openings and list lead-ins across nearby sentences and slides.",
+        "- Avoid repeated scaffolding phrases such as 'it further includes', 'the slide also lists', or similar repeated list lead-ins; prefer direct continuation or a fresh sentence when extending a list.",
+        "- Never output generic fallback lines like 'content is currently unavailable' unless raw block explicitly says no extractable content.",
+    ]
+
+    if short_indices:
+        lines.append(
+            "- SHORT narration mode applies to these slide indices: "
+            + ", ".join(str(i) for i in short_indices)
+            + "."
+        )
+        lines.extend(
+            [
+                "- For SHORT slides: output only 1-2 concise presenter sentences (target <= 35 words total).",
+                "- SHORT slides should naturally hand over to the human presenter.",
+            ]
+        )
+    else:
+        lines.append("- No SHORT slide is configured. Use FULL mode for all slides.")
+
+    lines.extend(
+        [
+            "- For slides not configured as SHORT: use FULL mode by default.",
+            "- For FULL mode: cover major bullet/list entries but stay concise and factual.",
+            "- For long exclusion/requirement lists in FULL mode: keep all listed items; optional context must be brief and must not replace listed details.",
+            "- Keep the required === SLIDE | index | title === output format exactly.",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def build_narration_mode_user_block(
+    mode_map: dict[int, str],
+    slide_source_meta: dict[int, tuple[str, int]] | None = None,
+) -> str:
+    if not mode_map:
+        return (
+            "NARRATION MODE CONFIG:\n"
+            "- No per-slide config found. Treat all slides as FULL mode."
+        )
+
+    lines = ["NARRATION MODE CONFIG (from slide_narration_mode.csv):"]
+    for slide_idx in sorted(mode_map):
+        source_text = ""
+        if slide_source_meta and slide_idx in slide_source_meta:
+            pptx_name, local_idx = slide_source_meta[slide_idx]
+            source_text = f" ({pptx_name} | file slide {local_idx})"
+        lines.append(f"- Slide {slide_idx}{source_text}: {mode_map[slide_idx].upper()}")
+    lines.append("- Any slide not listed above is FULL mode.")
+    return "\n".join(lines)
 
 
 def find_first_pptx(folder: str) -> str:
@@ -494,6 +1623,86 @@ def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
     return []
 
 
+def read_slide_image_map_from_tsv(root: str) -> dict[int, str]:
+    """Read slide index -> exported image path from Temp/slides_iterate.tsv."""
+    path = os.path.join(root, SLIDES_ITERATE_TSV_DEFAULT)
+    out: dict[int, str] = {}
+    if not os.path.isfile(path):
+        return out
+
+    try:
+        with open(path, encoding="utf-8-sig") as f:
+            for raw_line in f:
+                line = raw_line.rstrip("\r\n")
+                if not line:
+                    continue
+                parts = line.split("\t")
+                if len(parts) < 3:
+                    continue
+
+                idx_raw = (parts[0] or "").strip()
+                abs_path = (parts[2] or "").strip()
+                if not idx_raw or not abs_path:
+                    continue
+
+                try:
+                    idx = int(float(idx_raw))
+                except ValueError:
+                    continue
+
+                if idx <= 0:
+                    continue
+
+                candidate = abs_path
+                if not os.path.isabs(candidate):
+                    candidate = os.path.normpath(os.path.join(root, candidate))
+                if os.path.isfile(candidate):
+                    out[idx] = os.path.normpath(candidate)
+    except Exception as e:
+        print(f"WARN Could not read slides_iterate.tsv for OCR fallback: {e}", file=sys.stderr)
+
+    return out
+
+
+def _collect_shape_hyperlinks(shape) -> list[str]:
+    links: list[str] = []
+    seen: set[str] = set()
+
+    def add_link(value: Any) -> None:
+        token = str(value or "").strip()
+        if not token:
+            return
+        key = token.lower()
+        if key in seen:
+            return
+        seen.add(key)
+        links.append(token)
+
+    try:
+        click_action = getattr(shape, "click_action", None)
+        if click_action is not None:
+            hyperlink = getattr(click_action, "hyperlink", None)
+            if hyperlink is not None:
+                add_link(getattr(hyperlink, "address", ""))
+    except Exception:
+        pass
+
+    try:
+        if getattr(shape, "has_text_frame", False) and shape.has_text_frame:
+            for para in shape.text_frame.paragraphs:
+                for run in para.runs:
+                    try:
+                        run_hyperlink = getattr(run, "hyperlink", None)
+                        if run_hyperlink is not None:
+                            add_link(getattr(run_hyperlink, "address", ""))
+                    except Exception:
+                        continue
+    except Exception:
+        pass
+
+    return links
+
+
 def extract_shape_text(shape) -> str:
     parts: list[str] = []
 
@@ -513,10 +1722,190 @@ def extract_shape_text(shape) -> str:
             if row_cells:
                 parts.append(" | ".join(row_cells))
 
+    links = _collect_shape_hyperlinks(shape)
+    if links:
+        existing = "\n".join(parts).lower()
+        for link in links:
+            if link.lower() not in existing:
+                parts.append(f"Hyperlink: {link}")
+
     return "\n".join(parts).strip()
 
 
-def load_slides_from_pptx(pptx_path: str, start_index: int = 1) -> list[tuple[int, str, str]]:
+def _collect_text_shape_entries(shape, source_order: int) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+
+    child_shapes = getattr(shape, "shapes", None)
+    if child_shapes is not None:
+        child_entries: list[dict[str, Any]] = []
+        try:
+            for child_idx, child_shape in enumerate(child_shapes, start=1):
+                child_entries.extend(
+                    _collect_text_shape_entries(
+                        child_shape,
+                        source_order=(source_order * 1000) + child_idx,
+                    )
+                )
+        except Exception:
+            child_entries = []
+        if child_entries:
+            return child_entries
+
+    text = extract_shape_text(shape)
+    if not text:
+        return entries
+
+    top = int(getattr(shape, "top", 0) or 0)
+    left = int(getattr(shape, "left", 0) or 0)
+    height = int(getattr(shape, "height", 0) or 0)
+    entries.append(
+        {
+            "text": text,
+            "top": top,
+            "left": left,
+            "bottom": top + max(height, 1),
+            "source_order": source_order,
+        }
+    )
+    return entries
+
+
+def _share_visual_row(row: dict[str, Any], entry: dict[str, Any]) -> bool:
+    overlap = min(row["bottom"], entry["bottom"]) - max(row["top"], entry["top"])
+    return overlap >= -READING_ORDER_ROW_MARGIN_EMU
+
+
+def _sort_entries_by_visual_reading_order(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not entries:
+        return []
+
+    sorted_entries = sorted(
+        entries,
+        key=lambda item: (item["top"], item["left"], item["source_order"]),
+    )
+
+    rows: list[dict[str, Any]] = []
+    for entry in sorted_entries:
+        if rows and _share_visual_row(rows[-1], entry):
+            row = rows[-1]
+            row["entries"].append(entry)
+            row["top"] = min(row["top"], entry["top"])
+            row["bottom"] = max(row["bottom"], entry["bottom"])
+            continue
+
+        rows.append(
+            {
+                "top": entry["top"],
+                "bottom": entry["bottom"],
+                "entries": [entry],
+            }
+        )
+
+    ordered: list[dict[str, Any]] = []
+    for row in rows:
+        row["entries"].sort(
+            key=lambda item: (item["left"], item["top"], item["source_order"])
+        )
+        ordered.extend(row["entries"])
+
+    return ordered
+
+
+def extract_slide_text_chunks(slide) -> list[str]:
+    entries: list[dict[str, Any]] = []
+    for source_order, shape in enumerate(slide.shapes, start=1):
+        entries.extend(_collect_text_shape_entries(shape, source_order))
+
+    ordered_entries = _sort_entries_by_visual_reading_order(entries)
+    return [entry["text"] for entry in ordered_entries if entry["text"]]
+
+
+def _is_no_text_ocr_result(text: str) -> bool:
+    normalized = _normalize_for_match(text)
+    if not normalized:
+        return True
+    if "no readable text detected" in normalized:
+        return True
+    if "no extractable text found on this slide" in normalized:
+        return True
+    return normalized in {
+        "no readable text",
+        "no text",
+        "none",
+        "n a",
+        "na",
+    }
+
+
+def enrich_pptx_rows_with_image_ocr(
+    api_key: str,
+    vision_model: str,
+    rows: list[tuple[int, str, str, str, int]],
+    slide_image_map: dict[int, str],
+    ocr_passes: int,
+) -> list[tuple[int, str, str, str, int]]:
+    """Use exported slide images as OCR fallback for PPTX slides with no extracted text."""
+    if not rows or not api_key or not slide_image_map:
+        return rows
+
+    updated: list[tuple[int, str, str, str, int]] = []
+    applied = 0
+
+    for idx, title, body, pptx_path, local_idx in rows:
+        body_text = str(body or "")
+        has_text = bool(_extract_raw_lines_for_full_mode(body_text, title))
+        has_missing_marker = "[No extractable text found on this slide.]" in body_text
+
+        if has_text and not has_missing_marker:
+            updated.append((idx, title, body_text, pptx_path, local_idx))
+            continue
+
+        image_path = slide_image_map.get(idx, "")
+        if not image_path or not os.path.isfile(image_path):
+            updated.append((idx, title, body_text, pptx_path, local_idx))
+            continue
+
+        try:
+            ocr_text = vision_extract_with_tiling_retry(
+                api_key,
+                vision_model,
+                image_path,
+                f"{idx} - {title}",
+                max_passes=ocr_passes,
+            )
+        except Exception as e:
+            print(f"WARN OCR fallback failed for slide {idx}: {e}", file=sys.stderr)
+            updated.append((idx, title, body_text, pptx_path, local_idx))
+            continue
+
+        ocr_text = (ocr_text or "").strip()
+        if not ocr_text or _is_no_text_ocr_result(ocr_text):
+            updated.append((idx, title, body_text, pptx_path, local_idx))
+            continue
+
+        ocr_lines = [line.strip() for line in ocr_text.splitlines() if line.strip()]
+        filtered_lines = [l for l in ocr_lines if not re.search(r"slide text", l, re.IGNORECASE)]
+        main_line = max(filtered_lines, key=len) if filtered_lines else (max(ocr_lines, key=len) if ocr_lines else "")
+        applied += 1
+        updated.append(
+            (
+                idx,
+                title,
+                main_line,
+                pptx_path,
+                local_idx,
+            )
+        )
+
+    if applied:
+        print(
+            f"INFO OCR fallback populated text for {applied} slide(s) from exported slide images.",
+            file=sys.stderr,
+        )
+    return updated
+
+
+def load_slides_from_pptx(pptx_path: str, start_index: int = 1) -> list[tuple[int, str, str, str, int]]:
     try:
         from pptx import Presentation
     except Exception as e:
@@ -525,7 +1914,7 @@ def load_slides_from_pptx(pptx_path: str, start_index: int = 1) -> list[tuple[in
         ) from e
 
     presentation = Presentation(pptx_path)
-    rows: list[tuple[int, str, str]] = []
+    rows: list[tuple[int, str, str, str, int]] = []
     for local_idx, slide in enumerate(presentation.slides, start=1):
         idx = start_index + (local_idx - 1)
         title = ""
@@ -537,11 +1926,7 @@ def load_slides_from_pptx(pptx_path: str, start_index: int = 1) -> list[tuple[in
         if not title:
             title = f"Slide {local_idx}"
 
-        text_chunks: list[str] = []
-        for shape in slide.shapes:
-            chunk = extract_shape_text(shape)
-            if chunk:
-                text_chunks.append(chunk)
+        text_chunks = extract_slide_text_chunks(slide)
 
         notes_text = ""
         try:
@@ -554,13 +1939,13 @@ def load_slides_from_pptx(pptx_path: str, start_index: int = 1) -> list[tuple[in
 
         body_parts: list[str] = []
         if text_chunks:
-            body_parts.append("Slide text:\n" + "\n".join(text_chunks))
+            body_parts.append("\n".join(text_chunks))
         if notes_text:
             body_parts.append("Presenter notes:\n" + notes_text)
         if not body_parts:
             body_parts.append("[No extractable text found on this slide.]")
 
-        rows.append((idx, title, "\n\n".join(body_parts).strip()))
+        rows.append((idx, title, "\n\n".join(body_parts).strip(), pptx_path, local_idx))
     return rows
 
 
@@ -592,6 +1977,7 @@ def build_raw_from_images(
     vision_model: str,
     rows: list[tuple[int, str, str]],
     raw_out: str,
+    ocr_passes: int,
 ) -> str:
     raw_text_parts: list[str] = []
     with open(raw_out, "w", encoding="utf-8") as raw_fp:
@@ -604,7 +1990,13 @@ def build_raw_from_images(
                 raw_text_parts.append(block)
                 print(f"WARN missing image: {abs_img}", file=sys.stderr)
                 continue
-            extracted = vision_extract(api_key, vision_model, abs_img, label)
+            extracted = vision_extract_with_tiling_retry(
+                api_key,
+                vision_model,
+                abs_img,
+                label,
+                max_passes=ocr_passes,
+            )
             block = f"=== SLIDE {idx} ({title}) ===\n{extracted}\n"
             raw_fp.write(block)
             raw_fp.flush()
@@ -612,10 +2004,10 @@ def build_raw_from_images(
     return "".join(raw_text_parts)
 
 
-def build_raw_from_pptx(rows: list[tuple[int, str, str]], raw_out: str) -> str:
+def build_raw_from_pptx(rows: list[tuple[int, str, str, str, int]], raw_out: str) -> str:
     raw_text_parts: list[str] = []
     with open(raw_out, "w", encoding="utf-8") as raw_fp:
-        for idx, title, extracted in rows:
+        for idx, title, extracted, _pptx_path, _local_idx in rows:
             block = f"=== SLIDE {idx} ({title}) ===\n{extracted}\n"
             raw_fp.write(block)
             raw_fp.flush()
@@ -631,6 +2023,8 @@ def main() -> None:
 
     settings_path = os.path.join(root, "Data", "AIPresenter", "Config", "ai_settings.json")
     csv_path = os.path.join(root, "Data", "AIPresenter", "Input", "slides.csv")
+    narration_mode_csv_path = os.path.join(root, NARRATION_MODE_CSV_DEFAULT)
+    slide_index_map_csv_path = os.path.join(root, SLIDE_INDEX_MAP_CSV_DEFAULT)
     master_prompt_path = os.path.join(root, "Data", "AIPresenter", "Input", "presentation_master_prompt.txt")
     raw_out = os.path.join(root, "Data", "AIPresenter", "Temp", "extracted_slides_raw.txt")
     gpt_out = os.path.join(root, "Data", "AIPresenter", "Input", "gpt_slide_content.txt")
@@ -643,6 +2037,7 @@ def main() -> None:
     api_key = (cfg.get("openai_api_key") or "").strip()
     vision_model = (cfg.get("openai_vision_model") or "gpt-4o").strip()
     chat_model = (cfg.get("openai_model") or "gpt-4o").strip()
+    ocr_passes = parse_ocr_passes(cfg.get("openai_ocr_passes"), default_value=DEFAULT_OCR_PASSES)
 
     if not api_key or api_key.startswith("YOUR_"):
         print("Missing valid openai_api_key in ai_settings.json", file=sys.stderr)
@@ -679,28 +2074,55 @@ def main() -> None:
 
     raw_text = ""
     source_mode = ""
+    pptx_slide_lookup: dict[tuple[str, int], int] = {}
+    slide_source_meta: dict[int, tuple[str, int]] = {}
     if pptx_paths:
         try:
-            all_pptx_rows: list[tuple[int, str, str]] = []
+            all_pptx_rows: list[tuple[int, str, str, str, int]] = []
             next_index = 1
             for pptx_path in pptx_paths:
                 deck_rows = load_slides_from_pptx(pptx_path, start_index=next_index)
                 all_pptx_rows.extend(deck_rows)
                 next_index += len(deck_rows)
+
+            slide_image_map = read_slide_image_map_from_tsv(root)
+            if slide_image_map:
+                all_pptx_rows = enrich_pptx_rows_with_image_ocr(
+                    api_key,
+                    vision_model,
+                    all_pptx_rows,
+                    slide_image_map,
+                    ocr_passes=ocr_passes,
+                )
         except Exception as e:
             print(f"PPTX parse failed: {e}", file=sys.stderr)
             sys.exit(2)
 
         raw_text = build_raw_from_pptx(all_pptx_rows, raw_out)
+        write_slide_index_mapping_csv(root, slide_index_map_csv_path, all_pptx_rows)
+        pptx_slide_lookup = build_pptx_slide_lookup(root, all_pptx_rows)
+        slide_source_meta = build_slide_index_source_meta(all_pptx_rows)
         source_mode = f"pptx:{len(pptx_paths)} file(s)"
         print(
             "INFO pptx order: " + ", ".join(os.path.basename(path) for path in pptx_paths),
             file=sys.stderr,
         )
+        print(
+            "INFO slide index mapping: " + format_path_for_message(root, slide_index_map_csv_path),
+            file=sys.stderr,
+        )
     elif csv_rows:
         try:
-            raw_text = build_raw_from_images(api_key, vision_model, csv_rows, raw_out)
+            raw_text = build_raw_from_images(
+                api_key,
+                vision_model,
+                csv_rows,
+                raw_out,
+                ocr_passes=ocr_passes,
+            )
             source_mode = "csv-images"
+            if os.path.isfile(slide_index_map_csv_path):
+                os.remove(slide_index_map_csv_path)
         except (urllib.error.HTTPError, urllib.error.URLError, KeyError, OSError) as e:
             print(f"Vision extraction failed: {e}", file=sys.stderr)
             sys.exit(2)
@@ -716,17 +2138,36 @@ def main() -> None:
         print("No slide content extracted from source.", file=sys.stderr)
         sys.exit(2)
 
+    print(f"INFO OCR multi-pass enabled: {ocr_passes} pass(es)", file=sys.stderr)
+
+    mode_map, mode_warnings = read_slide_narration_mode_csv(
+        narration_mode_csv_path,
+        pptx_slide_lookup=pptx_slide_lookup if pptx_slide_lookup else None,
+    )
+    for warn in mode_warnings:
+        print(warn, file=sys.stderr)
+
+    runtime_rules = build_runtime_narration_rules(mode_map)
+    mode_user_block = build_narration_mode_user_block(mode_map, slide_source_meta)
+    effective_master_prompt = master_prompt + "\n\n" + runtime_rules
+
     user_block = (
         "RAW DATA (slide order):\n\n"
         + raw_text
+        + "\n\n"
+        + mode_user_block
         + "\n\nFollow the === SLIDE | index | title === block format as instructed."
     )
 
     try:
-        composed = chat_completion(api_key, chat_model, master_prompt, user_block)
+        composed = chat_completion(api_key, chat_model, effective_master_prompt, user_block)
     except (urllib.error.HTTPError, urllib.error.URLError, KeyError) as e:
         print(f"GPT compose failed: {e}", file=sys.stderr)
         sys.exit(3)
+
+    raw_blocks = parse_raw_slide_blocks(raw_text)
+    composed = enforce_full_mode_coverage(composed, raw_blocks, mode_map)
+    composed = enforce_hyperlink_summary_coverage(composed, raw_blocks)
 
     with open(gpt_out, "w", encoding="utf-8") as f:
         f.write(composed)

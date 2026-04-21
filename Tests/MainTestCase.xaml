@@ -89,7 +89,7 @@
       <AssemblyReference>WindowsBase</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence sap2010:Annotation.AnnotationText="Verify if the Main workflow works as expected.&#xA;The verification should check whether the status file or report built after the process run is the expected one." DisplayName="MainTestCase" sap:VirtualizedContainerService.HintSize="657.3333333333334,1230" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="Verify if the Main workflow works as expected.&#xA;The verification should check whether the status file or report built after the process run is the expected one." DisplayName="MainTestCase" sap:VirtualizedContainerService.HintSize="761.2,1314.4" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" sap2010:Annotation.AnnotationText="Please add the path to the status file" Default="Tests\Tests.xlsx" Name="StatusFileName" />
       <Variable x:TypeArguments="x:String" sap2010:Annotation.AnnotationText="Please add the path to the expected status file" Default="Tests\Tests.xlsx" Name="ExpectedDataFileName" />
@@ -100,8 +100,8 @@
         <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="Log Message - MainTestCase" sap:VirtualizedContainerService.HintSize="595.3333333333334,176.66666666666666" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;MainTestCase started.&quot;]" />
-    <Sequence DisplayName="... Given" sap:VirtualizedContainerService.HintSize="595.3333333333334,199.33333333333334" sap2010:WorkflowViewState.IdRef="Sequence_2">
+    <ui:LogMessage DisplayName="Log Message - MainTestCase" sap:VirtualizedContainerService.HintSize="567.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;MainTestCase started.&quot;]" />
+    <Sequence DisplayName="... Given" sap:VirtualizedContainerService.HintSize="567.2,171.2" sap2010:WorkflowViewState.IdRef="Sequence_2">
       <sap:WorkflowViewStateService.ViewState>
         <scg:Dictionary x:TypeArguments="x:String, x:Object">
           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -109,7 +109,7 @@
       </sap:WorkflowViewStateService.ViewState>
       <ui:Comment DisplayName="Prerequisites" sap:VirtualizedContainerService.HintSize="388,79.33333333333333" sap2010:WorkflowViewState.IdRef="Comment_1" Text="// Add prerequisite activities here" />
     </Sequence>
-    <Sequence DisplayName="... When" sap:VirtualizedContainerService.HintSize="595.3333333333334,320.6666666666667" sap2010:WorkflowViewState.IdRef="Sequence_3">
+    <Sequence DisplayName="... When" sap:VirtualizedContainerService.HintSize="567.2,292.8" sap2010:WorkflowViewState.IdRef="Sequence_3">
       <sap:WorkflowViewStateService.ViewState>
         <scg:Dictionary x:TypeArguments="x:String, x:Object">
           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -122,7 +122,7 @@
         </ui:InvokeWorkflowFile.Arguments>
       </ui:InvokeWorkflowFile>
     </Sequence>
-    <Sequence DisplayName="... Then" sap:VirtualizedContainerService.HintSize="595.3333333333334,400" sap2010:WorkflowViewState.IdRef="Sequence_4">
+    <Sequence DisplayName="... Then" sap:VirtualizedContainerService.HintSize="567.2,608" sap2010:WorkflowViewState.IdRef="Sequence_4">
       <Sequence.Variables>
         <Variable x:TypeArguments="sd:DataTable" Name="dt_ResultsData" />
         <Variable x:TypeArguments="sd:DataTable" Name="dt_ExpectedData" />
@@ -132,14 +132,14 @@
           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
         </scg:Dictionary>
       </sap:WorkflowViewStateService.ViewState>
-      <ui:ReadRange AddHeaders="True" DataTable="[dt_ResultsData]" DisplayName="Read Resulted Data" sap:VirtualizedContainerService.HintSize="533.3333333333334,120" sap2010:WorkflowViewState.IdRef="ReadRange_1" SheetName="Tests" WorkbookPath="[StatusFileName]">
+      <ui:ReadRange AddHeaders="True" DataTable="[dt_ResultsData]" DisplayName="Read Resulted Data" sap:VirtualizedContainerService.HintSize="533.6,226.4" sap2010:WorkflowViewState.IdRef="ReadRange_1" SheetName="Tests" WorkbookPath="[StatusFileName]">
         <ui:ReadRange.Range>
           <InArgument x:TypeArguments="x:String">
             <Literal x:TypeArguments="x:String" Value="" />
           </InArgument>
         </ui:ReadRange.Range>
       </ui:ReadRange>
-      <ui:ReadRange AddHeaders="True" DataTable="[dt_ExpectedData]" DisplayName="Read Expected Data" sap:VirtualizedContainerService.HintSize="533.6,97.6" sap2010:WorkflowViewState.IdRef="ReadRange_2" SheetName="Result" WorkbookPath="[ExpectedDataFileName]">
+      <ui:ReadRange AddHeaders="True" DataTable="[dt_ExpectedData]" DisplayName="Read Expected Data" sap:VirtualizedContainerService.HintSize="533.6,226.4" sap2010:WorkflowViewState.IdRef="ReadRange_2" SheetName="Result" WorkbookPath="[ExpectedDataFileName]">
         <ui:ReadRange.Range>
           <InArgument x:TypeArguments="x:String">
             <Literal x:TypeArguments="x:String" Value="" />

@@ -1,46 +1,45 @@
 You are preparing a spoken narration script for an AI presenter.
-
-Important context:
-- This is NOT a classroom lecture.
-- This is a recruitment presentation for FPT Corporation (the FPT Group), presented to potential candidates and stakeholders.
-- When discussing statutory or government-mandated benefits (for example, SSS), describe them as public/government programs, not company-owned benefits.
-- For those items, avoid first-person ownership wording such as "we provide SSS" or "our SSS benefit". Prefer neutral phrasing like "SSS is a government office/program" and "employees are covered based on government rules".
-
-Your goal is to transform raw slide text into a natural, persuasive, professional talk track that sounds like a real presenter at a hiring event.
-
+Critical compliance rules:
+- Narration must be grounded in each slide raw content as the primary source.
+- You may add brief outside context to improve flow only when it helps clarity.
+- Any outside context must stay generic and relevant; do not invent specific details, exact numbers, dates, commitments, policies, or claims not shown on the slide.
+- When a visible URL/hyperlink appears on a slide, never read the full URL string in narration.
+- Do not speak protocol/path/query or spell technical URL tokens (for example: do not read "http", "https", "www", slashes, query strings).
+- For hyperlink slides, if needed, add only 1 short summary sentence explaining what the link is for in the context of the slide.
+- Never output the literal label "Hyperlink:" in narration.
+- Do not say the word "hyperlink" as a field label; present the link naturally and summarize its purpose.
+- When a link clearly points to an official, public, or organizational source, describe it in neutral terms based only on what is visible in the slide.
+- Base link summaries only on visible link text, readable domain cues, and nearby slide context. If uncertain, use cautious wording such as "This link appears to point to..." and do not claim unseen page details.
+- Keep wording professional and clear, but concise.
+- Speak like a normal human presenter: natural sentence flow, short transitions, no robotic keyword dumping.
+- Vary sentence openings, bridge phrases, and list lead-ins across and within slides.
+- Avoid repeating the same scaffolding phrase across nearby sentences or slides (for example: "it further includes", "the slide also lists", "it also covers"). Prefer direct continuation or a fresh sentence instead.
+- Do not repeat a word or phrase more than twice in the same paragraph. Use diverse expressions, synonyms, or rephrase sentences to avoid word repetition. 
+Universal content filtering and repetition rules (for all presentations):
+- Do not repeat or narrate any heading, label, or section title that is generic, structural, or template-like. Only mention such terms if they are central to the unique meaning of the slide.
+- Remove or ignore any line that is a hyperlink, email address, or raw URL (for example: lines starting with 'http', 'https', 'www.', 'mailto:', or 'Hyperlink:'). Only summarize the purpose of the link if it is relevant to the slide's message.
+- If a line or phrase appears more than once in a slide (consecutively or non-consecutively), only keep the first occurrence in the narration.
+- Do not read or narrate any technical, template, or meta label that is not meaningful to the audience.
+- Always focus narration on the unique, meaningful content of each slide, not on repeated, generic, or structural labels.
+- These rules must be applied for every slide, regardless of the specific content or file. Always apply the logic based on the structure and repetition in the slide content.
 Your task:
-1. For each slide, write a clear, flowing, human-sounding spoken script in English.
-     - Tone and style:
-         - Professional, warm, confident, and audience-facing.
-         - Suitable for employer branding and talent attraction.
-         - Keep business language polished and corporate-professional; avoid slang, filler words, or overly casual phrasing.
-         - Avoid academic/teaching wording like "in this lesson" or "in this chapter".
-     - Depth and detail:
-         - Add more detail than the raw bullet points.
-         - Explain why each point matters to candidates (career growth, work environment, impact, opportunities, benefits).
-         - Clearly distinguish company-provided benefits from government/statutory benefits when both appear.
-         - Convert short bullets into connected explanations, not list-reading.
-     - Controlled outside context (important):
-         - When useful, add 1 to 2 short contextual sentences beyond slide text (industry trend, practical example, candidate perspective, market context in Vietnam, etc.).
-         - Keep this outside context relevant and concise.
-         - Do NOT invent internal FPT policy details, exact numbers, dates, or commitments that are not in the slide text.
-         - If adding context around uncertain points, phrase it carefully (for example: "In many organizations..." or "As a broader market trend...").
-     - Language quality:
-         - Vary sentence length and rhythm to sound natural.
-         - Expand acronyms at first mention when helpful.
-         - Keep transitions smooth between ideas.
-
-2. Strictly follow the slide order and indices from the raw data blocks (which look like `=== SLIDE n (title) ===`).
-
-3. On the final slide block (the highest slide index in the input), end naturally with a short recruitment-style closing sentence (thank the audience and invite next steps).
-
-4. Output ONLY the composed script using this exact delimiter format for downstream parsing:
-
+1. For each slide, produce spoken narration in English based only on that slide raw data.
+2. Preserve factual wording from raw slide content as much as possible.
+3. If slide content is list-heavy, cover all major listed items in a clear spoken order, then optionally add a short contextual bridge sentence. Do not rely on the same repeated list-introducer pattern for every continuation.
+4. If content is limited, keep narration short and factual instead of inventing details.
+5. You may add light connecting phrases (for example: "next", "in this section", "the slide shows") only when they do not add new facts.
+6. For slides containing URLs/hyperlinks, do not output the raw URL, do not output "Hyperlink:", and do not read protocol/path/query; provide only a brief link-purpose summary when it is useful.
+7. Use transitions only when they improve flow. Do not force a recap or transition on every slide.
+8. Strictly follow slide order and indices from the raw blocks (`=== SLIDE n (title) ===`).
+9. If the incoming raw slide title is generic or placeholder-like (for example: `Slide 6`, `Slide 8`, `Untitled Slide`), replace it with the most likely visible slide title from that slide's raw text. Prefer the top heading or the clearest repeated heading text. Only keep `Slide <n>` when no readable title can be recovered from the raw content at all.
+10. Always filter out lines and words as described in the filtering rules above before generating narration.
+Output format (required):
 === SLIDE | <slide_index> | <slide_title> ===
-<Your spoken narration paragraph(s) for this slide. Plain text only.>
-
-Repeat one block for each slide, ensuring slide indices ascend correctly. Use the exact `slide_index` and `slide_title` from the raw data. The title must not contain the "=" character.
-
-Do not add any intro or outro text outside of these structured blocks.
-
-If a slide is missing content or has extraction issues (for example: "image not found"), write a brief, honest spoken line for that slide, such as: "It seems the content for this slide is currently unavailable. Let me move to the next point." 
+<spoken narration plain text>
+Header safety rules:
+- Header must be one physical line.
+- `<slide_title>` must not contain tab/newline/carriage-return.
+- Normalize title whitespace to single spaces.
+- Keep original title wording and order when the raw title is already meaningful.
+- When replacing a generic placeholder title, choose the shortest accurate visible heading from the same slide content instead of leaving `Slide <n>`.
+Do not add text outside these slide blocks.

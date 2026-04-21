@@ -3,8 +3,6 @@
 ================================================================================
 
 This project uses Python for (UiPath invokes `pyw` for no console window):
-  - resolve_default_microphone.py  — default mic name when ai_settings has
-    "microphone_name": "default" (requires pycaw).
   - elevenlabs_tts.py              — ElevenLabs TTS to WAV (stdlib).
   - play_response_audio.py — plays response.wav and blocks until the end (uses
     ffplay.exe next to ffmpeg.exe if present: copy both from the same ffmpeg build).
@@ -74,14 +72,8 @@ This project uses Python for (UiPath invokes `pyw` for no console window):
     py -m pip install -r Data\AIPresenter\Scripts\requirements-aipresenter.txt
 
   This installs:
-    - pycaw (and its dependencies: comtypes, psutil) for default microphone name
-      resolution used by resolve_default_microphone.py.
     - openpyxl for reading ordered PPTX list from pptx_run_order.xlsx.
       (If openpyxl is unavailable, pptx_run_order_template.csv still works.)
-
-  Verify:
-
-    py -c "import pycaw; print('pycaw OK')"
 
 --------------------------------------------------------------------------------
 4. UiPath runtime notes
@@ -95,21 +87,7 @@ This project uses Python for (UiPath invokes `pyw` for no console window):
   - Run the robot from a context where the same user has installed packages with
     `py -m pip` (per-user installs apply to that Windows account).
 
---------------------------------------------------------------------------------
-5. resolved_microphone_name.txt (Temp folder)
---------------------------------------------------------------------------------
-
-  When ai_settings.json has "microphone_name": "default", the workflow runs
-  resolve_default_microphone.py before each recording and overwrites:
-
-    Data\AIPresenter\Temp\resolved_microphone_name.txt
-
-  That file is a runtime cache of the current Windows default capture device name.
-  Do not treat it as fixed configuration; do not commit it to source control if you
-  use Git (see .gitignore).
-
---------------------------------------------------------------------------------
-6. Pipeline: Vision extract + GPT slide script (AIInteractivePresenter Init)
+5. Pipeline: Vision extract + GPT slide script (AIInteractivePresenter Init)
 --------------------------------------------------------------------------------
 
   After slides_from_pptx.py builds slides_iterate.tsv, UiPath runs:
@@ -132,8 +110,7 @@ This project uses Python for (UiPath invokes `pyw` for no console window):
   Requires valid openai_api_key in Data\AIPresenter\Config\ai_settings.json.
   Optional: openai_vision_model (default gpt-4o).
 
---------------------------------------------------------------------------------
-7. Quick checklist
+6. Quick checklist
 --------------------------------------------------------------------------------
 
   [ ] py --version works in a terminal
@@ -142,7 +119,6 @@ This project uses Python for (UiPath invokes `pyw` for no console window):
       - Data\AIPresenter\Input\pptx_run_order.xlsx
       - Data\AIPresenter\Input\pptx_run_order_template.csv
   [ ] See Data\AIPresenter\Input\pptx_run_order.README.txt for full queue rules
-  [ ] py -c "import pycaw; print('ok')"
   [ ] Run the UiPath workflow again
 
 ================================================================================

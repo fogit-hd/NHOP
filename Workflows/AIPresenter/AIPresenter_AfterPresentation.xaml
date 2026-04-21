@@ -1,43 +1,35 @@
-<Activity mc:Ignorable="sap sap2010" x:Class="AIPresenter_AfterPresentation" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Activity mc:Ignorable="sap sap2010" x:Class="AIPresenter_AfterPresentation" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <x:Members>
-    <x:Property Name="bln_UseWindowsDefaultMic" Type="InOutArgument(x:Boolean)" />
-    <x:Property Name="dict_Headers" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
-    <x:Property Name="int_PipelineShellResult" Type="InOutArgument(x:Int32)" />
-    <x:Property Name="int_PlayResponseShellResult" Type="InOutArgument(x:Int32)" />
-    <x:Property Name="int_PlaySlideVideoShellResult" Type="InOutArgument(x:Int32)" />
-    <x:Property Name="int_SlideOrdinal" Type="InOutArgument(x:Int32)" />
-    <x:Property Name="int_SlidesCsvShellResult" Type="InOutArgument(x:Int32)" />
-    <x:Property Name="str_AIResponse" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_AudioPath" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_CurrentSlideContent" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_ElevenJsonBody" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_ElevenLabsKey" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_ElevenResponseRaw" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_FfmpegArgLine" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_FfmpegPath" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_FfmpegRecordArgFile" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_FfmpegRecordExeFile" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_FfmpegRecordPidFile" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_GptComposedSlides" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_GptJsonBody" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_GptUserContent" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_MicrophoneName" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_OpenAIKey" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_PlayResponseAudioScript" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_PlayVideoScript" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_PythonExe" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_RecordInputArgs" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_ResolvedMicFile" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_ResolveMicScriptPath" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_SlidePrompt" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_SlideVideoPath" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_StartFfmpegScript" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_StopFfmpegScript" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_PresentationActionChoice" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_VoiceId" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_WavInputPath" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_WhisperJsonBody" Type="InOutArgument(x:String)" />
-    <x:Property Name="str_WhisperResponse" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_Headers" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="io_PipelineShellResult" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="io_PlayResponseShellResult" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="io_PlaySlideVideoShellResult" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="io_SlideOrdinal" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="io_SlidesCsvShellResult" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="io_AIResponse" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_AudioPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_CurrentSlideContent" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_ElevenJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_ElevenLabsKey" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_ElevenResponseRaw" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_FfmpegArgLine" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_FfmpegPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_GptComposedSlides" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_GptJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_GptUserContent" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_OpenAIKey" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_PlayResponseAudioScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_PlayVideoScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_PythonExe" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_SlidePrompt" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_SlideVideoPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_StartFfmpegScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_StopFfmpegScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_PresentationActionChoice" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_VoiceId" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_WavInputPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_WhisperJsonBody" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_WhisperResponse" Type="InOutArgument(x:String)" />
   </x:Members>
   <VisualBasic.Settings>
     <x:Null />
@@ -119,28 +111,43 @@
       <AssemblyReference>UiPath.Platform</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <!-- State crosses the boundary via x:Members (InOut); inner activities use those workflow arguments. -->
-  <Sequence DisplayName="After slides: finalization" sap:VirtualizedContainerService.HintSize="200,200" sap2010:WorkflowViewState.IdRef="Sequence_AfterSlides">
-      <If Condition="[Not String.IsNullOrWhiteSpace(str_SlideVideoPath) AndAlso System.IO.File.Exists(str_SlideVideoPath)]" sap:VirtualizedContainerService.HintSize="200,200" sap2010:WorkflowViewState.IdRef="If_PlaySlideVideo">
-        <If.Then>
-          <Assign sap:VirtualizedContainerService.HintSize="200,200" sap2010:WorkflowViewState.IdRef="Assign_PlaySlideVideoShell">
+  <Sequence DisplayName="After slides: finalization" sap:VirtualizedContainerService.HintSize="761.2,1462.4" sap2010:WorkflowViewState.IdRef="Sequence_AfterSlides">
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <ui:LogMessage DisplayName="AfterPresentation start" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_AfterPresentationStart" Level="Info" Message="[&quot;AfterPresentation started. Preparing finalization actions.&quot;]" />
+    <If Condition="[Not String.IsNullOrWhiteSpace(io_SlideVideoPath) AndAlso System.IO.File.Exists(io_SlideVideoPath)]" DisplayName="If there are any file as Slide Video Path" sap:VirtualizedContainerService.HintSize="451.2,628" sap2010:WorkflowViewState.IdRef="If_PlaySlideVideo">
+      <If.Then>
+        <Sequence DisplayName="Play slide video and log result" sap:VirtualizedContainerService.HintSize="449.6,400" sap2010:WorkflowViewState.IdRef="Sequence_1">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Assign DisplayName="Assign " sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_PlaySlideVideoShell">
             <Assign.To>
-              <OutArgument x:TypeArguments="x:Int32">[int_PlaySlideVideoShellResult]</OutArgument>
+              <OutArgument x:TypeArguments="x:Int32">[io_PlaySlideVideoShellResult]</OutArgument>
             </Assign.To>
             <Assign.Value>
-              <InArgument x:TypeArguments="x:Int32">[Microsoft.VisualBasic.Interaction.Shell(Chr(34) + str_PythonExe + Chr(34) + &quot; &quot; + Chr(34) + str_PlayVideoScript + Chr(34) + &quot; --path &quot; + Chr(34) + str_SlideVideoPath + Chr(34) + &quot; --ffmpeg &quot; + Chr(34) + str_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.NormalFocus, True)]</InArgument>
+              <InArgument x:TypeArguments="x:Int32">[Microsoft.VisualBasic.Interaction.Shell(Chr(34) + io_PythonExe + Chr(34) + " " + Chr(34) + io_PlayVideoScript + Chr(34) + " --path " + Chr(34) + io_SlideVideoPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.NormalFocus, True)]</InArgument>
             </Assign.Value>
           </Assign>
-        </If.Then>
-      </If>
-      <Assign sap:VirtualizedContainerService.HintSize="200,200" sap2010:WorkflowViewState.IdRef="Assign_PresentationContextAfterPresentation">
-        <Assign.To>
-          <OutArgument x:TypeArguments="x:String">[str_CurrentSlideContent]</OutArgument>
-        </Assign.To>
-        <Assign.Value>
-          <InArgument x:TypeArguments="x:String">[&quot;Presentation notes (all slides):&quot; + Environment.NewLine + Environment.NewLine + str_GptComposedSlides]</InArgument>
-        </Assign.Value>
-      </Assign>
-      <ui:MessageBox Caption="{x:Null}" AutoCloseAfter="00:00:00" Buttons="Ok" DisplayName="After presentation — finished" sap:VirtualizedContainerService.HintSize="200,200" sap2010:WorkflowViewState.IdRef="MessageBox_AfterPresentation" Text="Presentation finished." TopMost="True" ChosenButton="[str_PresentationActionChoice]" />
+          <ui:LogMessage DisplayName="AfterPresentation video playback result" sap:VirtualizedContainerService.HintSize="416,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_AfterPresentationVideoPlaybackResult" Level="Info" Message="[&quot;Optional final video playback exit code: &quot; + io_PlaySlideVideoShellResult.ToString]" />
+        </Sequence>
+      </If.Then>
+    </If>
+    <Assign DisplayName="Assign Current Side Content" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_PresentationContextAfterPresentation">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_CurrentSlideContent]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["Presentation notes (all slides):" + Environment.NewLine + Environment.NewLine + io_GptComposedSlides]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="AfterPresentation context ready" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_AfterPresentationContextReady" Level="Info" Message="[&quot;Final presentation context generated.&quot;]" />
+    <ui:MessageBox Caption="{x:Null}" AutoCloseAfter="00:00:00" Buttons="Ok" ChosenButton="[io_PresentationActionChoice]" DisplayName="After presentation — finished" sap:VirtualizedContainerService.HintSize="451.2,122.4" sap2010:WorkflowViewState.IdRef="MessageBox_AfterPresentation" Text="[&quot;Presentation finished.&quot;]" TopMost="True" />
+    <ui:LogMessage DisplayName="AfterPresentation completed" sap:VirtualizedContainerService.HintSize="451.2,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_AfterPresentationCompleted" Level="Info" Message="[&quot;AfterPresentation completed.&quot;]" />
   </Sequence>
 </Activity>

@@ -1,0 +1,32 @@
+REQUIRED AND USED APPLICATIONS IN THE PROJECT
+
+1. UiPath Studio/Robot
+Used to run the project's XAML workflows.
+
+2. Python 3.x (recommended: 3.11)
+Used to run scripts in Data/AIPresenter/Scripts.
+Required pip packages: python-pptx, openpyxl, Pillow.
+Built-in module used: tkinter (for popup UI/effects/icons).
+Note: tkinter is bundled with Python on Windows and is not installed via pip.
+
+3. FFmpeg toolset (ffmpeg.exe, ffplay.exe, ffprobe.exe)
+Used for audio/video processing, slide segment muxing, media playback, and duration calculation.
+
+4. Microsoft PowerPoint Desktop
+Required for PPTX mode to export slides as PNG images (COM automation), enabling OCR/image fallback to work reliably.
+
+4. Microsoft Excel
+Required for robot to read Config.xlsx file and manage data from csv file.
+
+5. OpenAI API
+Used for vision extraction and narration composition.
+
+6. ElevenLabs API
+Used for text-to-speech to generate narration WAV files.
+
+7. Windows built-in process tools (taskkill.exe)
+Used to close/manage playback and control popup processes at runtime.
+
+8. Winget + PowerShell (for bootstrap/automatic installation)
+Not required at runtime if dependencies are already installed, but needed when running check_and_install_dependencies.bat.
+The bat checker now verifies python-pptx, openpyxl, Pillow, and tkinter availability.

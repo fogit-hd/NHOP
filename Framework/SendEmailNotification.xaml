@@ -99,35 +99,35 @@
       <AssemblyReference>UiPath.Platform</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Send email notification" sap:VirtualizedContainerService.HintSize="628.4000000000001,4238.4" sap2010:WorkflowViewState.IdRef="Sequence_SendEmailNotification">
+  <Sequence DisplayName="Send email notification" sap:VirtualizedContainerService.HintSize="761.2,4238.4" sap2010:WorkflowViewState.IdRef="Sequence_SendEmailNotification">
     <Sequence.Variables>
-      <Variable x:TypeArguments="x:String" Name="str_SlideStatusTsvPath" />
-      <Variable x:TypeArguments="x:String" Name="str_RecipientEmail">
+      <Variable x:TypeArguments="x:String" Name="strSlideStatusTsvPath" />
+      <Variable x:TypeArguments="x:String" Name="strRecipientEmail">
         <Variable.Default>
           <Literal x:TypeArguments="x:String" Value="" />
         </Variable.Default>
       </Variable>
-      <Variable x:TypeArguments="x:String" Name="str_SenderEmail">
+      <Variable x:TypeArguments="x:String" Name="strSenderEmail">
         <Variable.Default>
           <Literal x:TypeArguments="x:String" Value="" />
         </Variable.Default>
       </Variable>
-      <Variable x:TypeArguments="x:String" Name="str_SenderPassword">
+      <Variable x:TypeArguments="x:String" Name="strSenderPassword">
         <Variable.Default>
           <Literal x:TypeArguments="x:String" Value="" />
         </Variable.Default>
       </Variable>
-      <Variable x:TypeArguments="x:String" Name="str_SmtpServer">
+      <Variable x:TypeArguments="x:String" Name="strSmtpServer">
         <Variable.Default>
           <Literal x:TypeArguments="x:String" Value="" />
         </Variable.Default>
       </Variable>
-      <Variable x:TypeArguments="x:Int32" Name="int_SmtpPort" />
-      <Variable x:TypeArguments="x:String" Name="str_EmailSubject" />
-      <Variable x:TypeArguments="x:String" Name="str_EmailBody" />
-      <Variable x:TypeArguments="x:String" Name="str_ErrorSummary" />
-      <Variable x:TypeArguments="x:String" Name="str_ErrorSummaryHtml" />
-      <Variable x:TypeArguments="x:String" Name="str_EmailFooterHtml" />
+      <Variable x:TypeArguments="x:Int32" Name="intSmtpPort" />
+      <Variable x:TypeArguments="x:String" Name="strEmailSubject" />
+      <Variable x:TypeArguments="x:String" Name="strEmailBody" />
+      <Variable x:TypeArguments="x:String" Name="strErrorSummary" />
+      <Variable x:TypeArguments="x:String" Name="strErrorSummaryHtml" />
+      <Variable x:TypeArguments="x:String" Name="strEmailFooterHtml" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -136,7 +136,7 @@
     </sap:WorkflowViewStateService.ViewState>
     <Assign DisplayName="Path: slide status TSV" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_SlideStatusPath">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_SlideStatusTsvPath]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strSlideStatusTsvPath]</OutArgument>
       </Assign.To>
       <Assign.Value>
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","slide_status_report.tsv")]</InArgument>
@@ -144,7 +144,7 @@
     </Assign>
     <Assign DisplayName="Build error summary text" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ErrorSummary">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_ErrorSummary]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strErrorSummary]</OutArgument>
       </Assign.To>
       <Assign.Value>
         <InArgument x:TypeArguments="x:String">[If(in_SystemException Is Nothing, "Detailed error:" + Environment.NewLine + "- No exception object was provided.", "Detailed error:" + Environment.NewLine + If(String.IsNullOrWhiteSpace(in_SystemException.Message), "- [No error message provided]", "- " + in_SystemException.Message) + If(in_SystemException.InnerException Is Nothing OrElse String.IsNullOrWhiteSpace(in_SystemException.InnerException.Message), "", Environment.NewLine + "- Inner: " + in_SystemException.InnerException.Message) + If(String.IsNullOrWhiteSpace(in_SystemException.Source), "", Environment.NewLine + "- Source: " + in_SystemException.Source))]</InArgument>
@@ -152,7 +152,7 @@
     </Assign>
     <Assign DisplayName="Build email subject" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_EmailSubject">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_EmailSubject]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strEmailSubject]</OutArgument>
       </Assign.To>
       <Assign.Value>
         <InArgument x:TypeArguments="x:String">[If(in_SystemException Is Nothing, "NHOP Robot Success Notification", "NHOP Robot Failure Alert") + If(String.IsNullOrWhiteSpace(in_TransactionID), "", " | Transaction: " + in_TransactionID)]</InArgument>
@@ -160,15 +160,15 @@
     </Assign>
     <Assign DisplayName="Convert error summary to HTML" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ErrorSummaryHtml">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_ErrorSummaryHtml]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strErrorSummaryHtml]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(str_ErrorSummary), "N/A", str_ErrorSummary.Replace(vbCrLf,"&lt;br/&gt;").Replace(vbLf,"&lt;br/&gt;"))]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(strErrorSummary), "N/A", strErrorSummary.Replace(vbCrLf,"&lt;br/&gt;").Replace(vbLf,"&lt;br/&gt;"))]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Build shared email footer HTML" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_EmailFooterHtml">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_EmailFooterHtml]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strEmailFooterHtml]</OutArgument>
       </Assign.To>
       <Assign.Value>
         <InArgument x:TypeArguments="x:String">["&lt;hr style='border:none;border-top:1px solid #e5e7eb;margin:16px 0 12px 0;' /&gt;&lt;p style='margin:0;color:#6b7280;font-size:12px;'&gt;This is an automated message from &lt;strong&gt;NEO Force - FPT OJT Batch 6&lt;/strong&gt;. Please do not reply to this email.&lt;/p&gt;&lt;p style='margin:6px 0 0 0;color:#6b7280;font-size:12px;'&gt;Contact: NEO Force Team (FPT OJT Batch 6)&lt;/p&gt;"]</InArgument>
@@ -176,82 +176,82 @@
     </Assign>
     <Assign DisplayName="Build email body (success/failure)" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_EmailBody">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_EmailBody]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strEmailBody]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_SystemException Is Nothing, "&lt;html&gt;&lt;body style='margin:0;padding:0;background-color:#f4f6f8;font-family:Segoe UI,Arial,sans-serif;color:#111827;'&gt;&lt;div style='max-width:680px;margin:24px auto;padding:0 12px;'&gt;&lt;div style='background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;'&gt;&lt;div style='background:#e8f7ee;padding:16px 20px;border-bottom:1px solid #d1fae5;'&gt;&lt;h2 style='margin:0;color:#065f46;font-size:20px;'&gt;NHOP Robot Success&lt;/h2&gt;&lt;/div&gt;&lt;div style='padding:18px 20px;line-height:1.6;'&gt;&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Time:&lt;/strong&gt; " + Now.ToString("yyyy-MM-dd HH:mm:ss") + "&lt;/p&gt;" + If(String.IsNullOrWhiteSpace(in_TransactionID), "", "&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Transaction:&lt;/strong&gt; " + in_TransactionID + "&lt;/p&gt;") + "&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Status:&lt;/strong&gt; SUCCESS&lt;/p&gt;" + str_EmailFooterHtml + "&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;", "&lt;html&gt;&lt;body style='margin:0;padding:0;background-color:#f4f6f8;font-family:Segoe UI,Arial,sans-serif;color:#111827;'&gt;&lt;div style='max-width:680px;margin:24px auto;padding:0 12px;'&gt;&lt;div style='background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;'&gt;&lt;div style='background:#fee2e2;padding:16px 20px;border-bottom:1px solid #fecaca;'&gt;&lt;h2 style='margin:0;color:#991b1b;font-size:20px;'&gt;NHOP Robot Failure Alert&lt;/h2&gt;&lt;/div&gt;&lt;div style='padding:18px 20px;line-height:1.6;'&gt;&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Time:&lt;/strong&gt; " + Now.ToString("yyyy-MM-dd HH:mm:ss") + "&lt;/p&gt;" + If(String.IsNullOrWhiteSpace(in_TransactionID), "", "&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Transaction:&lt;/strong&gt; " + in_TransactionID + "&lt;/p&gt;") + "&lt;p style='margin:0 0 12px 0;'&gt;&lt;strong&gt;Status:&lt;/strong&gt; STOPPED after failure&lt;/p&gt;&lt;p style='margin:0 0 8px 0;'&gt;&lt;strong&gt;Error details:&lt;/strong&gt;&lt;/p&gt;&lt;div style='background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin:0 0 12px 0;'&gt;" + str_ErrorSummaryHtml + "&lt;/div&gt;" + str_EmailFooterHtml + "&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;")]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_SystemException Is Nothing, "&lt;html&gt;&lt;body style='margin:0;padding:0;background-color:#f4f6f8;font-family:Segoe UI,Arial,sans-serif;color:#111827;'&gt;&lt;div style='max-width:680px;margin:24px auto;padding:0 12px;'&gt;&lt;div style='background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;'&gt;&lt;div style='background:#e8f7ee;padding:16px 20px;border-bottom:1px solid #d1fae5;'&gt;&lt;h2 style='margin:0;color:#065f46;font-size:20px;'&gt;NHOP Robot Success&lt;/h2&gt;&lt;/div&gt;&lt;div style='padding:18px 20px;line-height:1.6;'&gt;&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Time:&lt;/strong&gt; " + Now.ToString("yyyy-MM-dd HH:mm:ss") + "&lt;/p&gt;" + If(String.IsNullOrWhiteSpace(in_TransactionID), "", "&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Transaction:&lt;/strong&gt; " + in_TransactionID + "&lt;/p&gt;") + "&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Status:&lt;/strong&gt; SUCCESS&lt;/p&gt;" + strEmailFooterHtml + "&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;", "&lt;html&gt;&lt;body style='margin:0;padding:0;background-color:#f4f6f8;font-family:Segoe UI,Arial,sans-serif;color:#111827;'&gt;&lt;div style='max-width:680px;margin:24px auto;padding:0 12px;'&gt;&lt;div style='background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;'&gt;&lt;div style='background:#fee2e2;padding:16px 20px;border-bottom:1px solid #fecaca;'&gt;&lt;h2 style='margin:0;color:#991b1b;font-size:20px;'&gt;NHOP Robot Failure Alert&lt;/h2&gt;&lt;/div&gt;&lt;div style='padding:18px 20px;line-height:1.6;'&gt;&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Time:&lt;/strong&gt; " + Now.ToString("yyyy-MM-dd HH:mm:ss") + "&lt;/p&gt;" + If(String.IsNullOrWhiteSpace(in_TransactionID), "", "&lt;p style='margin:0 0 10px 0;'&gt;&lt;strong&gt;Transaction:&lt;/strong&gt; " + in_TransactionID + "&lt;/p&gt;") + "&lt;p style='margin:0 0 12px 0;'&gt;&lt;strong&gt;Status:&lt;/strong&gt; STOPPED after failure&lt;/p&gt;&lt;p style='margin:0 0 8px 0;'&gt;&lt;strong&gt;Error details:&lt;/strong&gt;&lt;/p&gt;&lt;div style='background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin:0 0 12px 0;'&gt;" + strErrorSummaryHtml + "&lt;/div&gt;" + strEmailFooterHtml + "&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;")]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: recipient email" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigRecipientEmail">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_RecipientEmail]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strRecipientEmail]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_Recipient") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_Recipient"))), Convert.ToString(in_Config("Email_Recipient")), str_RecipientEmail)]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_Recipient") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_Recipient"))), Convert.ToString(in_Config("Email_Recipient")), strRecipientEmail)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: sender email" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigSenderEmail">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_SenderEmail]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strSenderEmail]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_Sender") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_Sender"))), Convert.ToString(in_Config("Email_Sender")), str_SenderEmail)]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_Sender") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_Sender"))), Convert.ToString(in_Config("Email_Sender")), strSenderEmail)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: sender password" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigSenderPassword">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_SenderPassword]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strSenderPassword]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SenderPassword") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SenderPassword"))), Convert.ToString(in_Config("Email_SenderPassword")), str_SenderPassword)]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SenderPassword") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SenderPassword"))), Convert.ToString(in_Config("Email_SenderPassword")), strSenderPassword)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: SMTP server" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigSmtpServer">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_SmtpServer]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strSmtpServer]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SmtpServer") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SmtpServer"))), Convert.ToString(in_Config("Email_SmtpServer")), str_SmtpServer)]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SmtpServer") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SmtpServer"))), Convert.ToString(in_Config("Email_SmtpServer")), strSmtpServer)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Config override: SMTP port" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_ConfigSmtpPort">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:Int32">[int_SmtpPort]</OutArgument>
+        <OutArgument x:TypeArguments="x:Int32">[intSmtpPort]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:Int32">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SmtpPort") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SmtpPort"))) AndAlso IsNumeric(Convert.ToString(in_Config("Email_SmtpPort"))), Convert.ToInt32(in_Config("Email_SmtpPort")), int_SmtpPort)]</InArgument>
+        <InArgument x:TypeArguments="x:Int32">[If(in_Config IsNot Nothing AndAlso in_Config.ContainsKey("Email_SmtpPort") AndAlso Not String.IsNullOrWhiteSpace(Convert.ToString(in_Config("Email_SmtpPort"))) AndAlso IsNumeric(Convert.ToString(in_Config("Email_SmtpPort"))), Convert.ToInt32(in_Config("Email_SmtpPort")), intSmtpPort)]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Normalize sender email" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeFailureSender">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_SenderEmail]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strSenderEmail]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[(If(str_SenderEmail, "")).Trim()]</InArgument>
+        <InArgument x:TypeArguments="x:String">[(If(strSenderEmail, "")).Trim()]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Normalize recipient email" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeFailureRecipient">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_RecipientEmail]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strRecipientEmail]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[(If(str_RecipientEmail, "")).Trim()]</InArgument>
+        <InArgument x:TypeArguments="x:String">[(If(strRecipientEmail, "")).Trim()]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Normalize SMTP server" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeFailureSmtpServer">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_SmtpServer]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strSmtpServer]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[(If(str_SmtpServer, "")).Trim()]</InArgument>
+        <InArgument x:TypeArguments="x:String">[(If(strSmtpServer, "")).Trim()]</InArgument>
       </Assign.Value>
     </Assign>
     <Assign DisplayName="Normalize sender password" sap:VirtualizedContainerService.HintSize="486.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeFailurePassword">
       <Assign.To>
-        <OutArgument x:TypeArguments="x:String">[str_SenderPassword]</OutArgument>
+        <OutArgument x:TypeArguments="x:String">[strSenderPassword]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[If((If(str_SmtpServer, "")).ToLower().Contains("gmail"), (If(str_SenderPassword, "")).Replace(" ", "").Replace(vbTab, "").Replace(vbCr, "").Replace(vbLf, "").Trim(), (If(str_SenderPassword, "")).Trim())]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If((If(strSmtpServer, "")).ToLower().Contains("gmail"), (If(strSenderPassword, "")).Replace(" ", "").Replace(vbTab, "").Replace(vbCr, "").Replace(vbLf, "").Trim(), (If(strSenderPassword, "")).Trim())]</InArgument>
       </Assign.Value>
     </Assign>
     <TryCatch DisplayName="Try send email notification" sap:VirtualizedContainerService.HintSize="486.4,1599.2" sap2010:WorkflowViewState.IdRef="TryCatch_SendEmailNotification">
@@ -262,13 +262,13 @@
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <If Condition="[String.IsNullOrWhiteSpace(str_SenderEmail) OrElse String.IsNullOrWhiteSpace(str_RecipientEmail) OrElse String.IsNullOrWhiteSpace(str_SenderPassword) OrElse str_SenderPassword.Equals(&quot;ADD_APP_PASSWORD_HERE&quot;, StringComparison.OrdinalIgnoreCase)]" DisplayName="Validate sender/recipient/password from Config" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_ValidateFailureEmailConfig">
+          <If Condition="[String.IsNullOrWhiteSpace(strSenderEmail) OrElse String.IsNullOrWhiteSpace(strRecipientEmail) OrElse String.IsNullOrWhiteSpace(strSenderPassword) OrElse strSenderPassword.Equals(&quot;ADD_APP_PASSWORD_HERE&quot;, StringComparison.OrdinalIgnoreCase)]" DisplayName="Validate sender/recipient/password from Config" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_ValidateFailureEmailConfig">
             <If.Then>
               <Throw DisplayName="Missing Email config" Exception="[New Exception(&quot;Missing email configuration in Data\Config.xlsx (Settings). Required keys: Email_Sender, Email_Recipient, Email_SenderPassword.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_MissingFailureEmailConfig" />
             </If.Then>
           </If>
-          <ui:LogMessage DisplayName="Log SMTP settings (safe)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_FailureMailConfigPreview" Level="Info" Message="[&quot;Preparing email notification via SMTP. Server=&quot; + str_SmtpServer + &quot;:&quot; + int_SmtpPort.ToString + &quot;, Sender=&quot; + str_SenderEmail + &quot;, Recipient=&quot; + str_RecipientEmail]" />
-          <ui:SendMail Bcc="{x:Null}" Cc="{x:Null}" ContinueOnError="{x:Null}" MailMessage="{x:Null}" Name="{x:Null}" ReplyTo="{x:Null}" ResourceAttachmentList="{x:Null}" ResourceAttachments="{x:Null}" Result="{x:Null}" SecurePassword="{x:Null}" TimeoutMS="{x:Null}" Action="Forward" AttachmentInputMode="Existing" Body="[str_EmailBody]" ConnectionMode="LegacyConfiguration" DisplayName="Send SMTP email notification" Email="[str_SenderEmail]" EnableSSL="True" From="[str_SenderEmail]" sap:VirtualizedContainerService.HintSize="451.2,378.4" sap2010:WorkflowViewState.IdRef="SendSMTPMail_Notification" IgnoreCRL="False" IsBodyHtml="True" Password="[str_SenderPassword]" Port="[int_SmtpPort]" SecureConnection="Auto" Server="[str_SmtpServer]" Subject="[str_EmailSubject]" To="[str_RecipientEmail]" UseISConnection="False" UseOAuth="False" UseRichTextEditor="True">
+          <ui:LogMessage DisplayName="Log SMTP settings (safe)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_FailureMailConfigPreview" Level="Info" Message="[&quot;Preparing email notification via SMTP. Server=&quot; + strSmtpServer + &quot;:&quot; + intSmtpPort.ToString + &quot;, Sender=&quot; + strSenderEmail + &quot;, Recipient=&quot; + strRecipientEmail]" />
+          <ui:SendMail Bcc="{x:Null}" Cc="{x:Null}" ContinueOnError="{x:Null}" IgnoreCRL="{x:Null}" MailMessage="{x:Null}" Name="{x:Null}" ReplyTo="{x:Null}" ResourceAttachmentList="{x:Null}" ResourceAttachments="{x:Null}" Result="{x:Null}" SecurePassword="{x:Null}" TimeoutMS="{x:Null}" UseOAuth="{x:Null}" Action="Forward" AttachmentInputMode="Existing" Body="[strEmailBody]" ConnectionMode="LegacyConfiguration" DisplayName="Send SMTP email notification" Email="[strSenderEmail]" EnableSSL="True" From="[strSenderEmail]" sap:VirtualizedContainerService.HintSize="451.2,378.4" sap2010:WorkflowViewState.IdRef="SendSMTPMail_Notification" IsBodyHtml="True" Password="[strSenderPassword]" Port="[intSmtpPort]" SecureConnection="Auto" Server="[strSmtpServer]" Subject="[strEmailSubject]" To="[strRecipientEmail]" UseISConnection="False" UseRichTextEditor="True">
             <ui:SendMail.AttachmentsBackup>
               <usau:BackupSlot x:TypeArguments="umame:AttachmentInputMode" StoredValue="Existing">
                 <usau:BackupSlot.BackupValues>
@@ -287,7 +287,7 @@
               <scg:List x:TypeArguments="InArgument(x:String)" Capacity="0" />
             </ui:SendMail.Files>
           </ui:SendMail>
-          <ui:LogMessage DisplayName="Log email notification sent" sap:VirtualizedContainerService.HintSize="451.2,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_SendMailSuccess" Level="Info" Message="[&quot;Email notification sent to: &quot; + str_RecipientEmail]" />
+          <ui:LogMessage DisplayName="Log email notification sent" sap:VirtualizedContainerService.HintSize="451.2,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_SendMailSuccess" Level="Info" Message="[&quot;Email notification sent to: &quot; + strRecipientEmail]" />
         </Sequence>
       </TryCatch.Try>
       <TryCatch.Catches>
@@ -296,13 +296,13 @@
             <ActivityAction.Argument>
               <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
             </ActivityAction.Argument>
-            <Sequence DisplayName="Catch" sap:VirtualizedContainerService.HintSize="449.6,225.6" sap2010:WorkflowViewState.IdRef="Sequence_CatchSendFailureEmail">
+            <Sequence DisplayName="Catch" sap:VirtualizedContainerService.HintSize="484.8,225.6" sap2010:WorkflowViewState.IdRef="Sequence_CatchSendFailureEmail">
               <sap:WorkflowViewStateService.ViewState>
                 <scg:Dictionary x:TypeArguments="x:String, x:Object">
                   <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                 </scg:Dictionary>
               </sap:WorkflowViewStateService.ViewState>
-              <ui:LogMessage DisplayName="Log message (Email notification step failed)" sap:VirtualizedContainerService.HintSize="416,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_SendMailFailed" Level="Warn" Message="[&quot;Send email notification step failed: &quot; + exception.Message + If(exception.InnerException Is Nothing OrElse String.IsNullOrWhiteSpace(exception.InnerException.Message), &quot;&quot;, &quot; | Inner: &quot; + exception.InnerException.Message) + If(exception.Message IsNot Nothing AndAlso (exception.Message.Contains(&quot;5.7.9&quot;) OrElse exception.Message.ToLower().Contains(&quot;application-specific password required&quot;)), &quot; Gmail SMTP requires an App Password. Set Email_SenderPassword to a 16-character Gmail App Password (no spaces) and use Email_SmtpServer=smtp.gmail.com, Email_SmtpPort=587 in Data\\Config.xlsx.&quot;, &quot; Configure Email_* keys in Data\\Config.xlsx (Settings sheet).&quot;)]" />
+              <ui:LogMessage DisplayName="Log message (Email notification step failed)" sap:VirtualizedContainerService.HintSize="451.2,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_SendMailFailed" Level="Warn" Message="[&quot;Send email notification step failed: &quot; + exception.Message + If(exception.InnerException Is Nothing OrElse String.IsNullOrWhiteSpace(exception.InnerException.Message), &quot;&quot;, &quot; | Inner: &quot; + exception.InnerException.Message) + If(exception.Message IsNot Nothing AndAlso (exception.Message.Contains(&quot;5.7.9&quot;) OrElse exception.Message.ToLower().Contains(&quot;application-specific password required&quot;)), &quot; Gmail SMTP requires an App Password. Set Email_SenderPassword to a 16-character Gmail App Password (no spaces) and use Email_SmtpServer=smtp.gmail.com, Email_SmtpPort=587 in Data\\Config.xlsx.&quot;, &quot; Configure Email_* keys in Data\\Config.xlsx (Settings sheet).&quot;)]" />
             </Sequence>
           </ActivityAction>
         </Catch>

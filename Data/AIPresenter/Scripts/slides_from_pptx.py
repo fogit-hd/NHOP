@@ -28,6 +28,8 @@ RUN_ORDER_TEMPLATE_CSV_DEFAULT = os.path.join(
 PPTX_SOURCE_ERROR_FILE = os.path.join(
     "Data", "AIPresenter", "Temp", "pptx_source_resolution_error.txt"
 )
+DEFAULT_EXPORT_WIDTH = 2560
+DEFAULT_EXPORT_HEIGHT = 1440
 
 
 def clear_pptx_export_root(root: str) -> str:
@@ -50,6 +52,22 @@ def sanitize_name(name: str) -> str:
     cleaned = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in name)
     cleaned = cleaned.strip("_")
     return cleaned or "presentation"
+
+
+def sanitize_tsv_field(value: Any) -> str:
+    """Flatten tabs/newlines so each TSV row always remains 4 physical columns."""
+    text = str(value or "")
+    return text.replace("\r\n", " ").replace("\n", " ").replace("\r", " ").replace("\t", " ").strip()
+
+
+def parse_export_dimension(value: Any, default_value: int) -> int:
+    try:
+        parsed = int(float(str(value).strip()))
+        if parsed >= 640:
+            return parsed
+    except (TypeError, ValueError):
+        pass
+    return default_value
 
 
 def find_first_pptx(folder: str) -> str:
@@ -132,6 +150,18 @@ def build_run_order_mismatch_message(
             "- Ensure each pptx_path exactly matches an existing .pptx file name/path.",
         ]
     )
+    return "\n".join(lines)
+
+
+def build_run_order_no_enabled_message(root: str, queue_path: str) -> str:
+    lines: list[str] = [
+        "No PPTX file is enabled in the run-order file.",
+        f"Run-order file: {format_path_for_message(root, queue_path)}",
+        "",
+        "Fix:",
+        "- Set enabled to TRUE for at least one pptx_path row.",
+        "- Ensure each enabled row points to an existing .pptx file.",
+    ]
     return "\n".join(lines)
 
 
@@ -360,6 +390,7 @@ def read_pptx_run_order_csv(root: str, input_dir: str, queue_path: str) -> tuple
 
 def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
     input_dir = os.path.join(root, "Data", "AIPresenter", "Input")
+    preferred_dir = os.path.join(input_dir, "pptx_file_here")
 
     configured = (
         (cfg.get("presentation_pptx_path") or "").strip()
@@ -392,6 +423,20 @@ def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
         else:
             queue_paths, queue_rows, unresolved = read_pptx_run_order(root, input_dir, queue_path)
 
+        if queue_rows > 0 and unresolved:
+            preferred_files = list_pptx_files(preferred_dir)
+            raise RuntimeError(
+                build_run_order_mismatch_message(
+                    root,
+                    queue_path,
+                    unresolved,
+                    preferred_files,
+                )
+            )
+
+        if queue_rows > 0 and not queue_paths and not unresolved:
+            raise RuntimeError(build_run_order_no_enabled_message(root, queue_path))
+
         if queue_paths:
             return queue_paths
         if queue_rows > 0 and not queue_path_with_rows:
@@ -400,7 +445,6 @@ def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
         unresolved_queue_entries.extend(unresolved)
 
     if queue_rows_detected > 0:
-        preferred_dir = os.path.join(input_dir, "pptx_file_here")
         preferred_files = list_pptx_files(preferred_dir)
 
         if unresolved_queue_entries:
@@ -451,7 +495,14 @@ def load_rows_from_csv(root: str, csv_path: str) -> list[tuple[int, str, str, st
     return rows
 
 
-def export_pptx_slides_to_images(root: str, pptx_path: str, slide_count: int, deck_order: int) -> list[str]:
+def export_pptx_slides_to_images(
+    root: str,
+    pptx_path: str,
+    slide_count: int,
+    deck_order: int,
+    export_width: int,
+    export_height: int,
+) -> list[str]:
     out_root = os.path.join(root, "Data", "AIPresenter", "Temp", "pptx_slides")
     deck_name = sanitize_name(os.path.splitext(os.path.basename(pptx_path))[0])
     out_dir = os.path.join(out_root, f"deck_{deck_order:03d}_{deck_name}")
@@ -479,8 +530,8 @@ def export_pptx_slides_to_images(root: str, pptx_path: str, slide_count: int, de
         for idx in range(1, total + 1):
             out_png = os.path.join(out_dir, f"slide_{idx:03d}.png")
             slide = pres.Slides.Item(idx)
-            # Export to 1920x1080 PNG for consistent ffmpeg behavior.
-            slide.Export(out_png, "PNG", 1920, 1080)
+            # Use higher resolution to improve OCR readability on image-heavy slides.
+            slide.Export(out_png, "PNG", export_width, export_height)
             if os.path.isfile(out_png):
                 exported[idx - 1] = os.path.normpath(out_png)
     except Exception as e:
@@ -508,6 +559,8 @@ def load_rows_from_single_pptx(
     pptx_path: str,
     start_index: int,
     deck_order: int,
+    export_width: int,
+    export_height: int,
 ) -> list[tuple[int, str, str, str]]:
     try:
         Presentation = importlib.import_module("pptx").Presentation
@@ -517,7 +570,14 @@ def load_rows_from_single_pptx(
 
     presentation = Presentation(pptx_path)
     slide_count = len(presentation.slides)
-    exported_abs_paths = export_pptx_slides_to_images(root, pptx_path, slide_count, deck_order)
+    exported_abs_paths = export_pptx_slides_to_images(
+        root,
+        pptx_path,
+        slide_count,
+        deck_order,
+        export_width,
+        export_height,
+    )
 
     rows: list[tuple[int, str, str, str]] = []
     base_name = os.path.basename(pptx_path)
@@ -600,6 +660,9 @@ def main() -> None:
             cfg = {}
             configured_pptx_setting = ""
 
+    export_width = parse_export_dimension(cfg.get("pptx_export_width"), DEFAULT_EXPORT_WIDTH)
+    export_height = parse_export_dimension(cfg.get("pptx_export_height"), DEFAULT_EXPORT_HEIGHT)
+
     clear_pptx_source_error(root)
     try:
         pptx_paths = resolve_pptx_paths(root, cfg)
@@ -610,10 +673,12 @@ def main() -> None:
         sys.exit(1)
 
     if configured_pptx_setting and not pptx_paths:
-        print(
-            "Configured PPTX path not found or unreadable. Check presentation_pptx_path/pptx_input_path/slide_pptx_path.",
-            file=sys.stderr,
+        detail = (
+            "Configured PPTX path not found or unreadable. "
+            "Check presentation_pptx_path/pptx_input_path/slide_pptx_path."
         )
+        write_pptx_source_error(root, detail)
+        print(detail, file=sys.stderr)
         sys.exit(1)
 
     rows: list[tuple[int, str, str, str]] = []
@@ -622,13 +687,24 @@ def main() -> None:
     if pptx_paths:
         next_index = 1
         for deck_order, pptx_path in enumerate(pptx_paths, start=1):
-            deck_rows = load_rows_from_single_pptx(root, pptx_path, next_index, deck_order)
+            deck_rows = load_rows_from_single_pptx(
+                root,
+                pptx_path,
+                next_index,
+                deck_order,
+                export_width,
+                export_height,
+            )
             rows.extend(deck_rows)
             next_index += len(deck_rows)
 
         source_mode = "pptx" if len(pptx_paths) == 1 else f"pptx-batch:{len(pptx_paths)}"
         print(
             "INFO pptx order: " + ", ".join(os.path.basename(path) for path in pptx_paths),
+            file=sys.stderr,
+        )
+        print(
+            f"INFO pptx export resolution: {export_width}x{export_height}",
             file=sys.stderr,
         )
     else:
@@ -638,22 +714,27 @@ def main() -> None:
 
     with open(out_tsv, "w", encoding="utf-8") as out:
         for idx, title, abs_path, rel in rows:
-            out.write(f"{idx}\t{title}\t{abs_path}\t{rel}\n")
+            out.write(
+                f"{idx}\t{sanitize_tsv_field(title)}\t"
+                f"{sanitize_tsv_field(abs_path)}\t{sanitize_tsv_field(rel)}\n"
+            )
 
     if source_mode == "none":
-        print(
+        detail = (
             "No PPTX or slides.csv source found. Ensure at least one .pptx is available "
-            "(Data/AIPresenter/Input/pptx_file_here or configured path).",
-            file=sys.stderr,
+            "(Data/AIPresenter/Input/pptx_file_here or configured path)."
         )
+        write_pptx_source_error(root, detail)
+        print(detail, file=sys.stderr)
         sys.exit(1)
 
     if source_mode.startswith("pptx") and not rows:
-        print(
+        detail = (
             "PPTX source was detected but no slides were extracted. "
-            "Check PPTX readability and required dependencies (python-pptx/comtypes/PowerPoint).",
-            file=sys.stderr,
+            "Check PPTX readability and required dependencies (python-pptx/comtypes/PowerPoint)."
         )
+        write_pptx_source_error(root, detail)
+        print(detail, file=sys.stderr)
         sys.exit(2)
 
     print(f"OK source={source_mode} {len(rows)} slide(s) -> {out_tsv}")

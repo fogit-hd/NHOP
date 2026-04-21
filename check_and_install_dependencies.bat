@@ -336,14 +336,6 @@ if errorlevel 1 (
 call :refresh_path
 if exist "%PIP_LOG%" del /f /q "%PIP_LOG%" >nul 2>nul
 
-%PY_CMD% -c "import pycaw" >nul 2>nul
-if errorlevel 1 (
-  echo [ERROR] pycaw is still not importable in the selected Python interpreter.
-  set "HAS_FAILURE=1"
-  echo.
-  exit /b 0
-)
-
 %PY_CMD% -c "import pptx" >nul 2>nul
 if errorlevel 1 (
   echo [ERROR] python-pptx is still not importable in the selected Python interpreter.
@@ -374,6 +366,38 @@ if errorlevel 1 (
   )
 )
 
+%PY_CMD% -c "from PIL import Image" >nul 2>nul
+if errorlevel 1 (
+  echo [WARN] Pillow is not importable after requirements install. Trying direct install...
+  %PY_CMD% -m pip install --disable-pip-version-check --quiet "Pillow>=10.0.0" >>"%PIP_LOG%" 2>&1
+  if errorlevel 1 (
+    echo [ERROR] Pillow direct install failed.
+    echo [INFO] pip details:
+    type "%PIP_LOG%"
+    set "HAS_FAILURE=1"
+    echo.
+    exit /b 0
+  )
+
+  %PY_CMD% -c "from PIL import Image" >nul 2>nul
+  if errorlevel 1 (
+    echo [ERROR] Pillow is still not importable in the selected Python interpreter.
+    set "HAS_FAILURE=1"
+    echo.
+    exit /b 0
+  )
+)
+
+%PY_CMD% -c "import tkinter" >nul 2>nul
+if errorlevel 1 (
+  echo [ERROR] tkinter is not available in the selected Python interpreter.
+  echo [INFO] tkinter is part of standard Python on Windows and is not reliably installed via pip.
+  echo [ACTION] Reinstall Python and enable "tcl/tk and IDLE", then rerun this script.
+  set "HAS_FAILURE=1"
+  echo.
+  exit /b 0
+)
+
 set "PPTX_VER="
 for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import pptx; print(pptx.__version__)" 2^>nul`) do (
   set "PPTX_VER=%%V"
@@ -386,9 +410,23 @@ for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import openpyxl; print(openpyxl.
 )
 if not defined OPENPYXL_VER set "OPENPYXL_VER=unknown"
 
+set "PILLOW_VER="
+for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import PIL; print(PIL.__version__)" 2^>nul`) do (
+  set "PILLOW_VER=%%V"
+)
+if not defined PILLOW_VER set "PILLOW_VER=unknown"
+
+set "TK_VER="
+for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import tkinter as tk; print(tk.TkVersion)" 2^>nul`) do (
+  set "TK_VER=%%V"
+)
+if not defined TK_VER set "TK_VER=unknown"
+
 echo [OK] Python requirements are satisfied.
 echo [OK] python-pptx import check passed (version !PPTX_VER!).
 echo [OK] openpyxl import check passed (version !OPENPYXL_VER!).
+echo [OK] Pillow import check passed (version !PILLOW_VER!).
+echo [OK] tkinter import check passed (Tk !TK_VER!).
 echo.
 exit /b 0
 
