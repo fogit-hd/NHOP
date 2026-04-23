@@ -1,8 +1,0 @@
-Welcome slide: Introduce the project goal and flow.
-Architecture slide: Explain STT -> LLM -> TTS pipeline.
-Demo slide: Show a sample question and answer interaction.
-
-
-Optional notes area for local testing (English only).
-
-Example: Current time can be mentioned if relevant to the demo.

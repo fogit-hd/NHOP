@@ -1,0 +1,448 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="AIPresenter_InitAndPrepare" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="io_Headers" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="io_PipelineShellResult" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="io_SlidesCsvShellResult" Type="InOutArgument(x:Int32)" />
+    <x:Property Name="io_AudioPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_ElevenLabsKey" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_FfmpegPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_GlobalSlideContext" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_GptComposedSlides" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_NarrationAudioPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_OpenAIKey" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_OpenDefaultAppScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_PlayResponseAudioScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_PlayVideoScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_PipelineScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_PythonExe" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_SlidePrompt" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_SlideVideoPath" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_SlidesFromCsvScript" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_SlidesIterateTsv" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_VoiceId" Type="InOutArgument(x:String)" />
+    <x:Property Name="io_WavInputPath" Type="InOutArgument(x:String)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="64">
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Runtime.InteropServices</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Text.RegularExpressions</x:String>
+      <x:String>System.Windows.Forms</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>UiPath.Platform.Activities</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="80">
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic.Core</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>System.Collections</AssemblyReference>
+      <AssemblyReference>System.ComponentModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.EventBasedAsync</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Primitives</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>System.Configuration.ConfigurationManager</AssemblyReference>
+      <AssemblyReference>System.Console</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System.Private.Uri</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+      <AssemblyReference>System.Security.Permissions</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Text.RegularExpressions</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.Windows.Forms</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities.Design</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UIAutomationCore</AssemblyReference>
+      <AssemblyReference>UiPath.Workflow</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>GlobalVariablesT1PNoYwrqg</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="" DisplayName="Init and prepare data" sap:VirtualizedContainerService.HintSize="761.2,8868.8" sap2010:WorkflowViewState.IdRef="Sequence_InitPrepare">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="strSettingsPath" />
+      <Variable x:TypeArguments="x:String" Name="strSettingsJson" />
+      <Variable x:TypeArguments="x:String" Name="strRunPythonExitBat" />
+      <Variable x:TypeArguments="x:String" Name="strSlidesCsvExitFile" />
+      <Variable x:TypeArguments="x:String" Name="strPipelineExitFile" />
+      <Variable x:TypeArguments="x:String" Name="strSlidesCsvExitText" />
+      <Variable x:TypeArguments="x:String" Name="strPipelineExitText" />
+      <Variable x:TypeArguments="x:Int32" Name="intIgnoredShellPid" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <ui:LogMessage DisplayName="InitAndPrepare start" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_InitAndPrepareStart" Level="Info" Message="[&quot;InitAndPrepare started. Loading settings, scripts, and runtime paths.&quot;]" />
+    <Assign DisplayName="Set ai_settings path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_SettingsPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strSettingsPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Config","ai_settings.json")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:ReadTextFile File="{x:Null}" Content="[strSettingsJson]" DisplayName="Read ai_settings.json" FileName="[strSettingsPath]" sap:VirtualizedContainerService.HintSize="451.2,123.2" sap2010:WorkflowViewState.IdRef="ReadTextFile_Settings" />
+    <Assign DisplayName="Load OpenAI key from config" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_LoadOpenAIKey">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_OpenAIKey]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(System.Text.RegularExpressions.Regex.Match(strSettingsJson, """openai_api_key""\s*:\s*""([^""]*)""").Groups(1).Value), io_OpenAIKey, System.Text.RegularExpressions.Regex.Match(strSettingsJson, """openai_api_key""\s*:\s*""([^""]*)""").Groups(1).Value)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Load ElevenLabs key from config" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_LoadElevenKey">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_ElevenLabsKey]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(System.Text.RegularExpressions.Regex.Match(strSettingsJson, """elevenlabs_api_key""\s*:\s*""([^""]*)""").Groups(1).Value), io_ElevenLabsKey, System.Text.RegularExpressions.Regex.Match(strSettingsJson, """elevenlabs_api_key""\s*:\s*""([^""]*)""").Groups(1).Value)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Load Voice ID from config" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_LoadVoiceId">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_VoiceId]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(System.Text.RegularExpressions.Regex.Match(strSettingsJson, """elevenlabs_voice_id""\s*:\s*""([^""]*)""").Groups(1).Value), io_VoiceId, System.Text.RegularExpressions.Regex.Match(strSettingsJson, """elevenlabs_voice_id""\s*:\s*""([^""]*)""").Groups(1).Value)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set open_default_app.py path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_OpenDefaultAppScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_OpenDefaultAppScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","open_default_app.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set play_response_audio.py path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_PlayResponseAudioScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_PlayResponseAudioScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","play_response_audio.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set play_video_blocking.py path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_PlayVideoScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_PlayVideoScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","play_video_blocking.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set slides_from_pptx.py path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_SlidesFromCsvScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_SlidesFromCsvScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","slides_from_pptx.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set slides_iterate.tsv path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_SlidesIterateTsvPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_SlidesIterateTsv]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","slides_iterate.tsv")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Set pipeline_extract_and_compose.py path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_PipelineScript">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_PipelineScript]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","pipeline_extract_and_compose.py")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Narration WAV path (overwrite each slide)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_NarrationAudioPathInit">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_NarrationAudioPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","slide_narration.wav")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Load ffmpeg path from config" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_LoadFfmpegPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_FfmpegPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(System.Text.RegularExpressions.Regex.Match(strSettingsJson, """ffmpeg_path""\s*:\s*""([^""]*)""").Groups(1).Value), io_FfmpegPath, System.Text.RegularExpressions.Regex.Match(strSettingsJson, """ffmpeg_path""\s*:\s*""([^""]*)""").Groups(1).Value)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Load audio input path from config" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_LoadAudioInputPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_WavInputPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(System.Text.RegularExpressions.Regex.Match(strSettingsJson, """audio_input_path""\s*:\s*""([^""]*)""").Groups(1).Value), io_WavInputPath, System.Text.RegularExpressions.Regex.Match(strSettingsJson, """audio_input_path""\s*:\s*""([^""]*)""").Groups(1).Value)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Load audio output path from config" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_LoadAudioOutputPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_AudioPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(System.Text.RegularExpressions.Regex.Match(strSettingsJson, """audio_output_path""\s*:\s*""([^""]*)""").Groups(1).Value), io_AudioPath, System.Text.RegularExpressions.Regex.Match(strSettingsJson, """audio_output_path""\s*:\s*""([^""]*)""").Groups(1).Value)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize audio input path to absolute" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeInputPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_WavInputPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(System.IO.Path.IsPathRooted(io_WavInputPath), io_WavInputPath, System.IO.Path.Combine(Environment.CurrentDirectory, io_WavInputPath))]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize audio output path to absolute" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeOutputPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_AudioPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(System.IO.Path.IsPathRooted(io_AudioPath), io_AudioPath, System.IO.Path.Combine(Environment.CurrentDirectory, io_AudioPath))]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize ffmpeg path to absolute" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeFfmpegPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_FfmpegPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.Equals(io_FfmpegPath, "ffmpeg", StringComparison.OrdinalIgnoreCase), io_FfmpegPath, If(System.IO.Path.IsPathRooted(io_FfmpegPath), io_FfmpegPath, System.IO.Path.Combine(Environment.CurrentDirectory, io_FfmpegPath)))]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Load optional slide video path (empty = skip playback)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_LoadSlideVideoPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_SlideVideoPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(System.Text.RegularExpressions.Regex.Match(strSettingsJson, """slide_video_path""\s*:\s*""([^""]*)""").Groups(1).Value), "", System.Text.RegularExpressions.Regex.Match(strSettingsJson, """slide_video_path""\s*:\s*""([^""]*)""").Groups(1).Value.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Normalize slide video path to absolute" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeSlideVideoPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_SlideVideoPath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(io_SlideVideoPath), "", If(System.IO.Path.IsPathRooted(io_SlideVideoPath), io_SlideVideoPath, System.IO.Path.Combine(Environment.CurrentDirectory, io_SlideVideoPath)))]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <If Condition="[io_OpenAIKey.StartsWith(&quot;YOUR_&quot;) OrElse io_ElevenLabsKey.StartsWith(&quot;YOUR_&quot;) OrElse io_VoiceId.StartsWith(&quot;YOUR_&quot;)]" DisplayName="Validate keys from ai_settings.json" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_ValidateKeys">
+      <If.Then>
+        <Throw DisplayName="Missing API keys in ai_settings.json" Exception="[New Exception(&quot;Please update Data\\AIPresenter\\Config\\ai_settings.json with real openai_api_key, elevenlabs_api_key, and elevenlabs_voice_id.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_ValidateKeys" />
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Else" sap:VirtualizedContainerService.HintSize="449.6,89.6">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Sequence>
+      </If.Else>
+    </If>
+    <Assign DisplayName="Init Headers" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[io_Headers]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[New Dictionary(Of String,String) From {{"Authorization","Bearer " &amp; io_OpenAIKey}}]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="Default Slide Prompt" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_SlidePrompt]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["You are an AI presentation narrator. Create clear and concise narration based on the slide content."]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Runtime config summary" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_RuntimeConfigSummary" Level="Info" Message="[&quot;Runtime config loaded. Python=&quot; + io_PythonExe + &quot;; FFmpeg=&quot; + io_FfmpegPath]" />
+    <Assign DisplayName="Paths for run_python_with_exitfile.cmd" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_PythonExitHelperPaths">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strRunPythonExitBat]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","run_python_with_exitfile.cmd")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="slides_pptx exitcode file path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_SlidesCsvExitPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strSlidesCsvExitFile]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","slides_pptx_exitcode.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign DisplayName="pipeline exitcode file path" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_PipelineExitPath">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strPipelineExitFile]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","pipeline_exitcode.txt")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Run slides_from_pptx start" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_RunSlidesFromPptxStart" Level="Info" Message="[&quot;Running slides_from_pptx.py to build slides_iterate.tsv.&quot;]" />
+    <Assign DisplayName="Run slides_from_pptx (Shell waits; exit code via .cmd file)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_RunSlidesFromCsvShell">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[intIgnoredShellPid]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + strRunPythonExitBat + Chr(34) + " " + Chr(34) + io_PythonExe + Chr(34) + " " + Chr(34) + io_SlidesFromCsvScript + Chr(34) + " " + Chr(34) + Environment.CurrentDirectory + Chr(34) + " " + Chr(34) + strSlidesCsvExitFile + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:ReadTextFile File="{x:Null}" Content="[strSlidesCsvExitText]" DisplayName="Read slides_pptx exit code" FileName="[strSlidesCsvExitFile]" sap:VirtualizedContainerService.HintSize="451.2,123.2" sap2010:WorkflowViewState.IdRef="ReadTextFile_SlidesCsvExit" />
+    <Assign DisplayName="Build slides_iterate.tsv from PPTX/CSV source (exit code)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_RunSlidesFromCsv">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[io_SlidesCsvShellResult]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[System.Int32.Parse(strSlidesCsvExitText.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Run slides_from_pptx result" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_RunSlidesFromPptxResult" Level="Info" Message="[&quot;slides_from_pptx exit code: &quot; + io_SlidesCsvShellResult.ToString]" />
+    <If Condition="[io_SlidesCsvShellResult &lt;&gt; 0]" DisplayName="slides_from_pptx must succeed" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_SlidesFromPptxOk">
+      <If.Then>
+        <Throw DisplayName="slides_from_pptx failed" Exception="[New Exception(&quot;slides_from_pptx.py failed (exit code &quot; + io_SlidesCsvShellResult.ToString + &quot;). &quot; + If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;Check PPTX source path/folder, PPTX open permission, and run-order file entries.&quot;))]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_SlidesFromPptxFailed" />
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Else" sap:VirtualizedContainerService.HintSize="449.6,89.6">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Sequence>
+      </If.Else>
+    </If>
+    <If Condition="[io_SlidesCsvShellResult = 0 AndAlso (Not System.IO.File.Exists(io_SlidesIterateTsv) OrElse System.IO.File.ReadAllLines(io_SlidesIterateTsv).Count(Function(l) Not String.IsNullOrWhiteSpace(l)) = 0)]" DisplayName="Fail if no slides extracted" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_EmptySlidesIterateTsv">
+      <If.Then>
+        <Throw DisplayName="No slides extracted from PPTX source" Exception="[New Exception(&quot;No slides were extracted. Ensure at least one .pptx exists in Data\\AIPresenter\\Input\\pptx_file_here (or configure presentation_pptx_path), and that the PPTX file can be opened.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_EmptySlidesIterateTsv" />
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Else" sap:VirtualizedContainerService.HintSize="449.6,89.6">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Sequence>
+      </If.Else>
+    </If>
+    <Assign DisplayName="Load global notes from slides.txt (optional)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_GlobalSlideContext">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_GlobalSlideContext]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Input","slides.txt")), System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Input","slides.txt")), "")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Run pipeline start" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_RunPipelineStart" Level="Info" Message="[&quot;Running pipeline_extract_and_compose.py.&quot;]" />
+    <Assign DisplayName="Run Vision+GPT pipeline (Shell waits; exit code via .cmd file)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_RunPipelineShell">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[intIgnoredShellPid]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + strRunPythonExitBat + Chr(34) + " " + Chr(34) + io_PythonExe + Chr(34) + " " + Chr(34) + io_PipelineScript + Chr(34) + " " + Chr(34) + Environment.CurrentDirectory + Chr(34) + " " + Chr(34) + strPipelineExitFile + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:ReadTextFile File="{x:Null}" Content="[strPipelineExitText]" DisplayName="Read pipeline exit code" FileName="[strPipelineExitFile]" sap:VirtualizedContainerService.HintSize="451.2,123.2" sap2010:WorkflowViewState.IdRef="ReadTextFile_PipelineExit" />
+    <Assign DisplayName="Run Vision+GPT pipeline (exit code)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_RunPipeline">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[io_PipelineShellResult]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[System.Int32.Parse(strPipelineExitText.Trim())]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Run pipeline result" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_RunPipelineResult" Level="Info" Message="[&quot;pipeline_extract_and_compose exit code: &quot; + io_PipelineShellResult.ToString]" />
+    <If Condition="[io_PipelineShellResult &lt;&gt; 0]" DisplayName="Pipeline must succeed" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_PipelineOk">
+      <If.Then>
+        <Throw DisplayName="pipeline_extract_and_compose failed" Exception="[New Exception(&quot;pipeline_extract_and_compose.py failed (exit code &quot; + io_PipelineShellResult.ToString + &quot;). &quot; + If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;Check API key, PPTX source readability, and run-order entries.&quot;))]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_PipelineFailed" />
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Else" sap:VirtualizedContainerService.HintSize="449.6,89.6">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Sequence>
+      </If.Else>
+    </If>
+    <Delay DisplayName="Wait for pipeline file flush" Duration="00:00:01" sap:VirtualizedContainerService.HintSize="451.2,122.4" sap2010:WorkflowViewState.IdRef="Delay_AfterPipeline" />
+    <Assign DisplayName="Load gpt_slide_content.txt (composed narration)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_GptSlideContent">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_GptComposedSlides]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Input","gpt_slide_content.txt")), System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Input","gpt_slide_content.txt")), "")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Composed narration size" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_ComposedNarrationSize" Level="Info" Message="[&quot;Loaded gpt_slide_content length: &quot; + If(io_GptComposedSlides Is Nothing, &quot;0&quot;, io_GptComposedSlides.Length.ToString)]" />
+    <If Condition="[io_PipelineShellResult = 0 AndAlso String.IsNullOrWhiteSpace(io_GptComposedSlides)]" DisplayName="Fail if composed file empty after OK pipeline" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_WarnEmptyGptContent">
+      <If.Then>
+        <Throw DisplayName="gpt_slide_content empty after pipeline" Exception="[New Exception(&quot;gpt_slide_content.txt is empty after pipeline exit 0. Run pipeline_extract_and_compose.py from the project folder with --root set to CurrentDirectory; check stderr for API key, PPTX input (including Input\\pptx_file_here), or CSV fallback input. Ensure presentation_master_prompt.txt asks for === SLIDE | n | title === blocks.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_EmptyGptSlideContent" />
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Else" sap:VirtualizedContainerService.HintSize="449.6,89.6">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Sequence>
+      </If.Else>
+    </If>
+    <ui:LogMessage DisplayName="InitAndPrepare completed" sap:VirtualizedContainerService.HintSize="451.2,165.6" sap2010:WorkflowViewState.IdRef="LogMessage_InitAndPrepareCompleted" Level="Info" Message="[&quot;InitAndPrepare completed successfully.&quot;]" />
+  </Sequence>
+</Activity>

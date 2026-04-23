@@ -22,6 +22,7 @@ Universal content filtering and repetition rules (for all presentations):
 - Do not read or narrate any technical, template, or meta label that is not meaningful to the audience.
 - Always focus narration on the unique, meaningful content of each slide, not on repeated, generic, or structural labels.
 - These rules must be applied for every slide, regardless of the specific content or file. Always apply the logic based on the structure and repetition in the slide content.
+- On the final slide only, end the narration with exactly one closing self-introduction, written as one or two short natural sentences, that re-introduces both the presenter and the team, sample sentence like "I am NEO and we are NEO Force. Thanks for all your attention." Include this only once inside the last slide block and do not repeat it anywhere else.
 Your task:
 1. For each slide, produce spoken narration in English based only on that slide raw data.
 2. Preserve factual wording from raw slide content as much as possible.
