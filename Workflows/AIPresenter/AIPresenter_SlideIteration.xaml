@@ -118,7 +118,7 @@
       <AssemblyReference>UiPath.Platform</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="Slide iteration" sap:VirtualizedContainerService.HintSize="928.8,9683.2" sap2010:WorkflowViewState.IdRef="Sequence_SlideIter">
+  <Sequence DisplayName="Slide iteration" sap2010:Annotation.AnnotationText="Executes 'Slide iteration' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="928.8,9683.2" sap2010:WorkflowViewState.IdRef="Sequence_SlideIter">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strCurrentSlideTitle" />
       <Variable x:TypeArguments="x:String" Name="strAbsSlideImagePath" />
@@ -150,8 +150,8 @@
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="Slide iteration start" sap:VirtualizedContainerService.HintSize="928.8,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_SlideIterationStart" Level="Info" Message="[&quot;SlideIteration started with row: &quot; + in_slideItem]" />
-    <Assign DisplayName="Path for last ffplay PID" sap:VirtualizedContainerService.HintSize="928.8,174.4" sap2010:WorkflowViewState.IdRef="Assign_PidFilePath">
+    <ui:LogMessage DisplayName="Slide iteration start" sap2010:Annotation.AnnotationText="Executes 'Slide iteration start' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="928.8,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_SlideIterationStart" Level="Info" Message="[&quot;SlideIteration started with row: &quot; + in_slideItem]" />
+    <Assign DisplayName="Path for last ffplay PID" sap2010:Annotation.AnnotationText="Executes 'Path for last ffplay PID' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="928.8,174.4" sap2010:WorkflowViewState.IdRef="Assign_PidFilePath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strFfplayPidFile]</OutArgument>
       </Assign.To>
@@ -159,12 +159,12 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "AIPresenter", "Temp", "last_ffplay_pid.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <If Condition="[System.IO.File.Exists(strFfplayPidFile)]" DisplayName="Read previous ffplay PID if exists" sap:VirtualizedContainerService.HintSize="928.8,261.6" sap2010:WorkflowViewState.IdRef="If_ReadPreviousPid">
+    <If Condition="[System.IO.File.Exists(strFfplayPidFile)]" DisplayName="Read previous ffplay PID if exists" sap2010:Annotation.AnnotationText="Executes 'Read previous ffplay PID if exists' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="928.8,261.6" sap2010:WorkflowViewState.IdRef="If_ReadPreviousPid">
       <If.Then>
-        <ui:ReadTextFile File="{x:Null}" Content="[strPreviousFfplayPid]" DisplayName="Read last_ffplay_pid.txt" FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_PreviousPid" />
+        <ui:ReadTextFile File="{x:Null}" Content="[strPreviousFfplayPid]" DisplayName="Read last_ffplay_pid.txt" sap2010:Annotation.AnnotationText="Executes 'Read last_ffplay_pid.txt' to complete this step in the slide iteration workflow." FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_PreviousPid" />
       </If.Then>
     </If>
-    <Assign DisplayName="Path to wav_duration_seconds.py" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_WavDurationScriptPath">
+    <Assign DisplayName="Path to wav_duration_seconds.py" sap2010:Annotation.AnnotationText="Executes 'Path to wav_duration_seconds.py' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_WavDurationScriptPath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strWavDurationScript]</OutArgument>
       </Assign.To>
@@ -172,7 +172,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "AIPresenter", "Scripts", "wav_duration_seconds.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Path for wav duration result file" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_WavDurationResultPath">
+    <Assign DisplayName="Path for wav duration result file" sap2010:Annotation.AnnotationText="Executes 'Path for wav duration result file' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_WavDurationResultPath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strWavDurationResultFile]</OutArgument>
       </Assign.To>
@@ -180,7 +180,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "AIPresenter", "Temp", "narration_duration.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Path to gpt_slide_content.txt" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_GptContentPath">
+    <Assign DisplayName="Path to gpt_slide_content.txt" sap2010:Annotation.AnnotationText="Executes 'Path to gpt_slide_content.txt' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_GptContentPath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strGptContentPath]</OutArgument>
       </Assign.To>
@@ -188,12 +188,12 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Input","gpt_slide_content.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <If Condition="[System.IO.File.Exists(strGptContentPath)]" DisplayName="Load composed script from disk" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ReadGptFile">
+    <If Condition="[System.IO.File.Exists(strGptContentPath)]" DisplayName="Load composed script from disk" sap2010:Annotation.AnnotationText="Executes 'Load composed script from disk' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ReadGptFile">
       <If.Then>
-        <ui:ReadTextFile File="{x:Null}" Content="[strGptFromFile]" DisplayName="Read gpt_slide_content.txt" FileName="[strGptContentPath]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_GptSlideContent" />
+        <ui:ReadTextFile File="{x:Null}" Content="[strGptFromFile]" DisplayName="Read gpt_slide_content.txt" sap2010:Annotation.AnnotationText="Executes 'Read gpt_slide_content.txt' to complete this step in the slide iteration workflow." FileName="[strGptContentPath]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_GptSlideContent" />
       </If.Then>
       <If.Else>
-        <Assign DisplayName="No gpt file on disk" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_EmptyGptFile">
+        <Assign DisplayName="No gpt file on disk" sap2010:Annotation.AnnotationText="Executes 'No gpt file on disk' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_EmptyGptFile">
           <Assign.To>
             <OutArgument x:TypeArguments="x:String">[strGptFromFile]</OutArgument>
           </Assign.To>
@@ -203,7 +203,7 @@
         </Assign>
       </If.Else>
     </If>
-    <Assign DisplayName="Slide ordinal (+1 per row)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideOrdinal">
+    <Assign DisplayName="Slide ordinal (+1 per row)" sap2010:Annotation.AnnotationText="Executes 'Slide ordinal (+1 per row)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideOrdinal">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Int32">[io_SlideOrdinal]</OutArgument>
       </Assign.To>
@@ -211,12 +211,12 @@
         <InArgument x:TypeArguments="x:Int32">[io_SlideOrdinal + 1]</InArgument>
       </Assign.Value>
     </Assign>
-    <If Condition="[in_slideItem.Split(Convert.ToChar(9)).Length &lt; 4]" DisplayName="Validate TSV row (4 tab columns)" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateSlideTsv">
+    <If Condition="[in_slideItem.Split(Convert.ToChar(9)).Length &lt; 4]" DisplayName="Validate TSV row (4 tab columns)" sap2010:Annotation.AnnotationText="Executes 'Validate TSV row (4 tab columns)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateSlideTsv">
       <If.Then>
-        <Throw DisplayName="Bad slides_iterate row" Exception="[New Exception(&quot;slides_iterate.tsv: each line needs 4 tab-separated fields. Re-run slides_from_pptx.py.&quot;)]" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Throw_BadSlideTsv" />
+        <Throw DisplayName="Bad slides_iterate row" sap2010:Annotation.AnnotationText="Executes 'Bad slides_iterate row' to complete this step in the slide iteration workflow." Exception="[New Exception(&quot;slides_iterate.tsv: each line needs 4 tab-separated fields. Re-run slides_from_pptx.py.&quot;)]" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Throw_BadSlideTsv" />
       </If.Then>
     </If>
-    <Assign DisplayName="Current slide title (from source)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideTitleFromTsv">
+    <Assign DisplayName="Current slide title (from source)" sap2010:Annotation.AnnotationText="Executes 'Current slide title (from source)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideTitleFromTsv">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strCurrentSlideTitle]</OutArgument>
       </Assign.To>
@@ -224,7 +224,7 @@
         <InArgument x:TypeArguments="x:String">[in_slideItem.Split(Convert.ToChar(9))(1)]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Slide photo absolute path" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_AbsSlidePath">
+    <Assign DisplayName="Slide photo absolute path" sap2010:Annotation.AnnotationText="Executes 'Slide photo absolute path' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_AbsSlidePath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strAbsSlideImagePath]</OutArgument>
       </Assign.To>
@@ -232,7 +232,7 @@
         <InArgument x:TypeArguments="x:String">[in_slideItem.Split(Convert.ToChar(9))(2)]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Slide photo relative path (project root)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_RelSlidePathTsv">
+    <Assign DisplayName="Slide photo relative path (project root)" sap2010:Annotation.AnnotationText="Executes 'Slide photo relative path (project root)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_RelSlidePathTsv">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strRelSlidePath]</OutArgument>
       </Assign.To>
@@ -240,8 +240,8 @@
         <InArgument x:TypeArguments="x:String">[in_slideItem.Split(Convert.ToChar(9))(3)]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:LogMessage DisplayName="Slide metadata prepared" sap:VirtualizedContainerService.HintSize="850.4,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_SlideMetadataPrepared" Level="Info" Message="[&quot;Prepared slide &quot; + in_slideItem.Split(Convert.ToChar(9))(0).Trim + &quot; | &quot; + strCurrentSlideTitle]" />
-    <Assign DisplayName="Slice narration for this slide (gpt_slide_content.txt)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideNarrationFromComposed">
+    <ui:LogMessage DisplayName="Slide metadata prepared" sap2010:Annotation.AnnotationText="Executes 'Slide metadata prepared' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_SlideMetadataPrepared" Level="Info" Message="[&quot;Prepared slide &quot; + in_slideItem.Split(Convert.ToChar(9))(0).Trim + &quot; | &quot; + strCurrentSlideTitle]" />
+    <Assign DisplayName="Slice narration for this slide (gpt_slide_content.txt)" sap2010:Annotation.AnnotationText="Executes 'Slice narration for this slide (gpt_slide_content.txt)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideNarrationFromComposed">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strSlideNarrationText]</OutArgument>
       </Assign.To>
@@ -249,7 +249,7 @@
         <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(If(String.IsNullOrWhiteSpace(strGptFromFile), in_GptComposedSlides, strGptFromFile)), "", System.Text.RegularExpressions.Regex.Match(If(String.IsNullOrWhiteSpace(strGptFromFile), in_GptComposedSlides, strGptFromFile), "(?m)^===\s*SLIDE\s*\|\s*" &amp; CInt(in_slideItem.Split(Convert.ToChar(9))(0).Trim).ToString &amp; "\s*\|.*?===\s*\r?\n([\s\S]*?)(?=^(?:===\s*SLIDE\s*\|)|\Z)").Groups(1).Value.Trim)]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Slide context (narration + slide meta)" sap:VirtualizedContainerService.HintSize="850.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_3">
+    <Assign DisplayName="Slide context (narration + slide meta)" sap2010:Annotation.AnnotationText="Executes 'Slide context (narration + slide meta)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_3">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[io_CurrentSlideContent]</OutArgument>
       </Assign.To>
@@ -257,7 +257,7 @@
         <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(in_GlobalSlideContext), in_GlobalSlideContext &amp; Environment.NewLine &amp; Environment.NewLine, "") &amp; "[Slide " &amp; in_slideItem.Split(Convert.ToChar(9))(0).Trim &amp; ": " &amp; strCurrentSlideTitle &amp; "]" &amp; Environment.NewLine &amp; "Slide narration (from GPT):" &amp; Environment.NewLine &amp; strSlideNarrationText &amp; Environment.NewLine &amp; Environment.NewLine &amp; "Image (relative): " &amp; strRelSlidePath &amp; Environment.NewLine &amp; "Image (absolute): " &amp; strAbsSlideImagePath]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Refresh state before slide processing" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshStateBeforeSlideProcessing">
+    <Assign DisplayName="Refresh state before slide processing" sap2010:Annotation.AnnotationText="Executes 'Refresh state before slide processing' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshStateBeforeSlideProcessing">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPresentationControlState]</OutArgument>
       </Assign.To>
@@ -265,10 +265,10 @@
         <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(in_PresentationControlStateFile) AndAlso System.IO.File.Exists(in_PresentationControlStateFile), System.IO.File.ReadAllText(in_PresentationControlStateFile), "running")]</InArgument>
       </Assign.Value>
     </Assign>
-    <While DisplayName="Pause checkpoint before slide processing" sap:VirtualizedContainerService.HintSize="850.4,138" sap2010:WorkflowViewState.IdRef="While_PauseCheckpointBeforeSlideProcessing" Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlState) AndAlso strPresentationControlState.Trim().Equals(&quot;paused&quot;, StringComparison.OrdinalIgnoreCase)]">
-      <Sequence DisplayName="Hold until Continue" sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_HoldBeforeSlideProcessing">
-        <Delay DisplayName="Paused polling delay" Duration="00:00:00.3000000" sap:VirtualizedContainerService.HintSize="850.4,90.4" sap2010:WorkflowViewState.IdRef="Delay_PausePollingBeforeSlideProcessing" />
-        <Assign DisplayName="Refresh pause state" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshPauseStateBeforeSlideProcessing">
+    <While DisplayName="Pause checkpoint before slide processing" sap2010:Annotation.AnnotationText="Executes 'Pause checkpoint before slide processing' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,138" sap2010:WorkflowViewState.IdRef="While_PauseCheckpointBeforeSlideProcessing" Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlState) AndAlso strPresentationControlState.Trim().Equals(&quot;paused&quot;, StringComparison.OrdinalIgnoreCase)]">
+      <Sequence DisplayName="Hold until Continue" sap2010:Annotation.AnnotationText="Executes 'Hold until Continue' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_HoldBeforeSlideProcessing">
+        <Delay DisplayName="Paused polling delay" sap2010:Annotation.AnnotationText="Executes 'Paused polling delay' to complete this step in the slide iteration workflow." Duration="00:00:00.3000000" sap:VirtualizedContainerService.HintSize="850.4,90.4" sap2010:WorkflowViewState.IdRef="Delay_PausePollingBeforeSlideProcessing" />
+        <Assign DisplayName="Refresh pause state" sap2010:Annotation.AnnotationText="Executes 'Refresh pause state' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshPauseStateBeforeSlideProcessing">
           <Assign.To>
             <OutArgument x:TypeArguments="x:String">[strPresentationControlState]</OutArgument>
           </Assign.To>
@@ -278,15 +278,15 @@
         </Assign>
       </Sequence>
     </While>
-    <If Condition="[Not String.IsNullOrWhiteSpace(strSlideNarrationText)]" DisplayName="Has narration text for TTS?" sap:VirtualizedContainerService.HintSize="928.8,5874.4" sap2010:WorkflowViewState.IdRef="If_HasNarrationForTts">
+    <If Condition="[Not String.IsNullOrWhiteSpace(strSlideNarrationText)]" DisplayName="Has narration text for TTS?" sap2010:Annotation.AnnotationText="Executes 'Has narration text for TTS?' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="928.8,5874.4" sap2010:WorkflowViewState.IdRef="If_HasNarrationForTts">
       <If.Then>
-        <Sequence DisplayName="TTS narration branch" sap:VirtualizedContainerService.HintSize="920.8,5631.2" sap2010:WorkflowViewState.IdRef="Sequence_TtsNarrationBranch">
+        <Sequence DisplayName="TTS narration branch" sap2010:Annotation.AnnotationText="Executes 'TTS narration branch' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="920.8,5631.2" sap2010:WorkflowViewState.IdRef="Sequence_TtsNarrationBranch">
           <sap:WorkflowViewStateService.ViewState>
             <scg:Dictionary x:TypeArguments="x:String, x:Object">
               <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             </scg:Dictionary>
           </sap:WorkflowViewStateService.ViewState>
-          <Assign DisplayName="ElevenLabs Headers (narration)" sap:VirtualizedContainerService.HintSize="887.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_ElevenHeadersNarr">
+          <Assign DisplayName="ElevenLabs Headers (narration)" sap2010:Annotation.AnnotationText="Executes 'ElevenLabs Headers (narration)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="887.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_ElevenHeadersNarr">
             <Assign.To>
               <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[io_Headers]</OutArgument>
             </Assign.To>
@@ -294,7 +294,7 @@
               <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[New Dictionary(Of String,String) From {{"xi-api-key",io_ElevenLabsKey},{"accept","audio/wav"},{"Content-Type","application/json"}}]</InArgument>
             </Assign.Value>
           </Assign>
-          <Assign DisplayName="ElevenLabs Body (narration)" sap:VirtualizedContainerService.HintSize="815.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_ElevenBodyNarr">
+          <Assign DisplayName="ElevenLabs Body (narration)" sap2010:Annotation.AnnotationText="Executes 'ElevenLabs Body (narration)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="815.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_ElevenBodyNarr">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[io_ElevenJsonBody]</OutArgument>
             </Assign.To>
@@ -302,8 +302,8 @@
               <InArgument x:TypeArguments="x:String">["{""text"":""" &amp; strSlideNarrationText.Replace("""","\""") &amp; """,""model_id"":""eleven_multilingual_v2""}"]</InArgument>
             </Assign.Value>
           </Assign>
-          <ui:LogMessage DisplayName="Invoke TTS start" sap:VirtualizedContainerService.HintSize="815.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_InvokeTtsStart" Level="Info" Message="[&quot;Invoking ElevenLabs TTS for slide &quot; + in_slideItem.Split(Convert.ToChar(9))(0).Trim]" />
-          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke ElevenLabs TTS (slide narration)" sap:VirtualizedContainerService.HintSize="815.2,176" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_TTSNarr" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AI\ElevenLabsTTSWorkflow.xaml">
+          <ui:LogMessage DisplayName="Invoke TTS start" sap2010:Annotation.AnnotationText="Executes 'Invoke TTS start' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="815.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_InvokeTtsStart" Level="Info" Message="[&quot;Invoking ElevenLabs TTS for slide &quot; + in_slideItem.Split(Convert.ToChar(9))(0).Trim]" />
+          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Invoke ElevenLabs TTS (slide narration)" sap2010:Annotation.AnnotationText="Executes 'Invoke ElevenLabs TTS (slide narration)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="815.2,176" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_TTSNarr" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AI\ElevenLabsTTSWorkflow.xaml">
             <ui:InvokeWorkflowFile.Arguments>
               <InArgument x:TypeArguments="x:String" x:Key="in_TextToSpeak">[strSlideNarrationText]</InArgument>
               <InArgument x:TypeArguments="x:String" x:Key="in_ElevenLabsKey">[io_ElevenLabsKey]</InArgument>
@@ -313,32 +313,32 @@
               <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseRaw">[io_ElevenResponseRaw]</OutArgument>
             </ui:InvokeWorkflowFile.Arguments>
           </ui:InvokeWorkflowFile>
-          <ui:LogMessage DisplayName="Invoke TTS result" sap:VirtualizedContainerService.HintSize="780,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_InvokeTtsResult" Level="Info" Message="[&quot;TTS workflow returned response length: &quot; + If(String.IsNullOrWhiteSpace(io_ElevenResponseRaw), &quot;0&quot;, io_ElevenResponseRaw.Length.ToString)]" />
-          <If Condition="[String.IsNullOrWhiteSpace(io_ElevenResponseRaw)]" DisplayName="Validate TTS response not empty" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateTtsResponseEmpty">
+          <ui:LogMessage DisplayName="Invoke TTS result" sap2010:Annotation.AnnotationText="Executes 'Invoke TTS result' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_InvokeTtsResult" Level="Info" Message="[&quot;TTS workflow returned response length: &quot; + If(String.IsNullOrWhiteSpace(io_ElevenResponseRaw), &quot;0&quot;, io_ElevenResponseRaw.Length.ToString)]" />
+          <If Condition="[String.IsNullOrWhiteSpace(io_ElevenResponseRaw)]" DisplayName="Validate TTS response not empty" sap2010:Annotation.AnnotationText="Executes 'Validate TTS response not empty' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateTtsResponseEmpty">
             <If.Then>
-              <Throw DisplayName="TTS response missing" Exception="[New Exception(&quot;ElevenLabs TTS returned empty response. Check API connectivity and Data\\AIPresenter\\Temp\\tts_result.txt.&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_TtsResponseEmpty" />
+              <Throw DisplayName="TTS response missing" sap2010:Annotation.AnnotationText="Executes 'TTS response missing' to complete this step in the slide iteration workflow." Exception="[New Exception(&quot;ElevenLabs TTS returned empty response. Check API connectivity and Data\\AIPresenter\\Temp\\tts_result.txt.&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_TtsResponseEmpty" />
             </If.Then>
           </If>
-          <If Condition="[Not String.IsNullOrWhiteSpace(io_ElevenResponseRaw) AndAlso io_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;)]" DisplayName="Fail when ElevenLabs returns TTS_ERROR" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateTtsError">
+          <If Condition="[Not String.IsNullOrWhiteSpace(io_ElevenResponseRaw) AndAlso io_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;)]" DisplayName="Fail when ElevenLabs returns TTS_ERROR" sap2010:Annotation.AnnotationText="Executes 'Fail when ElevenLabs returns TTS_ERROR' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateTtsError">
             <If.Then>
-              <Throw DisplayName="ElevenLabs TTS failed" Exception="[New Exception(&quot;ElevenLabs TTS failed: &quot; + io_ElevenResponseRaw)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_TtsErrorResponse" />
+              <Throw DisplayName="ElevenLabs TTS failed" sap2010:Annotation.AnnotationText="Executes 'ElevenLabs TTS failed' to complete this step in the slide iteration workflow." Exception="[New Exception(&quot;ElevenLabs TTS failed: &quot; + io_ElevenResponseRaw)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_TtsErrorResponse" />
             </If.Then>
           </If>
-          <If Condition="[Not String.IsNullOrWhiteSpace(io_ElevenResponseRaw) AndAlso Not io_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso (Not System.IO.File.Exists(io_NarrationAudioPath) OrElse (New System.IO.FileInfo(io_NarrationAudioPath)).Length &lt;= 0)]" DisplayName="Validate generated narration WAV" sap:VirtualizedContainerService.HintSize="887.2,340.8" sap2010:WorkflowViewState.IdRef="If_ValidateNarrationWav">
+          <If Condition="[Not String.IsNullOrWhiteSpace(io_ElevenResponseRaw) AndAlso Not io_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso (Not System.IO.File.Exists(io_NarrationAudioPath) OrElse (New System.IO.FileInfo(io_NarrationAudioPath)).Length &lt;= 0)]" DisplayName="Validate generated narration WAV" sap2010:Annotation.AnnotationText="Executes 'Validate generated narration WAV' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="887.2,340.8" sap2010:WorkflowViewState.IdRef="If_ValidateNarrationWav">
             <If.Then>
-              <Throw DisplayName="Narration WAV missing or empty" Exception="[New Exception(&quot;Narration WAV was not created/opened: &quot; + io_NarrationAudioPath + &quot;. Check ElevenLabs output path and file permission.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_NarrationWavMissing" />
+              <Throw DisplayName="Narration WAV missing or empty" sap2010:Annotation.AnnotationText="Executes 'Narration WAV missing or empty' to complete this step in the slide iteration workflow." Exception="[New Exception(&quot;Narration WAV was not created/opened: &quot; + io_NarrationAudioPath + &quot;. Check ElevenLabs output path and file permission.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_NarrationWavMissing" />
             </If.Then>
           </If>
-          <If Condition="[Not String.IsNullOrWhiteSpace(io_ElevenResponseRaw) AndAlso Not io_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso System.IO.File.Exists(io_NarrationAudioPath)]" DisplayName="If TTS OK, get duration for delay" sap:VirtualizedContainerService.HintSize="887.2,925.6" sap2010:WorkflowViewState.IdRef="If_GetAudioDuration">
+          <If Condition="[Not String.IsNullOrWhiteSpace(io_ElevenResponseRaw) AndAlso Not io_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso System.IO.File.Exists(io_NarrationAudioPath)]" DisplayName="If TTS OK, get duration for delay" sap2010:Annotation.AnnotationText="Executes 'If TTS OK, get duration for delay' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="887.2,925.6" sap2010:WorkflowViewState.IdRef="If_GetAudioDuration">
             <If.Then>
-              <Sequence DisplayName="Get duration and set delay" sap:VirtualizedContainerService.HintSize="449.6,697.6" sap2010:WorkflowViewState.IdRef="Sequence_GetDuration">
+              <Sequence DisplayName="Get duration and set delay" sap2010:Annotation.AnnotationText="Executes 'Get duration and set delay' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="449.6,697.6" sap2010:WorkflowViewState.IdRef="Sequence_GetDuration">
                 <sap:WorkflowViewStateService.ViewState>
                   <scg:Dictionary x:TypeArguments="x:String, x:Object">
                     <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                   </scg:Dictionary>
                 </sap:WorkflowViewStateService.ViewState>
-                <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset narration duration file" FileName="[strWavDurationResultFile]" sap:VirtualizedContainerService.HintSize="416,175.2" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetWavDurationResult" Text="0" />
-                <Assign DisplayName="Run wav_duration_seconds.py (wait)" sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_RunWavDurationScriptWait">
+                <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset narration duration file" sap2010:Annotation.AnnotationText="Executes 'Reset narration duration file' to complete this step in the slide iteration workflow." FileName="[strWavDurationResultFile]" sap:VirtualizedContainerService.HintSize="416,175.2" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetWavDurationResult" Text="0" />
+                <Assign DisplayName="Run wav_duration_seconds.py (wait)" sap2010:Annotation.AnnotationText="Executes 'Run wav_duration_seconds.py (wait)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="416,174.4" sap2010:WorkflowViewState.IdRef="Assign_RunWavDurationScriptWait">
                   <Assign.To>
                     <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                   </Assign.To>
@@ -346,8 +346,8 @@
                     <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + strWavDurationScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --out " + Chr(34) + strWavDurationResultFile + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                   </Assign.Value>
                 </Assign>
-                <Delay DisplayName="Delay 0.15 second" Duration="00:00:00.1500000" sap:VirtualizedContainerService.HintSize="416,122.4" sap2010:WorkflowViewState.IdRef="Delay_WaitForDurationFile" />
-                <Assign DisplayName="Set duration from file or default" sap:VirtualizedContainerService.HintSize="416,165.6" sap2010:WorkflowViewState.IdRef="Assign_SetDurationFromFileOrDefault">
+                <Delay DisplayName="Delay 0.15 second" sap2010:Annotation.AnnotationText="Executes 'Delay 0.15 second' to complete this step in the slide iteration workflow." Duration="00:00:00.1500000" sap:VirtualizedContainerService.HintSize="416,122.4" sap2010:WorkflowViewState.IdRef="Delay_WaitForDurationFile" />
+                <Assign DisplayName="Set duration from file or default" sap2010:Annotation.AnnotationText="Executes 'Set duration from file or default' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="416,165.6" sap2010:WorkflowViewState.IdRef="Assign_SetDurationFromFileOrDefault">
                   <Assign.To>
                     <OutArgument x:TypeArguments="x:Double">[dblNarrationDuration]</OutArgument>
                   </Assign.To>
@@ -358,7 +358,7 @@
               </Sequence>
             </If.Then>
             <If.Else>
-              <Sequence DisplayName="Else" sap:VirtualizedContainerService.HintSize="449.6,89.6" sap2010:WorkflowViewState.IdRef="Sequence_1">
+              <Sequence DisplayName="Else" sap2010:Annotation.AnnotationText="Executes 'Else' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="449.6,89.6" sap2010:WorkflowViewState.IdRef="Sequence_1">
                 <sap:WorkflowViewStateService.ViewState>
                   <scg:Dictionary x:TypeArguments="x:String, x:Object">
                     <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -367,23 +367,23 @@
               </Sequence>
             </If.Else>
           </If>
-          <If Condition="[Not String.IsNullOrWhiteSpace(io_ElevenResponseRaw) AndAlso Not io_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso System.IO.File.Exists(io_NarrationAudioPath)]" DisplayName="Mux slide MP4 + play (duration = narration)" sap:VirtualizedContainerService.HintSize="887.2,3245.6" sap2010:WorkflowViewState.IdRef="If_PlayNarrationOk">
+          <If Condition="[Not String.IsNullOrWhiteSpace(io_ElevenResponseRaw) AndAlso Not io_ElevenResponseRaw.StartsWith(&quot;TTS_ERROR:&quot;) AndAlso System.IO.File.Exists(io_NarrationAudioPath)]" DisplayName="Mux slide MP4 + play (duration = narration)" sap2010:Annotation.AnnotationText="Executes 'Mux slide MP4 + play (duration = narration)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="887.2,3245.6" sap2010:WorkflowViewState.IdRef="If_PlayNarrationOk">
             <If.Then>
-              <Sequence DisplayName="Image+audio segment then play" sap:VirtualizedContainerService.HintSize="885.6,2772.8" sap2010:WorkflowViewState.IdRef="Sequence_MuxAndPlaySlide">
+              <Sequence DisplayName="Image+audio segment then play" sap2010:Annotation.AnnotationText="Executes 'Image+audio segment then play' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="885.6,2772.8" sap2010:WorkflowViewState.IdRef="Sequence_MuxAndPlaySlide">
                 <sap:WorkflowViewStateService.ViewState>
                   <scg:Dictionary x:TypeArguments="x:String, x:Object">
                     <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                   </scg:Dictionary>
                 </sap:WorkflowViewStateService.ViewState>
-                <If Condition="[System.IO.File.Exists(strAbsSlideImagePath)]" DisplayName="Slide image for mux?" sap:VirtualizedContainerService.HintSize="852,2712.8" sap2010:WorkflowViewState.IdRef="If_ImageForMux">
+                <If Condition="[System.IO.File.Exists(strAbsSlideImagePath)]" DisplayName="Slide image for mux?" sap2010:Annotation.AnnotationText="Executes 'Slide image for mux?' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="852,2712.8" sap2010:WorkflowViewState.IdRef="If_ImageForMux">
                   <If.Then>
-                    <Sequence DisplayName="Build segment + play" sap:VirtualizedContainerService.HintSize="850.4,2240" sap2010:WorkflowViewState.IdRef="Sequence_BuildSegmentPlay">
+                    <Sequence DisplayName="Build segment + play" sap2010:Annotation.AnnotationText="Executes 'Build segment + play' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,2240" sap2010:WorkflowViewState.IdRef="Sequence_BuildSegmentPlay">
                       <sap:WorkflowViewStateService.ViewState>
                         <scg:Dictionary x:TypeArguments="x:String, x:Object">
                           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                         </scg:Dictionary>
                       </sap:WorkflowViewStateService.ViewState>
-                      <Assign DisplayName="Per-slide segment MP4 path" sap:VirtualizedContainerService.HintSize="816.8,174.4" sap2010:WorkflowViewState.IdRef="Assign_SlideSegmentPath">
+                      <Assign DisplayName="Per-slide segment MP4 path" sap2010:Annotation.AnnotationText="Executes 'Per-slide segment MP4 path' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="816.8,174.4" sap2010:WorkflowViewState.IdRef="Assign_SlideSegmentPath">
                         <Assign.To>
                           <OutArgument x:TypeArguments="x:String">[strSlideSegmentMp4]</OutArgument>
                         </Assign.To>
@@ -391,7 +391,7 @@
                           <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","segments","slide_" &amp; CInt(in_slideItem.Split(Convert.ToChar(9))(0).Trim).ToString("D3") &amp; ".mp4")]</InArgument>
                         </Assign.Value>
                       </Assign>
-                      <Assign DisplayName="ffmpeg: image + WAV → segment (append manifest)" sap:VirtualizedContainerService.HintSize="780,88" sap2010:WorkflowViewState.IdRef="Assign_ShellBuildSlideMux">
+                      <Assign DisplayName="ffmpeg: image + WAV → segment (append manifest)" sap2010:Annotation.AnnotationText="Executes 'ffmpeg: image + WAV → segment (append manifest)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,88" sap2010:WorkflowViewState.IdRef="Assign_ShellBuildSlideMux">
                         <Assign.To>
                           <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                         </Assign.To>
@@ -399,30 +399,30 @@
                           <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + in_BuildSlideVideoScript + Chr(34) + " --image " + Chr(34) + strAbsSlideImagePath + Chr(34) + " --audio " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --out " + Chr(34) + strSlideSegmentMp4 + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34) + " --append-manifest " + Chr(34) + in_SegmentsManifestPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                         </Assign.Value>
                       </Assign>
-                      <Delay DisplayName="Wait for mux file" Duration="00:00:00.2500000" sap:VirtualizedContainerService.HintSize="816.8,122.4" sap2010:WorkflowViewState.IdRef="Delay_AfterMux" />
-                      <If Condition="[System.IO.File.Exists(strSlideSegmentMp4)]" DisplayName="Segment file created?" sap:VirtualizedContainerService.HintSize="816.8,1795.2" sap2010:WorkflowViewState.IdRef="If_SegmentExists">
+                      <Delay DisplayName="Wait for mux file" sap2010:Annotation.AnnotationText="Executes 'Wait for mux file' to complete this step in the slide iteration workflow." Duration="00:00:00.2500000" sap:VirtualizedContainerService.HintSize="816.8,122.4" sap2010:WorkflowViewState.IdRef="Delay_AfterMux" />
+                      <If Condition="[System.IO.File.Exists(strSlideSegmentMp4)]" DisplayName="Segment file created?" sap2010:Annotation.AnnotationText="Executes 'Segment file created?' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="816.8,1795.2" sap2010:WorkflowViewState.IdRef="If_SegmentExists">
                         <If.Then>
-                          <Sequence DisplayName="Cleanup previous PID then play segment" sap:VirtualizedContainerService.HintSize="815.2,1002.4" sap2010:WorkflowViewState.IdRef="Sequence_PlaySegmentAndKillPreviousPid">
+                          <Sequence DisplayName="Cleanup previous PID then play segment" sap2010:Annotation.AnnotationText="Executes 'Cleanup previous PID then play segment' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="815.2,1002.4" sap2010:WorkflowViewState.IdRef="Sequence_PlaySegmentAndKillPreviousPid">
                             <sap:WorkflowViewStateService.ViewState>
                               <scg:Dictionary x:TypeArguments="x:String, x:Object">
                                 <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                               </scg:Dictionary>
                             </sap:WorkflowViewStateService.ViewState>
-                            <If Condition="[False]" DisplayName="If previous PID exists, kill it" sap:VirtualizedContainerService.HintSize="781.6,268.8" sap2010:WorkflowViewState.IdRef="If_KillPreviousPid">
+                            <If Condition="[False]" DisplayName="If previous PID exists, kill it" sap2010:Annotation.AnnotationText="Executes 'If previous PID exists, kill it' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="781.6,268.8" sap2010:WorkflowViewState.IdRef="If_KillPreviousPid">
                               <If.Then>
-                                <ui:StartProcess Arguments="[&quot;/F /PID &quot; + strPreviousFfplayPid.Trim()]" DisplayName="Kill Previous Slide Video" FileName="taskkill.exe" sap:VirtualizedContainerService.HintSize="334.4,88" sap2010:WorkflowViewState.IdRef="StartProcess_KillPrevious" WorkingDirectory="[Environment.CurrentDirectory]" />
+                                <ui:StartProcess Arguments="[&quot;/F /PID &quot; + strPreviousFfplayPid.Trim()]" DisplayName="Kill Previous Slide Video" sap2010:Annotation.AnnotationText="Executes 'Kill Previous Slide Video' to complete this step in the slide iteration workflow." FileName="taskkill.exe" sap:VirtualizedContainerService.HintSize="334.4,88" sap2010:WorkflowViewState.IdRef="StartProcess_KillPrevious" WorkingDirectory="[Environment.CurrentDirectory]" />
                               </If.Then>
                             </If>
-                            <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset current ffplay PID file" FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="781.6,175.2" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetCurrentFfplayPid">
+                            <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset current ffplay PID file" sap2010:Annotation.AnnotationText="Executes 'Reset current ffplay PID file' to complete this step in the slide iteration workflow." FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="781.6,175.2" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetCurrentFfplayPid">
                               <ui:WriteTextFile.Text>
                                 <InArgument x:TypeArguments="x:String">
                                   <Literal x:TypeArguments="x:String" Value="" />
                                 </InArgument>
                               </ui:WriteTextFile.Text>
                             </ui:WriteTextFile>
-                            <ui:StartProcess Arguments="[&quot;&quot;&quot;&quot; + in_PlayVideoScript + &quot;&quot;&quot; --path &quot;&quot;&quot; + strSlideSegmentMp4 + &quot;&quot;&quot; --ffmpeg &quot;&quot;&quot; + io_FfmpegPath + &quot;&quot;&quot; --pid-file &quot;&quot;&quot; + strFfplayPidFile + &quot;&quot;&quot; --no-autoexit&quot;]" DisplayName="Play slide segment (non-blocking, pyw)" FileName="[in_PythonwExe]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_PlaySlideSegment" WorkingDirectory="[Environment.CurrentDirectory]" />
-                            <Sequence DisplayName="Pause-aware close delay after next slide appears" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_PauseAwareCloseDelayAfterNextSlideAppears">
-                              <Assign DisplayName="Init close delay remaining" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_InitCloseDelayRemaining">
+                            <ui:StartProcess Arguments="[&quot;&quot;&quot;&quot; + in_PlayVideoScript + &quot;&quot;&quot; --path &quot;&quot;&quot; + strSlideSegmentMp4 + &quot;&quot;&quot; --ffmpeg &quot;&quot;&quot; + io_FfmpegPath + &quot;&quot;&quot; --pid-file &quot;&quot;&quot; + strFfplayPidFile + &quot;&quot;&quot; --no-autoexit&quot;]" DisplayName="Play slide segment (non-blocking, pyw)" sap2010:Annotation.AnnotationText="Executes 'Play slide segment (non-blocking, pyw)' to complete this step in the slide iteration workflow." FileName="[in_PythonwExe]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_PlaySlideSegment" WorkingDirectory="[Environment.CurrentDirectory]" />
+                            <Sequence DisplayName="Pause-aware close delay after next slide appears" sap2010:Annotation.AnnotationText="Executes 'Pause-aware close delay after next slide appears' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_PauseAwareCloseDelayAfterNextSlideAppears">
+                              <Assign DisplayName="Init close delay remaining" sap2010:Annotation.AnnotationText="Executes 'Init close delay remaining' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_InitCloseDelayRemaining">
                                 <Assign.To>
                                   <OutArgument x:TypeArguments="x:Double">[dblCloseAfterNextDelayRemaining]</OutArgument>
                                 </Assign.To>
@@ -430,7 +430,7 @@
                                   <InArgument x:TypeArguments="x:Double">[dblCloseAfterNextDelaySeconds]</InArgument>
                                 </Assign.Value>
                               </Assign>
-                              <Assign DisplayName="Reset close-delay resume marker" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ResetCloseDelayResumeMarker">
+                              <Assign DisplayName="Reset close-delay resume marker" sap2010:Annotation.AnnotationText="Executes 'Reset close-delay resume marker' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ResetCloseDelayResumeMarker">
                                 <Assign.To>
                                   <OutArgument x:TypeArguments="x:Boolean">[blnCloseAfterNextDelayResumePending]</OutArgument>
                                 </Assign.To>
@@ -438,9 +438,9 @@
                                   <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
                                 </Assign.Value>
                               </Assign>
-                              <While DisplayName="Pause-aware close-delay countdown" sap:VirtualizedContainerService.HintSize="780,138" sap2010:WorkflowViewState.IdRef="While_PauseAwareCloseDelayAfterNextSlideAppears" Condition="[dblCloseAfterNextDelayRemaining &gt; 0]">
-                                <Sequence DisplayName="Tick close-delay countdown" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_TickPauseAwareCloseDelayAfterNextSlideAppears">
-                                  <Assign DisplayName="Refresh presentation control state" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshPresentationControlStateForCloseDelay">
+                              <While DisplayName="Pause-aware close-delay countdown" sap2010:Annotation.AnnotationText="Executes 'Pause-aware close-delay countdown' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,138" sap2010:WorkflowViewState.IdRef="While_PauseAwareCloseDelayAfterNextSlideAppears" Condition="[dblCloseAfterNextDelayRemaining &gt; 0]">
+                                <Sequence DisplayName="Tick close-delay countdown" sap2010:Annotation.AnnotationText="Executes 'Tick close-delay countdown' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_TickPauseAwareCloseDelayAfterNextSlideAppears">
+                                  <Assign DisplayName="Refresh presentation control state" sap2010:Annotation.AnnotationText="Executes 'Refresh presentation control state' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshPresentationControlStateForCloseDelay">
                                     <Assign.To>
                                       <OutArgument x:TypeArguments="x:String">[strPresentationControlState]</OutArgument>
                                     </Assign.To>
@@ -448,10 +448,10 @@
                                       <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(in_PresentationControlStateFile) AndAlso System.IO.File.Exists(in_PresentationControlStateFile), System.IO.File.ReadAllText(in_PresentationControlStateFile), "running")]</InArgument>
                                     </Assign.Value>
                                   </Assign>
-                                  <If Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlState) AndAlso strPresentationControlState.Trim().Equals(&quot;paused&quot;, StringComparison.OrdinalIgnoreCase)]" DisplayName="Paused during close delay?" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_PausedDuringCloseDelayAfterNextSlideAppears">
+                                  <If Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlState) AndAlso strPresentationControlState.Trim().Equals(&quot;paused&quot;, StringComparison.OrdinalIgnoreCase)]" DisplayName="Paused during close delay?" sap2010:Annotation.AnnotationText="Executes 'Paused during close delay?' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_PausedDuringCloseDelayAfterNextSlideAppears">
                                     <If.Then>
-                                      <Sequence DisplayName="Hold delay while paused" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_HoldCloseDelayWhilePausedAfterNextSlideAppears">
-                                        <Assign DisplayName="Mark close-delay resume pending" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_MarkCloseDelayResumePending">
+                                      <Sequence DisplayName="Hold delay while paused" sap2010:Annotation.AnnotationText="Executes 'Hold delay while paused' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_HoldCloseDelayWhilePausedAfterNextSlideAppears">
+                                        <Assign DisplayName="Mark close-delay resume pending" sap2010:Annotation.AnnotationText="Executes 'Mark close-delay resume pending' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_MarkCloseDelayResumePending">
                                           <Assign.To>
                                             <OutArgument x:TypeArguments="x:Boolean">[blnCloseAfterNextDelayResumePending]</OutArgument>
                                           </Assign.To>
@@ -459,15 +459,15 @@
                                             <InArgument x:TypeArguments="x:Boolean">[True]</InArgument>
                                           </Assign.Value>
                                         </Assign>
-                                        <Delay DisplayName="Paused polling delay" Duration="00:00:00.3000000" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_PausePollingDuringCloseDelayAfterNextSlideAppears" />
+                                        <Delay DisplayName="Paused polling delay" sap2010:Annotation.AnnotationText="Executes 'Paused polling delay' to complete this step in the slide iteration workflow." Duration="00:00:00.3000000" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_PausePollingDuringCloseDelayAfterNextSlideAppears" />
                                       </Sequence>
                                     </If.Then>
                                     <If.Else>
-                                      <Sequence DisplayName="Advance close-delay timer" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_AdvanceCloseDelayTimerAfterNextSlideAppears">
-                                        <If Condition="[blnCloseAfterNextDelayResumePending]" DisplayName="Restart close delay at half after Continue" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_RestartCloseDelayHalfAfterContinue">
+                                      <Sequence DisplayName="Advance close-delay timer" sap2010:Annotation.AnnotationText="Executes 'Advance close-delay timer' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_AdvanceCloseDelayTimerAfterNextSlideAppears">
+                                        <If Condition="[blnCloseAfterNextDelayResumePending]" DisplayName="Restart close delay at half after Continue" sap2010:Annotation.AnnotationText="Executes 'Restart close delay at half after Continue' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_RestartCloseDelayHalfAfterContinue">
                                           <If.Then>
-                                            <Sequence DisplayName="Apply half close delay" sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_ApplyHalfCloseDelayAfterContinue">
-                                              <Assign DisplayName="Set close delay to half" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_SetCloseDelayHalfAfterContinue">
+                                            <Sequence DisplayName="Apply half close delay" sap2010:Annotation.AnnotationText="Executes 'Apply half close delay' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,200" sap2010:WorkflowViewState.IdRef="Sequence_ApplyHalfCloseDelayAfterContinue">
+                                              <Assign DisplayName="Set close delay to half" sap2010:Annotation.AnnotationText="Executes 'Set close delay to half' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_SetCloseDelayHalfAfterContinue">
                                                 <Assign.To>
                                                   <OutArgument x:TypeArguments="x:Double">[dblCloseAfterNextDelayRemaining]</OutArgument>
                                                 </Assign.To>
@@ -475,7 +475,7 @@
                                                   <InArgument x:TypeArguments="x:Double">[dblCloseAfterNextDelaySeconds / 2.0]</InArgument>
                                                 </Assign.Value>
                                               </Assign>
-                                              <Assign DisplayName="Clear close-delay resume marker" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ClearCloseDelayResumeMarkerAfterContinue">
+                                              <Assign DisplayName="Clear close-delay resume marker" sap2010:Annotation.AnnotationText="Executes 'Clear close-delay resume marker' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ClearCloseDelayResumeMarkerAfterContinue">
                                                 <Assign.To>
                                                   <OutArgument x:TypeArguments="x:Boolean">[blnCloseAfterNextDelayResumePending]</OutArgument>
                                                 </Assign.To>
@@ -486,7 +486,7 @@
                                             </Sequence>
                                           </If.Then>
                                         </If>
-                                        <Assign DisplayName="Compute close-delay wait step" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ComputeCloseDelayWaitStep">
+                                        <Assign DisplayName="Compute close-delay wait step" sap2010:Annotation.AnnotationText="Executes 'Compute close-delay wait step' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ComputeCloseDelayWaitStep">
                                           <Assign.To>
                                             <OutArgument x:TypeArguments="x:Double">[dblWaitStepSeconds]</OutArgument>
                                           </Assign.To>
@@ -494,8 +494,8 @@
                                             <InArgument x:TypeArguments="x:Double">[If(dblCloseAfterNextDelayRemaining &gt; 0.1, 0.1, dblCloseAfterNextDelayRemaining)]</InArgument>
                                           </Assign.Value>
                                         </Assign>
-                                        <Delay DisplayName="Close-delay wait step" Duration="[TimeSpan.FromSeconds(dblWaitStepSeconds)]" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_CloseDelayWaitStepAfterNextSlideAppears" />
-                                        <Assign DisplayName="Decrease close-delay remaining" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_DecreaseCloseDelayRemainingAfterNextSlideAppears">
+                                        <Delay DisplayName="Close-delay wait step" sap2010:Annotation.AnnotationText="Executes 'Close-delay wait step' to complete this step in the slide iteration workflow." Duration="[TimeSpan.FromSeconds(dblWaitStepSeconds)]" sap:VirtualizedContainerService.HintSize="780,90.4" sap2010:WorkflowViewState.IdRef="Delay_CloseDelayWaitStepAfterNextSlideAppears" />
+                                        <Assign DisplayName="Decrease close-delay remaining" sap2010:Annotation.AnnotationText="Executes 'Decrease close-delay remaining' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_DecreaseCloseDelayRemainingAfterNextSlideAppears">
                                           <Assign.To>
                                             <OutArgument x:TypeArguments="x:Double">[dblCloseAfterNextDelayRemaining]</OutArgument>
                                           </Assign.To>
@@ -509,12 +509,12 @@
                                 </Sequence>
                               </While>
                             </Sequence>
-                            <If Condition="[System.IO.File.Exists(strFfplayPidFile)]" DisplayName="Read current PID after launch" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ReadCurrentPidAfterLaunch">
+                            <If Condition="[System.IO.File.Exists(strFfplayPidFile)]" DisplayName="Read current PID after launch" sap2010:Annotation.AnnotationText="Executes 'Read current PID after launch' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ReadCurrentPidAfterLaunch">
                               <If.Then>
-                                <ui:ReadTextFile File="{x:Null}" Content="[strCurrentFfplayPid]" DisplayName="Read current ffplay PID" FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_CurrentPidAfterLaunch" />
+                                <ui:ReadTextFile File="{x:Null}" Content="[strCurrentFfplayPid]" DisplayName="Read current ffplay PID" sap2010:Annotation.AnnotationText="Executes 'Read current ffplay PID' to complete this step in the slide iteration workflow." FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="780,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_CurrentPidAfterLaunch" />
                               </If.Then>
                               <If.Else>
-                                <Assign DisplayName="Current PID unavailable" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_CurrentPidUnavailable">
+                                <Assign DisplayName="Current PID unavailable" sap2010:Annotation.AnnotationText="Executes 'Current PID unavailable' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_CurrentPidUnavailable">
                                   <Assign.To>
                                     <OutArgument x:TypeArguments="x:String">[strCurrentFfplayPid]</OutArgument>
                                   </Assign.To>
@@ -524,9 +524,9 @@
                                 </Assign>
                               </If.Else>
                             </If>
-                            <If Condition="[Not String.IsNullOrWhiteSpace(strPreviousFfplayPid) AndAlso Not String.IsNullOrWhiteSpace(strCurrentFfplayPid) AndAlso strPreviousFfplayPid.Trim() &lt;&gt; strCurrentFfplayPid.Trim()]" DisplayName="Close previous slide after next appears" sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ClosePreviousAfterNextShown">
+                            <If Condition="[Not String.IsNullOrWhiteSpace(strPreviousFfplayPid) AndAlso Not String.IsNullOrWhiteSpace(strCurrentFfplayPid) AndAlso strPreviousFfplayPid.Trim() &lt;&gt; strCurrentFfplayPid.Trim()]" DisplayName="Close previous slide after next appears" sap2010:Annotation.AnnotationText="Executes 'Close previous slide after next appears' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ClosePreviousAfterNextShown">
                               <If.Then>
-                                <Assign DisplayName="Close previous slide (hidden shell)" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ClosePreviousAfterNextShown">
+                                <Assign DisplayName="Close previous slide (hidden shell)" sap2010:Annotation.AnnotationText="Executes 'Close previous slide (hidden shell)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ClosePreviousAfterNextShown">
                                   <Assign.To>
                                     <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                                   </Assign.To>
@@ -539,14 +539,14 @@
                           </Sequence>
                         </If.Then>
                         <If.Else>
-                          <Sequence DisplayName="Mux failed — play WAV only" sap:VirtualizedContainerService.HintSize="815.2,663.2" sap2010:WorkflowViewState.IdRef="Sequence_FallbackWav">
+                          <Sequence DisplayName="Mux failed — play WAV only" sap2010:Annotation.AnnotationText="Executes 'Mux failed — play WAV only' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="815.2,663.2" sap2010:WorkflowViewState.IdRef="Sequence_FallbackWav">
                             <sap:WorkflowViewStateService.ViewState>
                               <scg:Dictionary x:TypeArguments="x:String, x:Object">
                                 <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                               </scg:Dictionary>
                             </sap:WorkflowViewStateService.ViewState>
-                            <ui:LogMessage DisplayName="Segment mux failed — play WAV" sap:VirtualizedContainerService.HintSize="781.6,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MuxFail" Level="Warn" Message="[&quot;build_slide_video did not produce segment; playing narration WAV only. Check ffmpeg_path and ffplay.exe.&quot;]" />
-                            <Assign DisplayName="Play narration WAV fallback" sap:VirtualizedContainerService.HintSize="781.6,174.4" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWavFallback">
+                            <ui:LogMessage DisplayName="Segment mux failed — play WAV" sap2010:Annotation.AnnotationText="Executes 'Segment mux failed — play WAV' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="781.6,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MuxFail" Level="Warn" Message="[&quot;build_slide_video did not produce segment; playing narration WAV only. Check ffmpeg_path and ffplay.exe.&quot;]" />
+                            <Assign DisplayName="Play narration WAV fallback" sap2010:Annotation.AnnotationText="Executes 'Play narration WAV fallback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="781.6,174.4" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWavFallback">
                               <Assign.To>
                                 <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                               </Assign.To>
@@ -554,9 +554,9 @@
                                 <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                               </Assign.Value>
                             </Assign>
-                            <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate WAV fallback playback" sap:VirtualizedContainerService.HintSize="781.6,254.4" sap2010:WorkflowViewState.IdRef="If_ValidateWavFallbackPlayback">
+                            <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate WAV fallback playback" sap2010:Annotation.AnnotationText="Executes 'Validate WAV fallback playback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="781.6,254.4" sap2010:WorkflowViewState.IdRef="If_ValidateWavFallbackPlayback">
                               <If.Then>
-                                <Throw DisplayName="WAV fallback playback failed" Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + io_NarrationAudioPath + &quot; (exit code &quot; + io_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_WavFallbackPlaybackFailed" />
+                                <Throw DisplayName="WAV fallback playback failed" sap2010:Annotation.AnnotationText="Executes 'WAV fallback playback failed' to complete this step in the slide iteration workflow." Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + io_NarrationAudioPath + &quot; (exit code &quot; + io_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Throw_WavFallbackPlaybackFailed" />
                               </If.Then>
                             </If>
                           </Sequence>
@@ -565,14 +565,14 @@
                     </Sequence>
                   </If.Then>
                   <If.Else>
-                    <Sequence DisplayName="Mux failed — play WAV only" sap:VirtualizedContainerService.HintSize="850.4,343.2" sap2010:WorkflowViewState.IdRef="Sequence_FallbackWav_NoImagePath">
+                    <Sequence DisplayName="Mux failed — play WAV only" sap2010:Annotation.AnnotationText="Executes 'Mux failed — play WAV only' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,343.2" sap2010:WorkflowViewState.IdRef="Sequence_FallbackWav_NoImagePath">
                       <sap:WorkflowViewStateService.ViewState>
                         <scg:Dictionary x:TypeArguments="x:String, x:Object">
                           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                         </scg:Dictionary>
                       </sap:WorkflowViewStateService.ViewState>
-                      <ui:LogMessage DisplayName="Segment mux failed — play WAV" sap:VirtualizedContainerService.HintSize="333.6,92.8" sap2010:WorkflowViewState.IdRef="LogMessage_MuxFail_NoImagePath" Level="Warn" Message="[&quot;build_slide_video did not produce segment; playing narration WAV only. Check ffmpeg_path and ffplay.exe.&quot;]" />
-                      <Assign DisplayName="Play narration WAV fallback" sap:VirtualizedContainerService.HintSize="333.6,81.6" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWavFallback_NoImagePath">
+                      <ui:LogMessage DisplayName="Segment mux failed — play WAV" sap2010:Annotation.AnnotationText="Executes 'Segment mux failed — play WAV' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="333.6,92.8" sap2010:WorkflowViewState.IdRef="LogMessage_MuxFail_NoImagePath" Level="Warn" Message="[&quot;build_slide_video did not produce segment; playing narration WAV only. Check ffmpeg_path and ffplay.exe.&quot;]" />
+                      <Assign DisplayName="Play narration WAV fallback" sap2010:Annotation.AnnotationText="Executes 'Play narration WAV fallback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="333.6,81.6" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWavFallback_NoImagePath">
                         <Assign.To>
                           <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                         </Assign.To>
@@ -580,9 +580,9 @@
                           <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                         </Assign.Value>
                       </Assign>
-                      <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate WAV fallback playback" sap:VirtualizedContainerService.HintSize="333.6,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateWavFallbackPlayback_NoImagePath">
+                      <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate WAV fallback playback" sap2010:Annotation.AnnotationText="Executes 'Validate WAV fallback playback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="333.6,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateWavFallbackPlayback_NoImagePath">
                         <If.Then>
-                          <Throw DisplayName="WAV fallback playback failed" Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + io_NarrationAudioPath + &quot; (exit code &quot; + io_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="333.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_WavFallbackPlaybackFailed_NoImagePath" />
+                          <Throw DisplayName="WAV fallback playback failed" sap2010:Annotation.AnnotationText="Executes 'WAV fallback playback failed' to complete this step in the slide iteration workflow." Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + io_NarrationAudioPath + &quot; (exit code &quot; + io_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="333.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_WavFallbackPlaybackFailed_NoImagePath" />
                         </If.Then>
                       </If>
                     </Sequence>
@@ -591,14 +591,14 @@
               </Sequence>
             </If.Then>
             <If.Else>
-              <Sequence DisplayName="No image for slide" sap:VirtualizedContainerService.HintSize="885.6,343.2" sap2010:WorkflowViewState.IdRef="Sequence_NoImage">
+              <Sequence DisplayName="No image for slide" sap2010:Annotation.AnnotationText="Executes 'No image for slide' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="885.6,343.2" sap2010:WorkflowViewState.IdRef="Sequence_NoImage">
                 <sap:WorkflowViewStateService.ViewState>
                   <scg:Dictionary x:TypeArguments="x:String, x:Object">
                     <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                   </scg:Dictionary>
                 </sap:WorkflowViewStateService.ViewState>
-                <ui:LogMessage DisplayName="Log: No image for slide" sap:VirtualizedContainerService.HintSize="333.6,92.8" sap2010:WorkflowViewState.IdRef="LogMessage_NoImage" Level="Info" Message="[&quot;No image for slide, playing audio only.&quot;]" />
-                <Assign DisplayName="Play narration WAV" sap:VirtualizedContainerService.HintSize="333.6,81.6" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWav">
+                <ui:LogMessage DisplayName="Log: No image for slide" sap2010:Annotation.AnnotationText="Executes 'Log: No image for slide' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="333.6,92.8" sap2010:WorkflowViewState.IdRef="LogMessage_NoImage" Level="Info" Message="[&quot;No image for slide, playing audio only.&quot;]" />
+                <Assign DisplayName="Play narration WAV" sap2010:Annotation.AnnotationText="Executes 'Play narration WAV' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="333.6,81.6" sap2010:WorkflowViewState.IdRef="Assign_PlayNarrationWav">
                   <Assign.To>
                     <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                   </Assign.To>
@@ -606,9 +606,9 @@
                     <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                   </Assign.Value>
                 </Assign>
-                <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate narration WAV playback" sap:VirtualizedContainerService.HintSize="333.6,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateNarrationWavPlayback">
+                <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate narration WAV playback" sap2010:Annotation.AnnotationText="Executes 'Validate narration WAV playback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="333.6,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateNarrationWavPlayback">
                   <If.Then>
-                    <Throw DisplayName="Narration WAV playback failed" Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + io_NarrationAudioPath + &quot; (exit code &quot; + io_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="333.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_NarrationWavPlaybackFailed" />
+                    <Throw DisplayName="Narration WAV playback failed" sap2010:Annotation.AnnotationText="Executes 'Narration WAV playback failed' to complete this step in the slide iteration workflow." Exception="[New Exception(&quot;Unable to open/play narration WAV: &quot; + io_NarrationAudioPath + &quot; (exit code &quot; + io_PlayResponseShellResult.ToString + &quot;).&quot;)]" sap:VirtualizedContainerService.HintSize="333.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_NarrationWavPlaybackFailed" />
                   </If.Then>
                 </If>
               </Sequence>
@@ -617,15 +617,15 @@
         </Sequence>
       </If.Then>
       <If.Else>
-        <Throw DisplayName="No narration text for current slide" Exception="[New Exception(&quot;No TTS narration for slide &quot; + CInt(in_slideItem.Split(Convert.ToChar(9))(0).Trim).ToString + &quot;. &quot; + If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;PPTX source mismatch detected:&quot; + Environment.NewLine + System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;gpt_slide_content.txt is missing/empty or missing === SLIDE | n | title === block.&quot;))]" sap:VirtualizedContainerService.HintSize="781.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_NoNarrationText" />
+        <Throw DisplayName="No narration text for current slide" sap2010:Annotation.AnnotationText="Executes 'No narration text for current slide' to complete this step in the slide iteration workflow." Exception="[New Exception(&quot;No TTS narration for slide &quot; + CInt(in_slideItem.Split(Convert.ToChar(9))(0).Trim).ToString + &quot;. &quot; + If(System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;PPTX source mismatch detected:&quot; + Environment.NewLine + System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory,&quot;Data&quot;,&quot;AIPresenter&quot;,&quot;Temp&quot;,&quot;pptx_source_resolution_error.txt&quot;)), &quot;gpt_slide_content.txt is missing/empty or missing === SLIDE | n | title === block.&quot;))]" sap:VirtualizedContainerService.HintSize="781.6,82.4" sap2010:WorkflowViewState.IdRef="Throw_NoNarrationText" />
       </If.Else>
     </If>
-    <If Condition="[Not String.IsNullOrWhiteSpace(in_LastCompletedSlideOrdinalFile)]" DisplayName="Expose current slide in preview immediately" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ExposeCurrentSlideForPreviewEarly">
+    <If Condition="[Not String.IsNullOrWhiteSpace(in_LastCompletedSlideOrdinalFile)]" DisplayName="Expose current slide in preview immediately" sap2010:Annotation.AnnotationText="Executes 'Expose current slide in preview immediately' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ExposeCurrentSlideForPreviewEarly">
       <If.Then>
-        <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write current slide ordinal for preview" FileName="[in_LastCompletedSlideOrdinalFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_CurrentSlideOrdinalForPreviewEarly" Text="[io_SlideOrdinal.ToString()]" />
+        <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write current slide ordinal for preview" sap2010:Annotation.AnnotationText="Executes 'Write current slide ordinal for preview' to complete this step in the slide iteration workflow." FileName="[in_LastCompletedSlideOrdinalFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_CurrentSlideOrdinalForPreviewEarly" Text="[io_SlideOrdinal.ToString()]" />
       </If.Then>
     </If>
-    <Assign DisplayName="Wait AI voice duration" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_PadSeconds">
+    <Assign DisplayName="Wait AI voice duration" sap2010:Annotation.AnnotationText="Executes 'Wait AI voice duration' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_PadSeconds">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Double">[dblPadSeconds]</OutArgument>
       </Assign.To>
@@ -633,7 +633,7 @@
         <InArgument x:TypeArguments="x:Double">[If(dblNarrationDuration &gt; 0, dblNarrationDuration, 5.0)]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Init remaining narration wait" sap:VirtualizedContainerService.HintSize="928.8,174.4" sap2010:WorkflowViewState.IdRef="Assign_InitRemainingNarrationWait">
+    <Assign DisplayName="Init remaining narration wait" sap2010:Annotation.AnnotationText="Executes 'Init remaining narration wait' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="928.8,174.4" sap2010:WorkflowViewState.IdRef="Assign_InitRemainingNarrationWait">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Double">[dblRemainingWaitSeconds]</OutArgument>
       </Assign.To>
@@ -641,14 +641,14 @@
         <InArgument x:TypeArguments="x:Double">[dblPadSeconds]</InArgument>
       </Assign.Value>
     </Assign>
-    <While DisplayName="Wait AI voice to finish (pause-aware)" sap:VirtualizedContainerService.HintSize="928.8,535.2" sap2010:WorkflowViewState.IdRef="While_PauseAwareNarrationWait" Condition="[dblRemainingWaitSeconds &gt; 0]">
-      <Sequence DisplayName="Wait or hold by Pause state" sap:VirtualizedContainerService.HintSize="884,343.2" sap2010:WorkflowViewState.IdRef="Sequence_PauseAwareNarrationWait">
+    <While DisplayName="Wait AI voice to finish (pause-aware)" sap2010:Annotation.AnnotationText="Executes 'Wait AI voice to finish (pause-aware)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="928.8,535.2" sap2010:WorkflowViewState.IdRef="While_PauseAwareNarrationWait" Condition="[dblRemainingWaitSeconds &gt; 0]">
+      <Sequence DisplayName="Wait or hold by Pause state" sap2010:Annotation.AnnotationText="Executes 'Wait or hold by Pause state' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="884,343.2" sap2010:WorkflowViewState.IdRef="Sequence_PauseAwareNarrationWait">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
             <x:Boolean x:Key="IsExpanded">True</x:Boolean>
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
-        <Assign DisplayName="Refresh presentation control state" sap:VirtualizedContainerService.HintSize="850.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshPresentationControlStateInSlide">
+        <Assign DisplayName="Refresh presentation control state" sap2010:Annotation.AnnotationText="Executes 'Refresh presentation control state' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,174.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshPresentationControlStateInSlide">
           <Assign.To>
             <OutArgument x:TypeArguments="x:String">[strPresentationControlState]</OutArgument>
           </Assign.To>
@@ -656,13 +656,13 @@
             <InArgument x:TypeArguments="x:String">[If(Not String.IsNullOrWhiteSpace(in_PresentationControlStateFile) AndAlso System.IO.File.Exists(in_PresentationControlStateFile), System.IO.File.ReadAllText(in_PresentationControlStateFile), "running")]</InArgument>
           </Assign.Value>
         </Assign>
-        <If Condition="[Not String.IsNullOrWhiteSpace(in_PresentationControlStateFile) AndAlso Not String.IsNullOrWhiteSpace(strPresentationControlState) AndAlso strPresentationControlState.Trim().Equals(&quot;paused&quot;, StringComparison.OrdinalIgnoreCase)]" DisplayName="Pause requested?" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_PauseRequestedDuringNarrationWait">
+        <If Condition="[Not String.IsNullOrWhiteSpace(in_PresentationControlStateFile) AndAlso Not String.IsNullOrWhiteSpace(strPresentationControlState) AndAlso strPresentationControlState.Trim().Equals(&quot;paused&quot;, StringComparison.OrdinalIgnoreCase)]" DisplayName="Pause requested?" sap2010:Annotation.AnnotationText="Executes 'Pause requested?' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_PauseRequestedDuringNarrationWait">
           <If.Then>
-            <Delay DisplayName="Paused polling delay" Duration="00:00:00.3000000" sap:VirtualizedContainerService.HintSize="850.4,90.4" sap2010:WorkflowViewState.IdRef="Delay_PausePollingDuringNarrationWait" />
+            <Delay DisplayName="Paused polling delay" sap2010:Annotation.AnnotationText="Executes 'Paused polling delay' to complete this step in the slide iteration workflow." Duration="00:00:00.3000000" sap:VirtualizedContainerService.HintSize="850.4,90.4" sap2010:WorkflowViewState.IdRef="Delay_PausePollingDuringNarrationWait" />
           </If.Then>
           <If.Else>
-            <Sequence DisplayName="Advance wait timer" sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_AdvanceNarrationWaitTimer">
-              <Assign DisplayName="Compute current wait step" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_CurrentWaitStepSeconds">
+            <Sequence DisplayName="Advance wait timer" sap2010:Annotation.AnnotationText="Executes 'Advance wait timer' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_AdvanceNarrationWaitTimer">
+              <Assign DisplayName="Compute current wait step" sap2010:Annotation.AnnotationText="Executes 'Compute current wait step' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_CurrentWaitStepSeconds">
                 <Assign.To>
                   <OutArgument x:TypeArguments="x:Double">[dblWaitStepSeconds]</OutArgument>
                 </Assign.To>
@@ -670,8 +670,8 @@
                   <InArgument x:TypeArguments="x:Double">[If(dblRemainingWaitSeconds &gt; 0.3, 0.3, dblRemainingWaitSeconds)]</InArgument>
                 </Assign.Value>
               </Assign>
-              <Delay DisplayName="Narration wait step" Duration="[TimeSpan.FromSeconds(dblWaitStepSeconds)]" sap:VirtualizedContainerService.HintSize="850.4,90.4" sap2010:WorkflowViewState.IdRef="Delay_NarrationWaitStep" />
-              <Assign DisplayName="Decrease remaining wait" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_DecreaseRemainingNarrationWait">
+              <Delay DisplayName="Narration wait step" sap2010:Annotation.AnnotationText="Executes 'Narration wait step' to complete this step in the slide iteration workflow." Duration="[TimeSpan.FromSeconds(dblWaitStepSeconds)]" sap:VirtualizedContainerService.HintSize="850.4,90.4" sap2010:WorkflowViewState.IdRef="Delay_NarrationWaitStep" />
+              <Assign DisplayName="Decrease remaining wait" sap2010:Annotation.AnnotationText="Executes 'Decrease remaining wait' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_DecreaseRemainingNarrationWait">
                 <Assign.To>
                   <OutArgument x:TypeArguments="x:Double">[dblRemainingWaitSeconds]</OutArgument>
                 </Assign.To>
@@ -684,34 +684,34 @@
         </If>
       </Sequence>
     </While>
-    <If Condition="[False]" DisplayName="Close slide playback window after voice (disabled)" sap:VirtualizedContainerService.HintSize="928.8,358.4" sap2010:WorkflowViewState.IdRef="If_CloseSlideAfterVoice">
+    <If Condition="[False]" DisplayName="Close slide playback window after voice (disabled)" sap2010:Annotation.AnnotationText="Executes 'Close slide playback window after voice (disabled)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="928.8,358.4" sap2010:WorkflowViewState.IdRef="If_CloseSlideAfterVoice">
       <If.Then>
-        <Sequence DisplayName="Read PID and close current slide" sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_CloseSlideAfterVoice">
-          <ui:ReadTextFile File="{x:Null}" Content="[strPreviousFfplayPid]" DisplayName="Read current ffplay PID" FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_CurrentFfplayPid" />
-          <If Condition="[Not String.IsNullOrWhiteSpace(strPreviousFfplayPid)]" DisplayName="PID available for close" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_HasFfplayPidForClose">
+        <Sequence DisplayName="Read PID and close current slide" sap2010:Annotation.AnnotationText="Executes 'Read PID and close current slide' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_CloseSlideAfterVoice">
+          <ui:ReadTextFile File="{x:Null}" Content="[strPreviousFfplayPid]" DisplayName="Read current ffplay PID" sap2010:Annotation.AnnotationText="Executes 'Read current ffplay PID' to complete this step in the slide iteration workflow." FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_CurrentFfplayPid" />
+          <If Condition="[Not String.IsNullOrWhiteSpace(strPreviousFfplayPid)]" DisplayName="PID available for close" sap2010:Annotation.AnnotationText="Executes 'PID available for close' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_HasFfplayPidForClose">
             <If.Then>
-              <ui:StartProcess Arguments="[&quot;/F /PID &quot; + strPreviousFfplayPid.Trim()]" DisplayName="Close current slide window" FileName="taskkill.exe" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_CloseCurrentSlide" WorkingDirectory="[Environment.CurrentDirectory]" />
+              <ui:StartProcess Arguments="[&quot;/F /PID &quot; + strPreviousFfplayPid.Trim()]" DisplayName="Close current slide window" sap2010:Annotation.AnnotationText="Executes 'Close current slide window' to complete this step in the slide iteration workflow." FileName="taskkill.exe" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_CloseCurrentSlide" WorkingDirectory="[Environment.CurrentDirectory]" />
             </If.Then>
           </If>
         </Sequence>
       </If.Then>
     </If>
-    <If Condition="[Not String.IsNullOrWhiteSpace(in_LastCompletedSlideOrdinalFile)]" DisplayName="Mark slide as completed for preview" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_MarkSlideCompletedForPreview">
+    <If Condition="[Not String.IsNullOrWhiteSpace(in_LastCompletedSlideOrdinalFile)]" DisplayName="Mark slide as completed for preview" sap2010:Annotation.AnnotationText="Executes 'Mark slide as completed for preview' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_MarkSlideCompletedForPreview">
       <If.Then>
-        <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write last completed slide ordinal" FileName="[in_LastCompletedSlideOrdinalFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_LastCompletedSlideOrdinal" Text="[io_SlideOrdinal.ToString()]" />
+        <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write last completed slide ordinal" sap2010:Annotation.AnnotationText="Executes 'Write last completed slide ordinal' to complete this step in the slide iteration workflow." FileName="[in_LastCompletedSlideOrdinalFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_LastCompletedSlideOrdinal" Text="[io_SlideOrdinal.ToString()]" />
       </If.Then>
     </If>
-    <ui:LogMessage DisplayName="Slide iteration completed" sap:VirtualizedContainerService.HintSize="850.4,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_SlideIterationCompleted" Level="Info" Message="[&quot;Slide iteration completed for slide ordinal: &quot; + io_SlideOrdinal.ToString]" />
-    <ui:LogMessage DisplayName="Auto continue after each slide" sap:VirtualizedContainerService.HintSize="850.4,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_AutoContinueAfterSlide" Level="Info" Message="[If(in_TotalSlides &gt; 0 AndAlso io_SlideOrdinal &gt;= (in_TotalSlides - 1), &quot;Final slide finished - closing playback and ending presentation.&quot;, &quot;Slide finished - continuing automatically (use Pause/Continue popup to control flow).&quot;)]" />
-    <If Condition="[in_TotalSlides &gt; 0 AndAlso io_SlideOrdinal &gt;= (in_TotalSlides - 1)]" DisplayName="Final slide: auto-close playback and finish" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_FinalSlideNoCloseAndFinish">
+    <ui:LogMessage DisplayName="Slide iteration completed" sap2010:Annotation.AnnotationText="Executes 'Slide iteration completed' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_SlideIterationCompleted" Level="Info" Message="[&quot;Slide iteration completed for slide ordinal: &quot; + io_SlideOrdinal.ToString]" />
+    <ui:LogMessage DisplayName="Auto continue after each slide" sap2010:Annotation.AnnotationText="Executes 'Auto continue after each slide' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_AutoContinueAfterSlide" Level="Info" Message="[If(in_TotalSlides &gt; 0 AndAlso io_SlideOrdinal &gt;= (in_TotalSlides - 1), &quot;Final slide finished - closing playback and ending presentation.&quot;, &quot;Slide finished - continuing automatically (use Pause/Continue popup to control flow).&quot;)]" />
+    <If Condition="[in_TotalSlides &gt; 0 AndAlso io_SlideOrdinal &gt;= (in_TotalSlides - 1)]" DisplayName="Final slide: auto-close playback and finish" sap2010:Annotation.AnnotationText="Executes 'Final slide: auto-close playback and finish' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_FinalSlideNoCloseAndFinish">
       <If.Then>
-        <Sequence DisplayName="Close final slide playback" sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_CloseFinalSlidePlayback">
-          <If Condition="[System.IO.File.Exists(strFfplayPidFile)]" DisplayName="Read current ffplay PID" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ReadFinalFfplayPid">
+        <Sequence DisplayName="Close final slide playback" sap2010:Annotation.AnnotationText="Executes 'Close final slide playback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,200" sap2010:WorkflowViewState.IdRef="Sequence_CloseFinalSlidePlayback">
+          <If Condition="[System.IO.File.Exists(strFfplayPidFile)]" DisplayName="Read current ffplay PID" sap2010:Annotation.AnnotationText="Executes 'Read current ffplay PID' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_ReadFinalFfplayPid">
             <If.Then>
-              <ui:ReadTextFile File="{x:Null}" Content="[strCurrentFfplayPid]" DisplayName="Read current ffplay PID (final slide)" FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_FinalCurrentFfplayPid" />
+              <ui:ReadTextFile File="{x:Null}" Content="[strCurrentFfplayPid]" DisplayName="Read current ffplay PID (final slide)" sap2010:Annotation.AnnotationText="Executes 'Read current ffplay PID (final slide)' to complete this step in the slide iteration workflow." FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_FinalCurrentFfplayPid" />
             </If.Then>
             <If.Else>
-              <Assign DisplayName="No ffplay PID file" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_NoFinalFfplayPid">
+              <Assign DisplayName="No ffplay PID file" sap2010:Annotation.AnnotationText="Executes 'No ffplay PID file' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_NoFinalFfplayPid">
                 <Assign.To>
                   <OutArgument x:TypeArguments="x:String">[strCurrentFfplayPid]</OutArgument>
                 </Assign.To>
@@ -721,9 +721,9 @@
               </Assign>
             </If.Else>
           </If>
-          <If Condition="[Not String.IsNullOrWhiteSpace(strCurrentFfplayPid)]" DisplayName="Kill final slide window by PID" sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_KillFinalSlideByPid">
+          <If Condition="[Not String.IsNullOrWhiteSpace(strCurrentFfplayPid)]" DisplayName="Kill final slide window by PID" sap2010:Annotation.AnnotationText="Executes 'Kill final slide window by PID' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_KillFinalSlideByPid">
             <If.Then>
-              <Assign DisplayName="Close final slide (hidden shell)" sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_CloseFinalSlideByPid">
+              <Assign DisplayName="Close final slide (hidden shell)" sap2010:Annotation.AnnotationText="Executes 'Close final slide (hidden shell)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_CloseFinalSlideByPid">
                 <Assign.To>
                   <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                 </Assign.To>
@@ -733,7 +733,7 @@
               </Assign>
             </If.Then>
           </If>
-          <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Clear ffplay PID file (final slide)" FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ClearFinalFfplayPid">
+          <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Clear ffplay PID file (final slide)" sap2010:Annotation.AnnotationText="Executes 'Clear ffplay PID file (final slide)' to complete this step in the slide iteration workflow." FileName="[strFfplayPidFile]" sap:VirtualizedContainerService.HintSize="850.4,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ClearFinalFfplayPid">
             <ui:WriteTextFile.Text>
               <InArgument x:TypeArguments="x:String">
                 <Literal x:TypeArguments="x:String" Value="" />

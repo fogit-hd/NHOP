@@ -33,7 +33,7 @@
       <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="ElevenLabs TTS Workflow" sap:VirtualizedContainerService.HintSize="560,260" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence DisplayName="ElevenLabs TTS Workflow" sap2010:Annotation.AnnotationText="Coordinates the full ElevenLabs text-to-speech flow, from input staging to output validation." sap:VirtualizedContainerService.HintSize="560,260" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strScriptPath" />
       <Variable x:TypeArguments="x:String" Name="strResultPath" />
@@ -50,8 +50,8 @@
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="TTS workflow start" sap:VirtualizedContainerService.HintSize="518,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TtsWorkflowStart" Level="Info" Message="[&quot;ElevenLabsTTSWorkflow started.&quot;]" />
-    <Assign DisplayName="Set script path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_1">
+    <ui:LogMessage DisplayName="TTS workflow start" sap2010:Annotation.AnnotationText="Logs the workflow start so each TTS request has a clear execution entry point." sap:VirtualizedContainerService.HintSize="518,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TtsWorkflowStart" Level="Info" Message="[&quot;ElevenLabsTTSWorkflow started.&quot;]" />
+    <Assign DisplayName="Set script path" sap2010:Annotation.AnnotationText="Builds the absolute path to the Python TTS script to avoid relative path resolution issues." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_1">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strScriptPath]</OutArgument>
       </Assign.To>
@@ -59,7 +59,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","elevenlabs_tts.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Use caller Python launcher when provided" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_UseCallerPythonLauncher">
+    <Assign DisplayName="Use caller Python launcher when provided" sap2010:Annotation.AnnotationText="Uses the caller-provided Python launcher when available, otherwise keeps the default launcher." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_UseCallerPythonLauncher">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPythonExe]</OutArgument>
       </Assign.To>
@@ -67,7 +67,7 @@
         <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(in_PythonExe), strPythonExe, in_PythonExe)]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Set result path (latest)" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_2">
+    <Assign DisplayName="Set result path (latest)" sap2010:Annotation.AnnotationText="Defines where the script writes the latest raw TTS response for this execution." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_2">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strResultPath]</OutArgument>
       </Assign.To>
@@ -75,7 +75,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_result.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Reset out response" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_ResetTtsOutResponse">
+    <Assign DisplayName="Reset out response" sap2010:Annotation.AnnotationText="Clears the outgoing response variable to prevent stale data from previous runs." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_ResetTtsOutResponse">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[out_ResponseRaw]</OutArgument>
       </Assign.To>
@@ -83,8 +83,8 @@
         <InArgument x:TypeArguments="x:String">[""]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset TTS result file" FileName="[strResultPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetTtsResultBeforeRun" Text="" />
-    <Assign DisplayName="Set tts text input path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_3">
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset TTS result file" sap2010:Annotation.AnnotationText="Resets the result file before execution so only the current script output is read." FileName="[strResultPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetTtsResultBeforeRun" Text="" />
+    <Assign DisplayName="Set tts text input path" sap2010:Annotation.AnnotationText="Defines the temp file path used to pass narration text into the Python script." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_3">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strTextPath]</OutArgument>
       </Assign.To>
@@ -92,7 +92,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_text.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Set tts key input path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_5">
+    <Assign DisplayName="Set tts key input path" sap2010:Annotation.AnnotationText="Defines the temp file path that carries the ElevenLabs API key for this run." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_5">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strKeyPath]</OutArgument>
       </Assign.To>
@@ -100,7 +100,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_key.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Set tts voice input path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_6">
+    <Assign DisplayName="Set tts voice input path" sap2010:Annotation.AnnotationText="Defines the temp file path that supplies the selected ElevenLabs voice identifier." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_6">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strVoicePath]</OutArgument>
       </Assign.To>
@@ -108,7 +108,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_voice.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Set output-audio input path" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_7">
+    <Assign DisplayName="Set output-audio input path" sap2010:Annotation.AnnotationText="Defines the temp file path that tells the script where to save the generated audio." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_7">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strOutputAudioPathFile]</OutArgument>
       </Assign.To>
@@ -116,12 +116,12 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","tts_output_audio_path.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS text input" FileName="[strTextPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" Text="[in_TextToSpeak]" />
-    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS key input" FileName="[strKeyPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_2" Text="[in_ElevenLabsKey]" />
-    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS voice input" FileName="[strVoicePath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_3" Text="[in_VoiceId]" />
-    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS output-audio path" FileName="[strOutputAudioPathFile]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_4" Text="[in_OutputAudioPath]" />
-    <ui:LogMessage DisplayName="TTS shell start" sap:VirtualizedContainerService.HintSize="518,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TtsShellStart" Level="Info" Message="[&quot;Running elevenlabs_tts.py with launcher: &quot; + strPythonExe]" />
-    <Assign DisplayName="Run ElevenLabs Python script (wait)" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_RunTtsShellWait">
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS text input" sap2010:Annotation.AnnotationText="Writes the narration text payload to disk for Python-side consumption." FileName="[strTextPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" Text="[in_TextToSpeak]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS key input" sap2010:Annotation.AnnotationText="Persists the API key into the agreed temp file consumed by the helper script." FileName="[strKeyPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_2" Text="[in_ElevenLabsKey]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS voice input" sap2010:Annotation.AnnotationText="Persists the target voice ID so the script can synthesize with the correct voice." FileName="[strVoicePath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_3" Text="[in_VoiceId]" />
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Write TTS output-audio path" sap2010:Annotation.AnnotationText="Writes the destination audio file path so generated WAV output goes to the expected location." FileName="[strOutputAudioPathFile]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_4" Text="[in_OutputAudioPath]" />
+    <ui:LogMessage DisplayName="TTS shell start" sap2010:Annotation.AnnotationText="Logs the exact launcher before script execution to simplify runtime troubleshooting." sap:VirtualizedContainerService.HintSize="518,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TtsShellStart" Level="Info" Message="[&quot;Running elevenlabs_tts.py with launcher: &quot; + strPythonExe]" />
+    <Assign DisplayName="Run ElevenLabs Python script (wait)" sap2010:Annotation.AnnotationText="Runs the TTS Python script synchronously and captures the returned shell exit code." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_RunTtsShellWait">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Int32">[intTtsShellResult]</OutArgument>
       </Assign.To>
@@ -129,8 +129,8 @@
         <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Convert.ToChar(34) + strPythonExe + Convert.ToChar(34) + " " + Convert.ToChar(34) + strScriptPath + Convert.ToChar(34) + " --output-path " + Convert.ToChar(34) + strResultPath + Convert.ToChar(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:LogMessage DisplayName="TTS shell result" sap:VirtualizedContainerService.HintSize="518,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TtsShellResult" Level="Info" Message="[&quot;elevenlabs_tts.py shell exit code: &quot; + intTtsShellResult.ToString]" />
-    <Assign DisplayName="Check TTS result file exists" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_8">
+    <ui:LogMessage DisplayName="TTS shell result" sap2010:Annotation.AnnotationText="Records the shell exit code to correlate Python execution status with downstream file checks." sap:VirtualizedContainerService.HintSize="518,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TtsShellResult" Level="Info" Message="[&quot;elevenlabs_tts.py shell exit code: &quot; + intTtsShellResult.ToString]" />
+    <Assign DisplayName="Check TTS result file exists" sap2010:Annotation.AnnotationText="Checks whether the script produced the expected result file before attempting to read it." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_8">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Boolean">[blnResultExists]</OutArgument>
       </Assign.To>
@@ -138,12 +138,12 @@
         <InArgument x:TypeArguments="x:Boolean">[System.IO.File.Exists(strResultPath)]</InArgument>
       </Assign.Value>
     </Assign>
-    <If Condition="[blnResultExists]" DisplayName="Read TTS result if exists" sap:VirtualizedContainerService.HintSize="518,108.8" sap2010:WorkflowViewState.IdRef="If_1">
+    <If Condition="[blnResultExists]" DisplayName="Read TTS result if exists" sap2010:Annotation.AnnotationText="Guards the file read step so the workflow only reads output when the file is present." sap:VirtualizedContainerService.HintSize="518,108.8" sap2010:WorkflowViewState.IdRef="If_1">
       <If.Then>
-        <ui:ReadTextFile File="{x:Null}" Content="[out_ResponseRaw]" DisplayName="Read TTS result" FileName="[strResultPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
+        <ui:ReadTextFile File="{x:Null}" Content="[out_ResponseRaw]" DisplayName="Read TTS result" sap2010:Annotation.AnnotationText="Loads the raw script response text into the output argument for caller-side handling." FileName="[strResultPath]" sap:VirtualizedContainerService.HintSize="518,80.8" sap2010:WorkflowViewState.IdRef="ReadTextFile_1" />
       </If.Then>
     </If>
-    <Assign DisplayName="Fallback TTS result" sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_4">
+    <Assign DisplayName="Fallback TTS result" sap2010:Annotation.AnnotationText="Provides a deterministic error message when no valid response was returned by the script." sap:VirtualizedContainerService.HintSize="518,82.4" sap2010:WorkflowViewState.IdRef="Assign_4">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[out_ResponseRaw]</OutArgument>
       </Assign.To>
@@ -151,6 +151,6 @@
         <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(out_ResponseRaw), "TTS_ERROR: No TTS result returned.", out_ResponseRaw)]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:LogMessage DisplayName="TTS workflow completed" sap:VirtualizedContainerService.HintSize="518,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TtsWorkflowCompleted" Level="Info" Message="[&quot;ElevenLabsTTSWorkflow completed. Response length: &quot; + If(String.IsNullOrWhiteSpace(out_ResponseRaw), &quot;0&quot;, out_ResponseRaw.Length.ToString)]" />
+    <ui:LogMessage DisplayName="TTS workflow completed" sap2010:Annotation.AnnotationText="Logs completion with response size to confirm that the TTS workflow finished with usable output." sap:VirtualizedContainerService.HintSize="518,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TtsWorkflowCompleted" Level="Info" Message="[&quot;ElevenLabsTTSWorkflow completed. Response length: &quot; + If(String.IsNullOrWhiteSpace(out_ResponseRaw), &quot;0&quot;, out_ResponseRaw.Length.ToString)]" />
   </Sequence>
 </Activity>

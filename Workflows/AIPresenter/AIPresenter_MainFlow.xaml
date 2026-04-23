@@ -83,7 +83,7 @@
       <AssemblyReference>UiPath.Platform</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="AIPresenter Main Flow" sap:VirtualizedContainerService.HintSize="761.2,3577.6" sap2010:WorkflowViewState.IdRef="Sequence_MainFlow">
+  <Sequence DisplayName="AIPresenter Main Flow" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;AIPresenter Main Flow&quot;." sap:VirtualizedContainerService.HintSize="761.2,3577.6" sap2010:WorkflowViewState.IdRef="Sequence_MainFlow">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="strAIResponse" />
       <Variable x:TypeArguments="x:String" Name="strAudioPath">
@@ -168,8 +168,8 @@
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="MainFlow start" sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowStart" Level="Info" Message="[&quot;AIPresenter_MainFlow started.&quot;]" />
-    <Assign DisplayName="Select no-console Python launcher" sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="Assign_SelectPythonwExe">
+    <ui:LogMessage DisplayName="MainFlow start" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;MainFlow start&quot;." sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowStart" Level="Info" Message="[&quot;AIPresenter_MainFlow started.&quot;]" />
+    <Assign DisplayName="Select no-console Python launcher" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Select no-console Python launcher&quot;." sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="Assign_SelectPythonwExe">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPythonwExe]</OutArgument>
       </Assign.To>
@@ -177,7 +177,7 @@
         <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Microsoft","WindowsApps","pythonw.exe")), "pythonw.exe", "pyw")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Use same launcher for hidden Python calls" sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="Assign_UsePythonwAsPythonExe">
+    <Assign DisplayName="Use same launcher for hidden Python calls" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Use same launcher for hidden Python calls&quot;." sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="Assign_UsePythonwAsPythonExe">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPythonExe]</OutArgument>
       </Assign.To>
@@ -185,8 +185,8 @@
         <InArgument x:TypeArguments="x:String">[strPythonwExe]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:LogMessage DisplayName="MainFlow init step" sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowInitStep" Level="Info" Message="[&quot;Initializing config, slide extraction, and composition pipeline.&quot;]" />
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Init and prepare (config, pipeline, slides)" sap:VirtualizedContainerService.HintSize="600,176" sap2010:WorkflowViewState.IdRef="Invoke_InitPrepare" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_InitAndPrepare.xaml">
+    <ui:LogMessage DisplayName="MainFlow init step" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;MainFlow init step&quot;." sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowInitStep" Level="Info" Message="[&quot;Initializing config, slide extraction, and composition pipeline.&quot;]" />
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Init and prepare (config, pipeline, slides)" sap2010:Annotation.AnnotationText="This activity calls a child workflow to keep this flow modular for &quot;Init and prepare (config, pipeline, slides)&quot;." sap:VirtualizedContainerService.HintSize="600,176" sap2010:WorkflowViewState.IdRef="Invoke_InitPrepare" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_InitAndPrepare.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="io_Headers">[dictHeaders]</InOutArgument>
         <InOutArgument x:TypeArguments="x:Int32" x:Key="io_PipelineShellResult">[intPipelineShellResult]</InOutArgument>
@@ -211,8 +211,8 @@
         <InOutArgument x:TypeArguments="x:String" x:Key="io_WavInputPath">[strWavInputPath]</InOutArgument>
       </ui:InvokeWorkflowFile.Arguments>
     </ui:InvokeWorkflowFile>
-    <ui:LogMessage DisplayName="MainFlow init result" sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowInitResult" Level="Info" Message="[&quot;Init finished. slides_from_pptx exit=&quot; + intSlidesCsvShellResult.ToString + &quot;; pipeline exit=&quot; + intPipelineShellResult.ToString]" />
-    <Assign DisplayName="Paths: segment manifest + final MP4 + scripts" sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="Assign_SegmentPathsBundle">
+    <ui:LogMessage DisplayName="MainFlow init result" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;MainFlow init result&quot;." sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowInitResult" Level="Info" Message="[&quot;Init finished. slides_from_pptx exit=&quot; + intSlidesCsvShellResult.ToString + &quot;; pipeline exit=&quot; + intPipelineShellResult.ToString]" />
+    <Assign DisplayName="Paths: segment manifest + final MP4 + scripts" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Paths: segment manifest + final MP4 + scripts&quot;." sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="Assign_SegmentPathsBundle">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strSegmentsManifestPath]</OutArgument>
       </Assign.To>
@@ -220,7 +220,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","segments_manifest.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Path: presentation_full.mp4 output" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PresentationFullVideoPath">
+    <Assign DisplayName="Path: presentation_full.mp4 output" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Path: presentation_full.mp4 output&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PresentationFullVideoPath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPresentationFullVideoPath]</OutArgument>
       </Assign.To>
@@ -228,7 +228,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Output","presentation_full.mp4")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Script: build_slide_video.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_BuildSlideVideoScript">
+    <Assign DisplayName="Script: build_slide_video.py" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Script: build_slide_video.py&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_BuildSlideVideoScript">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strBuildSlideVideoScript]</OutArgument>
       </Assign.To>
@@ -236,7 +236,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","build_slide_video.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Script: concat_presentation_videos.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ConcatPresentationScript">
+    <Assign DisplayName="Script: concat_presentation_videos.py" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Script: concat_presentation_videos.py&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ConcatPresentationScript">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strConcatPresentationScript]</OutArgument>
       </Assign.To>
@@ -244,7 +244,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","concat_presentation_videos.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Script: reset_presentation_segments.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ResetSegmentsScript">
+    <Assign DisplayName="Script: reset_presentation_segments.py" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Script: reset_presentation_segments.py&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ResetSegmentsScript">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strResetSegmentsScript]</OutArgument>
       </Assign.To>
@@ -252,7 +252,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","reset_presentation_segments.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Script: slide_navigation_popup.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideNavigationPopupScript">
+    <Assign DisplayName="Script: slide_navigation_popup.py" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Script: slide_navigation_popup.py&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideNavigationPopupScript">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strSlideNavigationPopupScript]</OutArgument>
       </Assign.To>
@@ -260,7 +260,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","slide_navigation_popup.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Script: pause_ffplay_by_state.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PauseFfplayByStateScript">
+    <Assign DisplayName="Script: pause_ffplay_by_state.py" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Script: pause_ffplay_by_state.py&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PauseFfplayByStateScript">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPauseFfplayByStateScript]</OutArgument>
       </Assign.To>
@@ -268,7 +268,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","pause_ffplay_by_state.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Script: preview_presented_slides.py" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PreviewPresentedSlidesScript">
+    <Assign DisplayName="Script: preview_presented_slides.py" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Script: preview_presented_slides.py&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PreviewPresentedSlidesScript">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPreviewPresentedSlidesScript]</OutArgument>
       </Assign.To>
@@ -276,7 +276,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Scripts","preview_presented_slides.py")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Path: ffplay PID file" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_FfplayPidFilePath">
+    <Assign DisplayName="Path: ffplay PID file" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Path: ffplay PID file&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_FfplayPidFilePath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strFfplayPidFilePath]</OutArgument>
       </Assign.To>
@@ -284,7 +284,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","last_ffplay_pid.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Path: last completed slide ordinal file" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_LastCompletedSlideOrdinalFilePath">
+    <Assign DisplayName="Path: last completed slide ordinal file" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Path: last completed slide ordinal file&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_LastCompletedSlideOrdinalFilePath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strLastCompletedSlideOrdinalFile]</OutArgument>
       </Assign.To>
@@ -292,7 +292,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","last_completed_slide_ordinal.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Path: presentation control state file" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PresentationControlStateFile">
+    <Assign DisplayName="Path: presentation control state file" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Path: presentation control state file&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PresentationControlStateFile">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPresentationControlStateFile]</OutArgument>
       </Assign.To>
@@ -300,7 +300,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","presentation_control_state.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Path: presentation control PID file" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PresentationControlPidFile">
+    <Assign DisplayName="Path: presentation control PID file" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Path: presentation control PID file&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_PresentationControlPidFile">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strPresentationControlPidFile]</OutArgument>
       </Assign.To>
@@ -308,7 +308,7 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","presentation_control_pid.txt")]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Reset segment folder + manifest (new run)" sap:VirtualizedContainerService.HintSize="600,88" sap2010:WorkflowViewState.IdRef="Assign_RunResetSegments">
+    <Assign DisplayName="Reset segment folder + manifest (new run)" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Reset segment folder + manifest (new run)&quot;." sap:VirtualizedContainerService.HintSize="600,88" sap2010:WorkflowViewState.IdRef="Assign_RunResetSegments">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Int32">[intPlayResponseShellResult]</OutArgument>
       </Assign.To>
@@ -316,7 +316,7 @@
         <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + strPythonExe + Chr(34) + " " + Chr(34) + strResetSegmentsScript + Chr(34) + " --root " + Chr(34) + Environment.CurrentDirectory + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
       </Assign.Value>
     </Assign>
-    <Assign DisplayName="Count total slides in iterate TSV" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_CountTotalSlides">
+    <Assign DisplayName="Count total slides in iterate TSV" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Count total slides in iterate TSV&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_CountTotalSlides">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Int32">[intTotalSlides]</OutArgument>
       </Assign.To>
@@ -324,8 +324,8 @@
         <InArgument x:TypeArguments="x:Int32">[If(System.IO.File.Exists(strSlidesIterateTsv), System.IO.File.ReadAllLines(strSlidesIterateTsv).Count(Function(l) Not String.IsNullOrWhiteSpace(l)), 0)]</InArgument>
       </Assign.Value>
     </Assign>
-    <ui:LogMessage DisplayName="Total slide count" sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TotalSlideCount" Level="Info" Message="[&quot;Total slides to process: &quot; + intTotalSlides.ToString]" />
-    <Assign DisplayName="Path: slide status TSV" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideStatusTsvPath">
+    <ui:LogMessage DisplayName="Total slide count" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;Total slide count&quot;." sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_TotalSlideCount" Level="Info" Message="[&quot;Total slides to process: &quot; + intTotalSlides.ToString]" />
+    <Assign DisplayName="Path: slide status TSV" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Path: slide status TSV&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_SlideStatusTsvPath">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strSlideStatusTsvPath]</OutArgument>
       </Assign.To>
@@ -333,35 +333,35 @@
         <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(Environment.CurrentDirectory,"Data","AIPresenter","Temp","slide_status_report.tsv")]</InArgument>
       </Assign.Value>
     </Assign>
-    <InvokeMethod DisplayName="Init slide status TSV header" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="InvokeMethod_InitSlideStatusTsv" MethodName="WriteAllText" TargetType="si:File">
+    <InvokeMethod DisplayName="Init slide status TSV header" sap2010:Annotation.AnnotationText="This activity executes a .NET helper method for file handling for &quot;Init slide status TSV header&quot;." sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="InvokeMethod_InitSlideStatusTsv" MethodName="WriteAllText" TargetType="si:File">
       <InArgument x:TypeArguments="x:String">[strSlideStatusTsvPath]</InArgument>
       <InArgument x:TypeArguments="x:String">["slide_index" + Chr(9) + "slide_title" + Chr(9) + "status" + Chr(9) + "error_message" + Environment.NewLine]</InArgument>
     </InvokeMethod>
-    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Init last completed slide ordinal" FileName="[strLastCompletedSlideOrdinalFile]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_InitLastCompletedSlideOrdinal" Text="-1" />
-    <If Condition="[intTotalSlides &gt; 0]" DisplayName="Launch Pause/Continue control popup" sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_LaunchPresentationControlPopup">
+    <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Init last completed slide ordinal" sap2010:Annotation.AnnotationText="This activity writes control or status data to a text file for &quot;Init last completed slide ordinal&quot;." FileName="[strLastCompletedSlideOrdinalFile]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_InitLastCompletedSlideOrdinal" Text="-1" />
+    <If Condition="[intTotalSlides &gt; 0]" DisplayName="Launch Pause/Continue control popup" sap2010:Annotation.AnnotationText="This activity evaluates a condition and runs the matching branch for &quot;Launch Pause/Continue control popup&quot;." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_LaunchPresentationControlPopup">
       <If.Then>
-        <Sequence DisplayName="Start presentation control UI" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_StartPresentationControlUi">
-          <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Init control state = running" FileName="[strPresentationControlStateFile]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_InitPresentationControlState" Text="running" />
-          <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset control PID file" FileName="[strPresentationControlPidFile]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetPresentationControlPid">
+        <Sequence DisplayName="Start presentation control UI" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;Start presentation control UI&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_StartPresentationControlUi">
+          <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Init control state = running" sap2010:Annotation.AnnotationText="This activity writes control or status data to a text file for &quot;Init control state = running&quot;." FileName="[strPresentationControlStateFile]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_InitPresentationControlState" Text="running" />
+          <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset control PID file" sap2010:Annotation.AnnotationText="This activity writes control or status data to a text file for &quot;Reset control PID file&quot;." FileName="[strPresentationControlPidFile]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetPresentationControlPid">
             <ui:WriteTextFile.Text>
               <InArgument x:TypeArguments="x:String">
                 <Literal x:TypeArguments="x:String" Value="" />
               </InArgument>
             </ui:WriteTextFile.Text>
           </ui:WriteTextFile>
-          <ui:StartProcess Arguments="[Chr(34) + strPauseFfplayByStateScript + Chr(34) + &quot; --state-file &quot; + Chr(34) + strPresentationControlStateFile + Chr(34) + &quot; --ffplay-pid-file &quot; + Chr(34) + strFfplayPidFilePath + Chr(34) + &quot; --owner-pid &quot; + System.Diagnostics.Process.GetCurrentProcess().Id.ToString()]" DisplayName="Run playback pause/resume controller (non-blocking)" FileName="[strPythonwExe]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_RunPlaybackPauseResumeController" WorkingDirectory="[Environment.CurrentDirectory]" />
-          <ui:StartProcess Arguments="[Chr(34) + strSlideNavigationPopupScript + Chr(34) + &quot; --mode pausecontrol --state-file &quot; + Chr(34) + strPresentationControlStateFile + Chr(34) + &quot; --pid-file &quot; + Chr(34) + strPresentationControlPidFile + Chr(34) + &quot; --owner-pid &quot; + System.Diagnostics.Process.GetCurrentProcess().Id.ToString() + &quot; --preview-script &quot; + Chr(34) + strPreviewPresentedSlidesScript + Chr(34) + &quot; --slides-tsv &quot; + Chr(34) + strSlidesIterateTsv + Chr(34) + &quot; --last-completed-ordinal-file &quot; + Chr(34) + strLastCompletedSlideOrdinalFile + Chr(34) + &quot; --title &quot; + Chr(34) + &quot;Presentation control&quot; + Chr(34) + &quot; --message &quot; + Chr(34) + &quot;Auto-run enabled. Pause will stop current narration and Continue will resume.&quot; + Chr(34)]" DisplayName="Run pause/continue popup (non-blocking)" FileName="[strPythonwExe]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_RunPresentationControlPopup" WorkingDirectory="[Environment.CurrentDirectory]" />
+          <ui:StartProcess Arguments="[Chr(34) + strPauseFfplayByStateScript + Chr(34) + &quot; --state-file &quot; + Chr(34) + strPresentationControlStateFile + Chr(34) + &quot; --ffplay-pid-file &quot; + Chr(34) + strFfplayPidFilePath + Chr(34) + &quot; --owner-pid &quot; + System.Diagnostics.Process.GetCurrentProcess().Id.ToString()]" DisplayName="Run playback pause/resume controller (non-blocking)" sap2010:Annotation.AnnotationText="This activity starts an external process needed by the presentation flow for &quot;Run playback pause/resume controller (non-blocking)&quot;." FileName="[strPythonwExe]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_RunPlaybackPauseResumeController" WorkingDirectory="[Environment.CurrentDirectory]" />
+          <ui:StartProcess Arguments="[Chr(34) + strSlideNavigationPopupScript + Chr(34) + &quot; --mode pausecontrol --state-file &quot; + Chr(34) + strPresentationControlStateFile + Chr(34) + &quot; --pid-file &quot; + Chr(34) + strPresentationControlPidFile + Chr(34) + &quot; --owner-pid &quot; + System.Diagnostics.Process.GetCurrentProcess().Id.ToString() + &quot; --preview-script &quot; + Chr(34) + strPreviewPresentedSlidesScript + Chr(34) + &quot; --slides-tsv &quot; + Chr(34) + strSlidesIterateTsv + Chr(34) + &quot; --last-completed-ordinal-file &quot; + Chr(34) + strLastCompletedSlideOrdinalFile + Chr(34) + &quot; --title &quot; + Chr(34) + &quot;Presentation control&quot; + Chr(34) + &quot; --message &quot; + Chr(34) + &quot;Auto-run enabled. Pause will stop current narration and Continue will resume.&quot; + Chr(34)]" DisplayName="Run pause/continue popup (non-blocking)" sap2010:Annotation.AnnotationText="This activity starts an external process needed by the presentation flow for &quot;Run pause/continue popup (non-blocking)&quot;." FileName="[strPythonwExe]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="StartProcess_RunPresentationControlPopup" WorkingDirectory="[Environment.CurrentDirectory]" />
         </Sequence>
       </If.Then>
     </If>
-    <ui:ForEach x:TypeArguments="x:String" CurrentIndex="{x:Null}" DisplayName="Slide loop (slides_iterate order)" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="ForEach_Slides" Values="[If(System.IO.File.Exists(strSlidesIterateTsv), System.IO.File.ReadAllLines(strSlidesIterateTsv).Where(Function(l) Not String.IsNullOrWhiteSpace(l)).ToArray(), New String() {})]">
+    <ui:ForEach x:TypeArguments="x:String" CurrentIndex="{x:Null}" DisplayName="Slide loop (slides_iterate order)" sap2010:Annotation.AnnotationText="This activity iterates through slide entries in order for &quot;Slide loop (slides_iterate order)&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="ForEach_Slides" Values="[If(System.IO.File.Exists(strSlidesIterateTsv), System.IO.File.ReadAllLines(strSlidesIterateTsv).Where(Function(l) Not String.IsNullOrWhiteSpace(l)).ToArray(), New String() {})]">
       <ui:ForEach.Body>
         <ActivityAction x:TypeArguments="x:String">
           <ActivityAction.Argument>
             <DelegateInArgument x:TypeArguments="x:String" Name="slideItem" />
           </ActivityAction.Argument>
-          <Sequence DisplayName="Invoke slide iteration (scope)" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_ForEachSlideInvoke">
-            <Assign DisplayName="Read current presentation control state" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ReadPresentationControlStateBeforeSlide">
+          <Sequence DisplayName="Invoke slide iteration (scope)" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;Invoke slide iteration (scope)&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_ForEachSlideInvoke">
+            <Assign DisplayName="Read current presentation control state" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Read current presentation control state&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ReadPresentationControlStateBeforeSlide">
               <Assign.To>
                 <OutArgument x:TypeArguments="x:String">[strPresentationControlState]</OutArgument>
               </Assign.To>
@@ -369,10 +369,10 @@
                 <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(strPresentationControlStateFile), System.IO.File.ReadAllText(strPresentationControlStateFile), "running")]</InArgument>
               </Assign.Value>
             </Assign>
-            <While DisplayName="Paused - wait before next slide" sap:VirtualizedContainerService.HintSize="600,138" sap2010:WorkflowViewState.IdRef="While_WaitWhenPausedBeforeSlide" Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlState) AndAlso strPresentationControlState.Trim().Equals(&quot;paused&quot;, StringComparison.OrdinalIgnoreCase)]">
-              <Sequence DisplayName="Wait + refresh pause state" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_WaitAndRefreshPauseState">
-                <Delay DisplayName="Pause polling delay" Duration="00:00:00.3000000" sap:VirtualizedContainerService.HintSize="600,90.4" sap2010:WorkflowViewState.IdRef="Delay_PausePolling" />
-                <Assign DisplayName="Refresh presentation control state" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshPresentationControlStateDuringPause">
+            <While DisplayName="Paused - wait before next slide" sap2010:Annotation.AnnotationText="This activity repeats polling while the pause condition remains true for &quot;Paused - wait before next slide&quot;." sap:VirtualizedContainerService.HintSize="600,138" sap2010:WorkflowViewState.IdRef="While_WaitWhenPausedBeforeSlide" Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlState) AndAlso strPresentationControlState.Trim().Equals(&quot;paused&quot;, StringComparison.OrdinalIgnoreCase)]">
+              <Sequence DisplayName="Wait + refresh pause state" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;Wait + refresh pause state&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_WaitAndRefreshPauseState">
+                <Delay DisplayName="Pause polling delay" sap2010:Annotation.AnnotationText="This activity waits briefly to reduce tight-loop polling for &quot;Pause polling delay&quot;." Duration="00:00:00.3000000" sap:VirtualizedContainerService.HintSize="600,90.4" sap2010:WorkflowViewState.IdRef="Delay_PausePolling" />
+                <Assign DisplayName="Refresh presentation control state" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Refresh presentation control state&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_RefreshPresentationControlStateDuringPause">
                   <Assign.To>
                     <OutArgument x:TypeArguments="x:String">[strPresentationControlState]</OutArgument>
                   </Assign.To>
@@ -382,11 +382,11 @@
                 </Assign>
               </Sequence>
             </While>
-            <ui:LogMessage DisplayName="Slide start" sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowSlideStart" Level="Info" Message="[&quot;Processing slide &quot; + slideItem.Split(Convert.ToChar(9))(0).Trim + &quot; | &quot; + slideItem.Split(Convert.ToChar(9))(1).Trim]" />
-            <TryCatch DisplayName="Try one slide and track status" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="TryCatch_SlideStatusTracking">
+            <ui:LogMessage DisplayName="Slide start" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;Slide start&quot;." sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowSlideStart" Level="Info" Message="[&quot;Processing slide &quot; + slideItem.Split(Convert.ToChar(9))(0).Trim + &quot; | &quot; + slideItem.Split(Convert.ToChar(9))(1).Trim]" />
+            <TryCatch DisplayName="Try one slide and track status" sap2010:Annotation.AnnotationText="This activity handles per-slide failures without losing diagnostics for &quot;Try one slide and track status&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="TryCatch_SlideStatusTracking">
               <TryCatch.Try>
-                <Sequence DisplayName="Try" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_SlideTryBody">
-                  <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Process one slide (image + narration)" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_SlideIteration" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_SlideIteration.xaml">
+                <Sequence DisplayName="Try" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;Try&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_SlideTryBody">
+                  <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="Process one slide (image + narration)" sap2010:Annotation.AnnotationText="This activity calls a child workflow to keep this flow modular for &quot;Process one slide (image + narration)&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_SlideIteration" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_SlideIteration.xaml">
                     <ui:InvokeWorkflowFile.Arguments>
                       <InArgument x:TypeArguments="x:String" x:Key="in_slideItem">[slideItem]</InArgument>
                       <InArgument x:TypeArguments="x:String" x:Key="in_GptComposedSlides">[strGptComposedSlides]</InArgument>
@@ -426,7 +426,7 @@
                       <InArgument x:TypeArguments="x:String" x:Key="in_LastCompletedSlideOrdinalFile">[strLastCompletedSlideOrdinalFile]</InArgument>
                     </ui:InvokeWorkflowFile.Arguments>
                   </ui:InvokeWorkflowFile>
-                  <InvokeMethod DisplayName="Append slide SUCCESS status" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="InvokeMethod_AppendSlideSuccess" MethodName="AppendAllText" TargetType="si:File">
+                  <InvokeMethod DisplayName="Append slide SUCCESS status" sap2010:Annotation.AnnotationText="This activity executes a .NET helper method for file handling for &quot;Append slide SUCCESS status&quot;." sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="InvokeMethod_AppendSlideSuccess" MethodName="AppendAllText" TargetType="si:File">
                     <InArgument x:TypeArguments="x:String">[strSlideStatusTsvPath]</InArgument>
                     <InArgument x:TypeArguments="x:String">[slideItem.Split(Convert.ToChar(9))(0).Trim + Chr(9) + slideItem.Split(Convert.ToChar(9))(1).Trim + Chr(9) + "SUCCESS" + Chr(9) + "" + Environment.NewLine]</InArgument>
                   </InvokeMethod>
@@ -438,13 +438,13 @@
                     <ActivityAction.Argument>
                       <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
                     </ActivityAction.Argument>
-                    <Sequence DisplayName="Catch" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_SlideCatchBody">
-                      <ui:LogMessage DisplayName="Slide failed log" sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowSlideFailed" Level="Error" Message="[&quot;Slide failed: &quot; + slideItem.Split(Convert.ToChar(9))(0).Trim + &quot; | &quot; + exception.Message]" />
-                      <InvokeMethod DisplayName="Append slide FAILED status" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="InvokeMethod_AppendSlideFailed" MethodName="AppendAllText" TargetType="si:File">
+                    <Sequence DisplayName="Catch" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;Catch&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_SlideCatchBody">
+                      <ui:LogMessage DisplayName="Slide failed log" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;Slide failed log&quot;." sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowSlideFailed" Level="Error" Message="[&quot;Slide failed: &quot; + slideItem.Split(Convert.ToChar(9))(0).Trim + &quot; | &quot; + exception.Message]" />
+                      <InvokeMethod DisplayName="Append slide FAILED status" sap2010:Annotation.AnnotationText="This activity executes a .NET helper method for file handling for &quot;Append slide FAILED status&quot;." sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="InvokeMethod_AppendSlideFailed" MethodName="AppendAllText" TargetType="si:File">
                         <InArgument x:TypeArguments="x:String">[strSlideStatusTsvPath]</InArgument>
                         <InArgument x:TypeArguments="x:String">[slideItem.Split(Convert.ToChar(9))(0).Trim + Chr(9) + slideItem.Split(Convert.ToChar(9))(1).Trim + Chr(9) + "FAILED" + Chr(9) + exception.Message.Replace(vbCr, " ").Replace(vbLf, " ").Replace(Chr(9), " ") + Environment.NewLine]</InArgument>
                       </InvokeMethod>
-                      <Rethrow DisplayName="Rethrow slide exception" sap:VirtualizedContainerService.HintSize="600,48" sap2010:WorkflowViewState.IdRef="Rethrow_SlideFailure" />
+                      <Rethrow DisplayName="Rethrow slide exception" sap2010:Annotation.AnnotationText="This activity propagates the caught exception after logging and tracking status for &quot;Rethrow slide exception&quot;." sap:VirtualizedContainerService.HintSize="600,48" sap2010:WorkflowViewState.IdRef="Rethrow_SlideFailure" />
                     </Sequence>
                   </ActivityAction>
                 </Catch>
@@ -454,10 +454,10 @@
         </ActivityAction>
       </ui:ForEach.Body>
     </ui:ForEach>
-    <If Condition="[System.IO.File.Exists(strSegmentsManifestPath) AndAlso (New System.IO.FileInfo(strSegmentsManifestPath)).Length &gt; 3]" DisplayName="Concat segments into one presentation_full.mp4?" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="If_ConcatPresentation">
+    <If Condition="[System.IO.File.Exists(strSegmentsManifestPath) AndAlso (New System.IO.FileInfo(strSegmentsManifestPath)).Length &gt; 3]" DisplayName="Concat segments into one presentation_full.mp4?" sap2010:Annotation.AnnotationText="This activity evaluates a condition and runs the matching branch when &quot;Concat segments into one presentation_full.mp4&quot; is true." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="If_ConcatPresentation">
       <If.Then>
-        <Sequence DisplayName="FFmpeg concat all slide segments" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_ConcatPresentation">
-          <Assign DisplayName="Run concat_presentation_videos.py (Shell /Wait)" sap:VirtualizedContainerService.HintSize="600,88" sap2010:WorkflowViewState.IdRef="Assign_RunConcatPresentation">
+        <Sequence DisplayName="FFmpeg concat all slide segments" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;FFmpeg concat all slide segments&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_ConcatPresentation">
+          <Assign DisplayName="Run concat_presentation_videos.py (Shell /Wait)" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Run concat_presentation_videos.py (Shell /Wait)&quot;." sap:VirtualizedContainerService.HintSize="600,88" sap2010:WorkflowViewState.IdRef="Assign_RunConcatPresentation">
             <Assign.To>
               <OutArgument x:TypeArguments="x:Int32">[intPlayResponseShellResult]</OutArgument>
             </Assign.To>
@@ -465,15 +465,15 @@
               <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + strPythonExe + Chr(34) + " " + Chr(34) + strConcatPresentationScript + Chr(34) + " --manifest " + Chr(34) + strSegmentsManifestPath + Chr(34) + " --out " + Chr(34) + strPresentationFullVideoPath + Chr(34) + " --ffmpeg " + Chr(34) + strFfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
             </Assign.Value>
           </Assign>
-          <ui:LogMessage DisplayName="Final video path" sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_FinalPresentationMp4" Level="Info" Message="[&quot;Full presentation video (if concat succeeded): &quot; + strPresentationFullVideoPath]" />
+          <ui:LogMessage DisplayName="Final video path" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;Final video path&quot;." sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_FinalPresentationMp4" Level="Info" Message="[&quot;Full presentation video (if concat succeeded): &quot; + strPresentationFullVideoPath]" />
         </Sequence>
       </If.Then>
     </If>
-    <If Condition="[intTotalSlides &lt;= 0]" DisplayName="Run AfterPresentation fallback only when no slides found" sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_RunAfterPresentationFallbackOnlyNoSlides">
+    <If Condition="[intTotalSlides &lt;= 0]" DisplayName="Run AfterPresentation fallback only when no slides found" sap2010:Annotation.AnnotationText="This activity evaluates a condition and runs the matching branch for &quot;Run AfterPresentation fallback only when no slides found&quot;." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_RunAfterPresentationFallbackOnlyNoSlides">
       <If.Then>
-        <Sequence DisplayName="No slides fallback sequence" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_NoSlidesFallback">
-          <ui:LogMessage DisplayName="No slides fallback" sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_NoSlidesFallback" Level="Info" Message="[&quot;No slide rows found. Running AfterPresentation fallback only.&quot;]" />
-          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="After slides: finalization" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_AfterPresentation" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_AfterPresentation.xaml">
+        <Sequence DisplayName="No slides fallback sequence" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;No slides fallback sequence&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_NoSlidesFallback">
+          <ui:LogMessage DisplayName="No slides fallback" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;No slides fallback&quot;." sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_NoSlidesFallback" Level="Info" Message="[&quot;No slide rows found. Running AfterPresentation fallback only.&quot;]" />
+          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" DisplayName="After slides: finalization" sap2010:Annotation.AnnotationText="This activity calls a child workflow to keep this flow modular for &quot;After slides: finalization&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Invoke_AfterPresentation" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Workflows\AIPresenter\AIPresenter_AfterPresentation.xaml">
             <ui:InvokeWorkflowFile.Arguments>
               <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="io_Headers">[dictHeaders]</InOutArgument>
               <InOutArgument x:TypeArguments="x:Int32" x:Key="io_PipelineShellResult">[intPipelineShellResult]</InOutArgument>
@@ -510,11 +510,11 @@
         </Sequence>
       </If.Then>
     </If>
-    <If Condition="[intTotalSlides &gt; 0]" DisplayName="Stop Pause/Continue control popup" sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_StopPresentationControlPopup">
+    <If Condition="[intTotalSlides &gt; 0]" DisplayName="Stop Pause/Continue control popup" sap2010:Annotation.AnnotationText="This activity evaluates a condition and runs the matching branch for &quot;Stop Pause/Continue control popup&quot;." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_StopPresentationControlPopup">
       <If.Then>
-        <Sequence DisplayName="Stop control popup and clear state" sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_StopPresentationControlPopup">
-          <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Signal popup to stop" FileName="[strPresentationControlStateFile]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_StopPresentationControlState" Text="stop" />
-          <Assign DisplayName="Read control popup PID" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ReadPresentationControlPid">
+        <Sequence DisplayName="Stop control popup and clear state" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;Stop control popup and clear state&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_StopPresentationControlPopup">
+          <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Signal popup to stop" sap2010:Annotation.AnnotationText="This activity writes control or status data to a text file for &quot;Signal popup to stop&quot;." FileName="[strPresentationControlStateFile]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_StopPresentationControlState" Text="stop" />
+          <Assign DisplayName="Read control popup PID" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Read control popup PID&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ReadPresentationControlPid">
             <Assign.To>
               <OutArgument x:TypeArguments="x:String">[strPresentationControlPid]</OutArgument>
             </Assign.To>
@@ -522,9 +522,9 @@
               <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(strPresentationControlPidFile), System.IO.File.ReadAllText(strPresentationControlPidFile), "")]</InArgument>
             </Assign.Value>
           </Assign>
-          <If Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlPid)]" DisplayName="Close control popup by PID" sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_KillPresentationControlPopupByPid">
+          <If Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlPid)]" DisplayName="Close control popup by PID" sap2010:Annotation.AnnotationText="This activity evaluates a condition and runs the matching branch for &quot;Close control popup by PID&quot;." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_KillPresentationControlPopupByPid">
             <If.Then>
-              <Assign DisplayName="Taskkill control popup process" sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_KillPresentationControlPopupByPid">
+              <Assign DisplayName="Taskkill control popup process" sap2010:Annotation.AnnotationText="This activity sets a workflow variable for downstream steps for &quot;Taskkill control popup process&quot;." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_KillPresentationControlPopupByPid">
                 <Assign.To>
                   <OutArgument x:TypeArguments="x:Int32">[intPlayResponseShellResult]</OutArgument>
                 </Assign.To>
@@ -537,6 +537,6 @@
         </Sequence>
       </If.Then>
     </If>
-    <ui:LogMessage DisplayName="MainFlow completed" sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowCompleted" Level="Info" Message="[&quot;AIPresenter_MainFlow completed.&quot;]" />
+    <ui:LogMessage DisplayName="MainFlow completed" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;MainFlow completed&quot;." sap:VirtualizedContainerService.HintSize="600,142.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowCompleted" Level="Info" Message="[&quot;AIPresenter_MainFlow completed.&quot;]" />
   </Sequence>
 </Activity>
