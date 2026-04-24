@@ -412,7 +412,7 @@ if errorlevel 1 (
 
 %PY_CMD% -c "import win32com.client" >nul 2>nul
 if errorlevel 1 (
-  echo [WARN] pywin32 (win32com) is not importable after requirements install. Trying direct install...
+  echo [WARN] pywin32/win32com is not importable after requirements install. Trying direct install...
   %PY_CMD% -m pip install --disable-pip-version-check --quiet "pywin32>=306" >>"%PIP_LOG%" 2>&1
   if errorlevel 1 (
     echo [ERROR] pywin32 direct install failed.
@@ -427,7 +427,7 @@ if errorlevel 1 (
 
   %PY_CMD% -c "import win32com.client" >nul 2>nul
   if errorlevel 1 (
-    echo [ERROR] pywin32 (win32com) is still not importable in the selected Python interpreter.
+    echo [ERROR] pywin32/win32com is still not importable in the selected Python interpreter.
     set "HAS_FAILURE=1"
     echo.
     exit /b 0
