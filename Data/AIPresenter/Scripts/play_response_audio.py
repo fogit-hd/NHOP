@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -49,10 +50,24 @@ def _resolve_under_project(p: str) -> Path:
 
 
 def _resolve_ffmpeg_exe(ffmpeg_arg: str) -> Path | None:
-    if not ffmpeg_arg.strip():
-        return None
-    p = _resolve_under_project(ffmpeg_arg)
-    return p if p.is_file() else None
+    raw_value = ffmpeg_arg.strip()
+    if raw_value:
+        p = _resolve_under_project(raw_value)
+        if p.is_file():
+            return p
+
+    bundled = PROJECT_ROOT / "Data" / "AIPresenter" / "Tools" / "ffmpeg.exe"
+    if bundled.is_file():
+        return bundled.resolve()
+
+    for name in ("ffmpeg.exe", "ffmpeg"):
+        found = shutil.which(name)
+        if found:
+            p = Path(found)
+            if p.is_file():
+                return p.resolve()
+
+    return None
 
 
 def _wav_duration_seconds(wav: Path) -> float:

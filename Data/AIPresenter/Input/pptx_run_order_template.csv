@@ -1,6 +1,0 @@
-run_order,pptx_path,enabled
-1,Data/AIPresenter/Input/pptx_file_here/FPT SOFTWARE PHILIPPINES CORP_2026_031926 .pptx,TRUE
-2,Data/AIPresenter/Input/pptx_file_here/FPT SOFTWARE PHILIPPINES CORP. _ 2026 .pptx,FALSE
-3,Data/AIPresenter/Input/pptx_file_here/Employee-Benefits-v1.1-1.pptx,FALSE
-4,Data/AIPresenter/Input/pptx_file_here/Code-of-Employee-Discipline-v1.1.pptx,FALSE
-5,Data/AIPresenter/Input/pptx_file_here/Org-Chart .pptx,FALSE

@@ -4,9 +4,9 @@ Build composed narration from slide sources.
 Priority:
 1) Configured .pptx path in Data/AIPresenter/Config/ai_settings.json
 2) Ordered .pptx list in Data/AIPresenter/Input/pptx_run_order.xlsx
-    or Data/AIPresenter/Input/pptx_run_order_template.csv
+    or Data/AIPresenter/Input/pptx_run_order_template.xlsx
 3) First .pptx in Data/AIPresenter/Input/pptx_file_here
-4) slides.csv + slide images (legacy fallback)
+4) slides.xlsx + slide images (legacy fallback)
 
 Writes:
 - Data/AIPresenter/Temp/extracted_slides_raw.txt
@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import argparse
 import base64
-import csv
 import json
 import os
 import re
@@ -31,15 +30,16 @@ import urllib.request
 from typing import Any
 
 RUN_ORDER_DEFAULT = os.path.join("Data", "AIPresenter", "Input", "pptx_run_order.xlsx")
-RUN_ORDER_TEMPLATE_CSV_DEFAULT = os.path.join(
-    "Data", "AIPresenter", "Input", "pptx_run_order_template.csv"
+RUN_ORDER_TEMPLATE_XLSX_DEFAULT = os.path.join(
+    "Data", "AIPresenter", "Input", "pptx_run_order_template.xlsx"
 )
-NARRATION_MODE_CSV_DEFAULT = os.path.join(
-    "Data", "AIPresenter", "Input", "slide_narration_mode.csv"
+NARRATION_MODE_XLSX_DEFAULT = os.path.join(
+    "Data", "AIPresenter", "Input", "slide_narration_mode.xlsx"
 )
-SLIDE_INDEX_MAP_CSV_DEFAULT = os.path.join(
-    "Data", "AIPresenter", "Input", "slide_index_mapping.csv"
+SLIDE_INDEX_MAP_XLSX_DEFAULT = os.path.join(
+    "Data", "AIPresenter", "Input", "slide_index_mapping.xlsx"
 )
+SUPPORTED_WORKBOOK_EXTENSIONS = {".xlsx", ".xlsm", ".xltx", ".xltm"}
 SLIDES_ITERATE_TSV_DEFAULT = os.path.join(
     "Data", "AIPresenter", "Temp", "slides_iterate.tsv"
 )
@@ -49,6 +49,24 @@ PPTX_SOURCE_ERROR_FILE = os.path.join(
 DEFAULT_OCR_PASSES = 2
 MAX_OCR_PASSES = 3
 READING_ORDER_ROW_MARGIN_EMU = 40000
+ILLEGAL_XLSX_CHAR_RE = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F]")
+
+
+def configure_stdio_utf8_fallback() -> None:
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        if stream is None:
+            continue
+        reconfigure = getattr(stream, "reconfigure", None)
+        if not callable(reconfigure):
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="backslashreplace")
+        except Exception:
+            pass
+
+
+configure_stdio_utf8_fallback()
 
 
 def load_json(path: str) -> dict:
@@ -73,6 +91,10 @@ def parse_ocr_passes(value: Any, default_value: int = DEFAULT_OCR_PASSES) -> int
     if parsed > MAX_OCR_PASSES:
         return MAX_OCR_PASSES
     return parsed
+
+
+def sanitize_excel_cell_text(value: Any) -> str:
+    return ILLEGAL_XLSX_CHAR_RE.sub(" ", str(value or ""))
 
 
 def _encode_image_for_vision(image_path: str) -> tuple[str, str]:
@@ -777,7 +799,7 @@ def _is_list_heavy_raw_lines(raw_lines: list[str]) -> bool:
         compact = " ".join(str(line or "").split()).strip()
         if not compact:
             continue
-        if re.match(r"^(?:\d+[\.\)]|[A-Za-z]\.|[-*•])\s*", compact):
+        if re.match(r"^(?:\d+[\.\)]|[A-Za-z]\.|[-*])\s*", compact):
             structured += 1
             continue
         if ":" in compact:
@@ -995,42 +1017,60 @@ def build_slide_index_source_meta(
     return meta
 
 
-def write_slide_index_mapping_csv(
+def write_slide_index_mapping_xlsx(
     root: str,
-    output_csv_path: str,
+    output_xlsx_path: str,
     rows: list[tuple[int, str, str, str, int]],
 ) -> None:
-    os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
-    with open(output_csv_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([
+    try:
+        from openpyxl import Workbook
+    except Exception:
+        print(
+            "WARN Cannot write slide_index_mapping.xlsx because openpyxl is missing.",
+            file=sys.stderr,
+        )
+        return
+
+    os.makedirs(os.path.dirname(output_xlsx_path), exist_ok=True)
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "slide_index_mapping"
+    ws.append(
+        [
             "global_slide_index",
             "pptx_file",
             "file_slide_index",
             "pptx_path",
             "slide_title",
-        ])
+        ]
+    )
 
-        for global_idx, title, _text, pptx_path, local_idx in rows:
-            try:
-                rel_path = os.path.relpath(pptx_path, root).replace("\\", "/")
-            except ValueError:
-                rel_path = pptx_path.replace("\\", "/")
-
-            writer.writerow([
+    for global_idx, title, _text, pptx_path, local_idx in rows:
+        try:
+            rel_path = os.path.relpath(pptx_path, root).replace("\\", "/")
+        except ValueError:
+            rel_path = pptx_path.replace("\\", "/")
+        ws.append(
+            [
                 global_idx,
-                os.path.basename(pptx_path),
+                sanitize_excel_cell_text(os.path.basename(pptx_path)),
                 local_idx,
-                rel_path,
-                title,
-            ])
+                sanitize_excel_cell_text(rel_path),
+                sanitize_excel_cell_text(title),
+            ]
+        )
+
+    try:
+        wb.save(output_xlsx_path)
+    finally:
+        wb.close()
 
 
-def read_slide_narration_mode_csv(
-    csv_path: str,
+def read_slide_narration_mode_xlsx(
+    workbook_path: str,
     pptx_slide_lookup: dict[tuple[str, int], int] | None = None,
 ) -> tuple[dict[int, str], list[str]]:
-    """Load per-slide narration mode config from CSV.
+    """Load per-slide narration mode config from Excel workbook.
 
     Supported target selectors per row:
     - slide_index (global, preferred when present)
@@ -1042,144 +1082,174 @@ def read_slide_narration_mode_csv(
     mode_map: dict[int, str] = {}
     warnings: list[str] = []
 
-    if not os.path.isfile(csv_path):
+    if not os.path.isfile(workbook_path):
         return mode_map, warnings
 
     try:
-        with open(csv_path, newline="", encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            if not reader.fieldnames:
-                warnings.append(
-                    "WARN slide_narration_mode.csv is empty. All slides will use FULL narration mode."
-                )
-                return mode_map, warnings
+        from openpyxl import load_workbook
+    except Exception:
+        warnings.append(
+            "WARN slide_narration_mode.xlsx found but openpyxl is missing. "
+            "All slides will use FULL narration mode."
+        )
+        return mode_map, warnings
 
-            header_pairs = [(name, normalize_header(name)) for name in reader.fieldnames]
-            index_aliases = {
-                "slide_index",
-                "index",
-                "slide",
-                "slide_no",
-                "slide_number",
-                "global_slide_index",
-                "global_index",
-            }
-            mode_aliases = {"mode", "narration_mode", "script_mode", "style"}
-            file_aliases = {
-                "pptx_file",
-                "pptx",
-                "file",
-                "file_name",
-                "filename",
-                "pptx_path",
-                "source_file",
-                "source_pptx",
-            }
-            local_index_aliases = {
-                "file_slide_index",
-                "pptx_slide_index",
-                "slide_in_file",
-                "local_slide_index",
-                "local_index",
-                "source_slide_index",
-            }
+    workbook = None
+    try:
+        workbook = load_workbook(workbook_path, data_only=True, read_only=True)
+        sheet = workbook.active
+        header_row = None
+        for values in sheet.iter_rows(min_row=1, max_row=1, values_only=True):
+            header_row = list(values)
+            break
+        if not header_row:
+            warnings.append(
+                "WARN slide_narration_mode.xlsx is empty. All slides will use FULL narration mode."
+            )
+            return mode_map, warnings
 
-            index_key = next((name for name, h in header_pairs if h in index_aliases), None)
-            mode_key = next((name for name, h in header_pairs if h in mode_aliases), None)
-            file_key = next((name for name, h in header_pairs if h in file_aliases), None)
-            local_index_key = next((name for name, h in header_pairs if h in local_index_aliases), None)
+        def norm_header(value: Any) -> str:
+            return normalize_header(value)
 
-            has_global_selector = bool(index_key)
-            has_file_selector = bool(file_key and local_index_key)
+        headers = [norm_header(v) for v in header_row]
+        index_aliases = {
+            "slide_index",
+            "index",
+            "slide",
+            "slide_no",
+            "slide_number",
+            "global_slide_index",
+            "global_index",
+        }
+        mode_aliases = {"mode", "narration_mode", "script_mode", "style"}
+        file_aliases = {
+            "pptx_file",
+            "pptx",
+            "file",
+            "file_name",
+            "filename",
+            "pptx_path",
+            "source_file",
+            "source_pptx",
+        }
+        local_index_aliases = {
+            "file_slide_index",
+            "pptx_slide_index",
+            "slide_in_file",
+            "local_slide_index",
+            "local_index",
+            "source_slide_index",
+        }
 
-            if not mode_key or (not has_global_selector and not has_file_selector):
-                warnings.append(
-                    "WARN slide_narration_mode.csv missing required columns. "
-                    "Expected mode plus slide_index OR pptx_file + file_slide_index."
-                )
-                return mode_map, warnings
+        index_idx = next((i for i, h in enumerate(headers) if h in index_aliases), -1)
+        mode_idx = next((i for i, h in enumerate(headers) if h in mode_aliases), -1)
+        file_idx = next((i for i, h in enumerate(headers) if h in file_aliases), -1)
+        local_index_idx = next((i for i, h in enumerate(headers) if h in local_index_aliases), -1)
 
-            for row_num, row in enumerate(reader, start=2):
-                if not row:
+        has_global_selector = index_idx >= 0
+        has_file_selector = file_idx >= 0 and local_index_idx >= 0
+
+        if mode_idx < 0 or (not has_global_selector and not has_file_selector):
+            warnings.append(
+                "WARN slide_narration_mode.xlsx missing required columns. "
+                "Expected mode plus slide_index OR pptx_file + file_slide_index."
+            )
+            return mode_map, warnings
+
+        for row_num, values in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
+            row = list(values)
+            selector_present = any(str(v or "").strip() for v in row)
+            if not selector_present:
+                continue
+
+            def row_value(idx: int) -> str:
+                if idx < 0 or idx >= len(row):
+                    return ""
+                raw = row[idx]
+                if raw is None:
+                    return ""
+                return str(raw).strip()
+
+            resolved_slide_idx: int | None = None
+
+            idx_raw = row_value(index_idx) if has_global_selector else ""
+            if idx_raw:
+                try:
+                    resolved_slide_idx = int(float(idx_raw))
+                except ValueError:
+                    warnings.append(
+                        f"WARN slide_narration_mode.xlsx line {row_num}: invalid slide_index '{idx_raw}', skipped."
+                    )
                     continue
 
-                selector_present = any(str(v or "").strip() for v in row.values())
-                if not selector_present:
-                    continue
+            if resolved_slide_idx is None and has_file_selector:
+                file_raw = row_value(file_idx)
+                local_raw = row_value(local_index_idx)
 
-                resolved_slide_idx: int | None = None
-
-                idx_raw = str(row.get(index_key) or "").strip() if index_key else ""
-                if idx_raw:
-                    try:
-                        resolved_slide_idx = int(float(idx_raw))
-                    except ValueError:
+                if file_raw or local_raw:
+                    if not file_raw or not local_raw:
                         warnings.append(
-                            f"WARN slide_narration_mode.csv line {row_num}: invalid slide_index '{idx_raw}', skipped."
+                            f"WARN slide_narration_mode.xlsx line {row_num}: "
+                            "provide both pptx_file and file_slide_index."
                         )
                         continue
 
-                if resolved_slide_idx is None and has_file_selector:
-                    file_raw = str(row.get(file_key) or "").strip() if file_key else ""
-                    local_raw = str(row.get(local_index_key) or "").strip() if local_index_key else ""
+                    try:
+                        local_idx = int(float(local_raw))
+                    except ValueError:
+                        warnings.append(
+                            f"WARN slide_narration_mode.xlsx line {row_num}: "
+                            f"invalid file_slide_index '{local_raw}', skipped."
+                        )
+                        continue
 
-                    if file_raw or local_raw:
-                        if not file_raw or not local_raw:
-                            warnings.append(
-                                f"WARN slide_narration_mode.csv line {row_num}: "
-                                "provide both pptx_file and file_slide_index."
-                            )
-                            continue
+                    if not pptx_slide_lookup:
+                        warnings.append(
+                            f"WARN slide_narration_mode.xlsx line {row_num}: "
+                            "cannot resolve pptx_file/file_slide_index because no PPTX source map is available."
+                        )
+                        continue
 
-                        try:
-                            local_idx = int(float(local_raw))
-                        except ValueError:
-                            warnings.append(
-                                f"WARN slide_narration_mode.csv line {row_num}: invalid file_slide_index '{local_raw}', skipped."
-                            )
-                            continue
+                    hit_idx: int | None = None
+                    for key in candidate_pptx_keys(file_raw):
+                        hit_idx = pptx_slide_lookup.get((key, local_idx))
+                        if hit_idx is not None:
+                            break
 
-                        if not pptx_slide_lookup:
-                            warnings.append(
-                                f"WARN slide_narration_mode.csv line {row_num}: "
-                                "cannot resolve pptx_file/file_slide_index because no PPTX source map is available."
-                            )
-                            continue
+                    if hit_idx is None:
+                        warnings.append(
+                            f"WARN slide_narration_mode.xlsx line {row_num}: "
+                            f"could not match pptx_file='{file_raw}' and file_slide_index='{local_raw}'."
+                        )
+                        continue
 
-                        hit_idx: int | None = None
-                        for key in candidate_pptx_keys(file_raw):
-                            hit_idx = pptx_slide_lookup.get((key, local_idx))
-                            if hit_idx is not None:
-                                break
+                    resolved_slide_idx = hit_idx
 
-                        if hit_idx is None:
-                            warnings.append(
-                                f"WARN slide_narration_mode.csv line {row_num}: "
-                                f"could not match pptx_file='{file_raw}' and file_slide_index='{local_raw}'."
-                            )
-                            continue
+            if resolved_slide_idx is None:
+                continue
 
-                        resolved_slide_idx = hit_idx
+            if resolved_slide_idx <= 0:
+                warnings.append(
+                    f"WARN slide_narration_mode.xlsx line {row_num}: slide index must be >= 1, skipped."
+                )
+                continue
 
-                if resolved_slide_idx is None:
-                    continue
+            mode_raw = row_value(mode_idx)
+            mode, known = parse_narration_mode(mode_raw)
+            if not known:
+                warnings.append(
+                    f"WARN slide_narration_mode.xlsx line {row_num}: unknown mode '{mode_raw}', defaulted to full."
+                )
 
-                if resolved_slide_idx <= 0:
-                    warnings.append(
-                        f"WARN slide_narration_mode.csv line {row_num}: slide index must be >= 1, skipped."
-                    )
-                    continue
-
-                mode_raw = row.get(mode_key)
-                mode, known = parse_narration_mode(mode_raw)
-                if not known:
-                    warnings.append(
-                        f"WARN slide_narration_mode.csv line {row_num}: unknown mode '{mode_raw}', defaulted to full."
-                    )
-
-                mode_map[resolved_slide_idx] = mode
+            mode_map[resolved_slide_idx] = mode
     except Exception as e:
-        warnings.append(f"WARN Could not read slide_narration_mode.csv: {e}")
+        warnings.append(f"WARN Could not read slide_narration_mode.xlsx: {e}")
+    finally:
+        try:
+            if workbook is not None:
+                workbook.close()
+        except Exception:
+            pass
 
     return mode_map, warnings
 
@@ -1236,7 +1306,7 @@ def build_narration_mode_user_block(
             "- No per-slide config found. Treat all slides as FULL mode."
         )
 
-    lines = ["NARRATION MODE CONFIG (from slide_narration_mode.csv):"]
+    lines = ["NARRATION MODE CONFIG (from slide_narration_mode.xlsx):"]
     for slide_idx in sorted(mode_map):
         source_text = ""
         if slide_source_meta and slide_idx in slide_source_meta:
@@ -1323,7 +1393,7 @@ def build_run_order_mismatch_message(
         [
             "",
             "Fix:",
-            "- Update pptx_run_order_template.csv (or pptx_run_order.xlsx).",
+            "- Update pptx_run_order_template.xlsx (or pptx_run_order.xlsx).",
             "- Ensure each pptx_path exactly matches an existing .pptx file name/path.",
         ]
     )
@@ -1474,85 +1544,6 @@ def read_pptx_run_order(root: str, input_dir: str, queue_path: str) -> tuple[lis
     return ordered_paths, rows_with_path, unresolved_paths
 
 
-def read_pptx_run_order_csv(root: str, input_dir: str, queue_path: str) -> tuple[list[str], int, list[str]]:
-    if not os.path.isfile(queue_path):
-        return [], 0, []
-
-    try:
-        with open(queue_path, newline="", encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            if not reader.fieldnames:
-                return [], 0, []
-
-            def norm_header(value: Any) -> str:
-                return str(value or "").strip().lower().replace(" ", "_")
-
-            path_aliases = {"pptx_path", "file_path", "path", "pptx", "file", "filename", "pptx_file"}
-            order_aliases = {"run_order", "order", "stt", "index", "priority"}
-            enabled_aliases = {"enabled", "is_enabled", "active", "use"}
-
-            header_pairs = [(name, norm_header(name)) for name in reader.fieldnames]
-            path_key = next((name for name, h in header_pairs if h in path_aliases), None)
-            order_key = next((name for name, h in header_pairs if h in order_aliases), None)
-            enabled_key = next((name for name, h in header_pairs if h in enabled_aliases), None)
-
-            if not path_key:
-                print(
-                    "WARN pptx run-order CSV does not contain a path column. "
-                    "Expected one of: pptx_path, file_path, path, pptx.",
-                    file=sys.stderr,
-                )
-                return [], 0, []
-
-            items: list[tuple[int, str]] = []
-            unresolved_paths: list[str] = []
-            rows_with_path = 0
-            for row in reader:
-                raw_path = str((row.get(path_key) if row else "") or "").strip()
-                if not raw_path:
-                    continue
-
-                rows_with_path += 1
-
-                enabled = True
-                if enabled_key:
-                    enabled = parse_enabled(row.get(enabled_key) if row else None)
-                if not enabled:
-                    continue
-
-                order_value = rows_with_path
-                if order_key:
-                    order_raw = (row.get(order_key) if row else None)
-                    if order_raw not in (None, ""):
-                        try:
-                            order_value = int(float(str(order_raw).strip()))
-                        except ValueError:
-                            order_value = rows_with_path
-
-                resolved = resolve_pptx_candidate(root, input_dir, raw_path)
-                if not resolved:
-                    print(f"WARN queue path not found: {raw_path}", file=sys.stderr)
-                    unresolved_paths.append(raw_path)
-                    continue
-
-                items.append((order_value, resolved))
-
-        items.sort(key=lambda it: (it[0], it[1].lower()))
-        ordered_paths: list[str] = []
-        seen: set[str] = set()
-        for _, path in items:
-            key = path.lower()
-            if key in seen:
-                continue
-            seen.add(key)
-            ordered_paths.append(path)
-
-        return ordered_paths, rows_with_path, unresolved_paths
-    except Exception as e:
-        print(f"WARN Could not read PPTX run-order CSV: {queue_path} ({e})", file=sys.stderr)
-        return [], 0, []
-
-
 def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
     configured = (
         (cfg.get("presentation_pptx_path") or "").strip()
@@ -1575,7 +1566,7 @@ def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
         )
     else:
         queue_candidates.append(os.path.join(root, RUN_ORDER_DEFAULT))
-        queue_candidates.append(os.path.join(root, RUN_ORDER_TEMPLATE_CSV_DEFAULT))
+        queue_candidates.append(os.path.join(root, RUN_ORDER_TEMPLATE_XLSX_DEFAULT))
 
     queue_rows_detected = 0
     queue_path_with_rows = ""
@@ -1583,9 +1574,18 @@ def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
     for queue_path in queue_candidates:
         ext = os.path.splitext(queue_path)[1].lower()
         if ext == ".csv":
-            queue_paths, queue_rows, unresolved = read_pptx_run_order_csv(root, input_dir, queue_path)
-        else:
-            queue_paths, queue_rows, unresolved = read_pptx_run_order(root, input_dir, queue_path)
+            raise RuntimeError(
+                "CSV run-order is no longer supported. "
+                "Use Excel workbook .xlsx for pptx_run_order_file."
+            )
+        if ext and ext not in SUPPORTED_WORKBOOK_EXTENSIONS:
+            print(
+                f"WARN Unsupported run-order extension '{ext}' for file: {queue_path}. "
+                "Expected an Excel workbook (.xlsx/.xlsm/.xltx/.xltm).",
+                file=sys.stderr,
+            )
+            continue
+        queue_paths, queue_rows, unresolved = read_pptx_run_order(root, input_dir, queue_path)
 
         if queue_paths:
             return queue_paths
@@ -1949,24 +1949,79 @@ def load_slides_from_pptx(pptx_path: str, start_index: int = 1) -> list[tuple[in
     return rows
 
 
-def load_rows_from_csv(root: str, csv_path: str) -> list[tuple[int, str, str]]:
+def load_rows_from_xlsx(root: str, workbook_path: str) -> list[tuple[int, str, str]]:
     rows: list[tuple[int, str, str]] = []
-    if not os.path.isfile(csv_path):
+    if not os.path.isfile(workbook_path):
         return rows
 
-    with open(csv_path, newline="", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if not row:
+    try:
+        from openpyxl import load_workbook
+    except Exception:
+        print(
+            "WARN slides.xlsx found but openpyxl is missing. "
+            "Install dependencies to use Excel slide source mode.",
+            file=sys.stderr,
+        )
+        return rows
+
+    workbook = None
+    try:
+        workbook = load_workbook(workbook_path, data_only=True, read_only=True)
+        sheet = workbook.active
+        header_row = None
+        for values in sheet.iter_rows(min_row=1, max_row=1, values_only=True):
+            header_row = list(values)
+            break
+        if not header_row:
+            return rows
+
+        def norm_header(value: Any) -> str:
+            return str(value or "").strip().lower().replace(" ", "_")
+
+        headers = [norm_header(v) for v in header_row]
+        idx_aliases = {"slide_index", "index", "slide", "slide_no", "slide_number"}
+        title_aliases = {"slide_title", "title", "slide_name", "name"}
+        path_aliases = {"slide_path", "path", "image_path", "file_path"}
+
+        idx_col = next((i for i, h in enumerate(headers) if h in idx_aliases), -1)
+        title_col = next((i for i, h in enumerate(headers) if h in title_aliases), -1)
+        path_col = next((i for i, h in enumerate(headers) if h in path_aliases), -1)
+
+        if idx_col < 0 or path_col < 0:
+            print(
+                "WARN slides.xlsx missing required columns. "
+                "Expected at least: slide_index and slide_path.",
+                file=sys.stderr,
+            )
+            return rows
+
+        for values in sheet.iter_rows(min_row=2, values_only=True):
+            row = list(values)
+            idx_raw = ""
+            title_raw = ""
+            rel_raw = ""
+            if idx_col < len(row) and row[idx_col] is not None:
+                idx_raw = str(row[idx_col]).strip()
+            if title_col >= 0 and title_col < len(row) and row[title_col] is not None:
+                title_raw = str(row[title_col]).strip()
+            if path_col < len(row) and row[path_col] is not None:
+                rel_raw = str(row[path_col]).strip().strip('"')
+            if not idx_raw or not rel_raw:
                 continue
-            idx_s = (row.get("slide_index") or "").strip()
-            title = (row.get("slide_title") or "").strip()
-            rel = (row.get("slide_path") or "").strip().strip('"')
-            if not idx_s or not rel:
+            try:
+                idx = int(float(idx_raw))
+            except ValueError:
                 continue
-            idx = int(idx_s)
-            abs_img = rel if os.path.isabs(rel) else os.path.normpath(os.path.join(root, rel))
-            rows.append((idx, title, abs_img))
+            abs_img = rel_raw if os.path.isabs(rel_raw) else os.path.normpath(os.path.join(root, rel_raw))
+            rows.append((idx, title_raw, abs_img))
+    except Exception as e:
+        print(f"WARN Could not read slides workbook: {workbook_path} ({e})", file=sys.stderr)
+    finally:
+        try:
+            if workbook is not None:
+                workbook.close()
+        except Exception:
+            pass
 
     rows.sort(key=lambda x: x[0])
     return rows
@@ -2022,9 +2077,9 @@ def main() -> None:
     root = os.path.normpath(args.root)
 
     settings_path = os.path.join(root, "Data", "AIPresenter", "Config", "ai_settings.json")
-    csv_path = os.path.join(root, "Data", "AIPresenter", "Input", "slides.csv")
-    narration_mode_csv_path = os.path.join(root, NARRATION_MODE_CSV_DEFAULT)
-    slide_index_map_csv_path = os.path.join(root, SLIDE_INDEX_MAP_CSV_DEFAULT)
+    slides_xlsx_path = os.path.join(root, "Data", "AIPresenter", "Input", "slides.xlsx")
+    narration_mode_xlsx_path = os.path.join(root, NARRATION_MODE_XLSX_DEFAULT)
+    slide_index_map_xlsx_path = os.path.join(root, SLIDE_INDEX_MAP_XLSX_DEFAULT)
     master_prompt_path = os.path.join(root, "Data", "AIPresenter", "Input", "presentation_master_prompt.txt")
     raw_out = os.path.join(root, "Data", "AIPresenter", "Temp", "extracted_slides_raw.txt")
     gpt_out = os.path.join(root, "Data", "AIPresenter", "Input", "gpt_slide_content.txt")
@@ -2055,7 +2110,7 @@ def main() -> None:
         or (cfg.get("pptx_input_path") or "").strip()
         or (cfg.get("slide_pptx_path") or "").strip()
     )
-    csv_rows = load_rows_from_csv(root, csv_path)
+    xlsx_rows = load_rows_from_xlsx(root, slides_xlsx_path)
     clear_pptx_source_error(root)
     try:
         pptx_paths = resolve_pptx_paths(root, cfg)
@@ -2099,7 +2154,7 @@ def main() -> None:
             sys.exit(2)
 
         raw_text = build_raw_from_pptx(all_pptx_rows, raw_out)
-        write_slide_index_mapping_csv(root, slide_index_map_csv_path, all_pptx_rows)
+        write_slide_index_mapping_xlsx(root, slide_index_map_xlsx_path, all_pptx_rows)
         pptx_slide_lookup = build_pptx_slide_lookup(root, all_pptx_rows)
         slide_source_meta = build_slide_index_source_meta(all_pptx_rows)
         source_mode = f"pptx:{len(pptx_paths)} file(s)"
@@ -2108,27 +2163,27 @@ def main() -> None:
             file=sys.stderr,
         )
         print(
-            "INFO slide index mapping: " + format_path_for_message(root, slide_index_map_csv_path),
+            "INFO slide index mapping: " + format_path_for_message(root, slide_index_map_xlsx_path),
             file=sys.stderr,
         )
-    elif csv_rows:
+    elif xlsx_rows:
         try:
             raw_text = build_raw_from_images(
                 api_key,
                 vision_model,
-                csv_rows,
+                xlsx_rows,
                 raw_out,
                 ocr_passes=ocr_passes,
             )
-            source_mode = "csv-images"
-            if os.path.isfile(slide_index_map_csv_path):
-                os.remove(slide_index_map_csv_path)
+            source_mode = "xlsx-images"
+            if os.path.isfile(slide_index_map_xlsx_path):
+                os.remove(slide_index_map_xlsx_path)
         except (urllib.error.HTTPError, urllib.error.URLError, KeyError, OSError) as e:
             print(f"Vision extraction failed: {e}", file=sys.stderr)
             sys.exit(2)
     else:
         print(
-            "No slide source found. Provide slides.csv or a .pptx in Data/AIPresenter/Input/pptx_file_here "
+            "No slide source found. Provide slides.xlsx or a .pptx in Data/AIPresenter/Input/pptx_file_here "
             "(or set presentation_pptx_path in ai_settings.json).",
             file=sys.stderr,
         )
@@ -2140,8 +2195,8 @@ def main() -> None:
 
     print(f"INFO OCR multi-pass enabled: {ocr_passes} pass(es)", file=sys.stderr)
 
-    mode_map, mode_warnings = read_slide_narration_mode_csv(
-        narration_mode_csv_path,
+    mode_map, mode_warnings = read_slide_narration_mode_xlsx(
+        narration_mode_xlsx_path,
         pptx_slide_lookup=pptx_slide_lookup if pptx_slide_lookup else None,
     )
     for warn in mode_warnings:
@@ -2175,12 +2230,14 @@ def main() -> None:
     slides_parsed = parse_slides_blocks(composed)
     if not slides_parsed:
         print(
-            "GPT did not return === SLIDE | ... === blocks — UiPath will not find per-slide narration; "
+            "GPT did not return === SLIDE | ... === blocks - UiPath will not find per-slide narration; "
             "check presentation_master_prompt.txt and model output.",
             file=sys.stderr,
         )
 
-    print(f"OK source={source_mode} raw={raw_out} gpt={gpt_out} slide_blocks={len(slides_parsed)}")
+    raw_rel = format_path_for_message(root, raw_out)
+    gpt_rel = format_path_for_message(root, gpt_out)
+    print(f"OK source={source_mode} raw={raw_rel} gpt={gpt_rel} slide_blocks={len(slides_parsed)}")
     sys.exit(0)
 
 

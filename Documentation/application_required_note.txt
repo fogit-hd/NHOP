@@ -16,7 +16,7 @@ Used for audio/video processing, slide segment muxing, media playback, and durat
 Required for PPTX mode to export slides as PNG images (COM automation), enabling OCR/image fallback to work reliably.
 
 4. Microsoft Excel
-Required for robot to read Config.xlsx file and manage data from csv file.
+Required for robot to read Config.xlsx and workbook-based input files (.xlsx).
 
 5. OpenAI API
 Used for vision extraction and narration composition.

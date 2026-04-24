@@ -4,7 +4,7 @@ This folder supports running multiple PPTX files in one robot run.
 
 Queue file name
 - Data/AIPresenter/Input/pptx_run_order.xlsx
-- Data/AIPresenter/Input/pptx_run_order_template.csv
+- Data/AIPresenter/Input/pptx_run_order_template.xlsx
 
 Required columns in row 1
 - run_order
@@ -21,10 +21,10 @@ Column rules
 - enabled: TRUE/FALSE (also accepts 1/0, yes/no, on/off).
 
 How to use
-1. Open Data/AIPresenter/Input/pptx_run_order_template.csv in Excel.
+1. Open Data/AIPresenter/Input/pptx_run_order_template.xlsx in Excel.
 2. Edit rows and values as needed.
 3. Use either option:
-  - Keep using pptx_run_order_template.csv directly, or
+  - Keep using pptx_run_order_template.xlsx directly, or
   - Save as Data/AIPresenter/Input/pptx_run_order.xlsx.
 4. Keep header names unchanged.
 5. Set enabled = TRUE for files you want to run.

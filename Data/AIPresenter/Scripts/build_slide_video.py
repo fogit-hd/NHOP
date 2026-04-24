@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -21,12 +22,44 @@ def _subprocess_kwargs_windows() -> dict:
     return kwargs
 
 
+def _safe_print(message: str, *, is_error: bool = False) -> None:
+    stream = sys.stderr if is_error else sys.stdout
+    text = message + "\n"
+    try:
+        stream.write(text)
+        stream.flush()
+    except UnicodeEncodeError:
+        encoding = getattr(stream, "encoding", None) or "utf-8"
+        payload = text.encode(encoding, errors="backslashreplace")
+        buffer = getattr(stream, "buffer", None)
+        if buffer is not None:
+            try:
+                buffer.write(payload)
+                buffer.flush()
+            except Exception:
+                pass
+
+
 def _resolve_ffmpeg_exe(ffmpeg_arg: str) -> Path | None:
-    if not ffmpeg_arg.strip():
-        return None
-    raw = Path(ffmpeg_arg.strip())
-    p = raw if raw.is_absolute() else (PROJECT_ROOT / raw).resolve()
-    return p if p.is_file() else None
+    raw_value = ffmpeg_arg.strip()
+    if raw_value:
+        raw = Path(raw_value)
+        p = raw if raw.is_absolute() else (PROJECT_ROOT / raw).resolve()
+        if p.is_file():
+            return p
+
+    bundled = PROJECT_ROOT / "Data" / "AIPresenter" / "Tools" / "ffmpeg.exe"
+    if bundled.is_file():
+        return bundled.resolve()
+
+    for name in ("ffmpeg.exe", "ffmpeg"):
+        found = shutil.which(name)
+        if found:
+            p = Path(found)
+            if p.is_file():
+                return p.resolve()
+
+    return None
 
 
 def _resolve_media(p: str) -> Path:
@@ -96,17 +129,20 @@ def main() -> None:
 
     ffmpeg_exe = _resolve_ffmpeg_exe(args.ffmpeg)
     if not ffmpeg_exe:
-        print("ffmpeg.exe not found (check --ffmpeg / ai_settings.json).", file=sys.stderr)
+        _safe_print(
+            "ffmpeg.exe not found (checked --ffmpeg value, Data/AIPresenter/Tools, and PATH).",
+            is_error=True,
+        )
         sys.exit(1)
 
     image = _resolve_media(args.image)
     audio = _resolve_media(args.audio)
     out = _resolve_media(args.out)
     if not image.is_file():
-        print(f"Image not found: {image}", file=sys.stderr)
+        _safe_print(f"Image not found: {image}", is_error=True)
         sys.exit(2)
     if not audio.is_file():
-        print(f"Audio not found: {audio}", file=sys.stderr)
+        _safe_print(f"Audio not found: {audio}", is_error=True)
         sys.exit(2)
     out.parent.mkdir(parents=True, exist_ok=True)
 
@@ -119,9 +155,9 @@ def main() -> None:
     if dur is None or dur <= 0:
         dur = _duration_seconds_wave_pcm(audio)
     if dur is None or dur <= 0:
-        print(
+        _safe_print(
             "Could not read audio duration (ffprobe/wave); mux may be wrong. Install ffprobe next to ffmpeg.",
-            file=sys.stderr,
+            is_error=True,
         )
         dur = None
     else:
@@ -197,9 +233,9 @@ def main() -> None:
         except OSError:
             pass
         if r2.returncode != 0 or not out.is_file() or out.stat().st_size < 100:
-            print(
+            _safe_print(
                 f"ffmpeg mux failed (see {err_log}). First error lines:\n{stderr_text[:800]}",
-                file=sys.stderr,
+                is_error=True,
             )
             sys.exit(3)
 
@@ -211,7 +247,7 @@ def main() -> None:
         line = str(out.resolve()).replace("\\", "/") + "\n"
         with open(man, "a", encoding="utf-8") as f:
             f.write(line)
-    print(f"OK segment={out}")
+    _safe_print(f"OK segment={out}")
     sys.exit(0)
 
 

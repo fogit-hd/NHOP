@@ -341,7 +341,7 @@
       </Assign.Value>
     </Assign>
     <ui:ReadTextFile File="{x:Null}" Content="[strSlidesCsvExitText]" DisplayName="Read slides_pptx exit code" FileName="[strSlidesCsvExitFile]" sap:VirtualizedContainerService.HintSize="451.2,123.2" sap2010:WorkflowViewState.IdRef="ReadTextFile_SlidesCsvExit" />
-    <Assign DisplayName="Build slides_iterate.tsv from PPTX/CSV source (exit code)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_RunSlidesFromCsv">
+    <Assign DisplayName="Build slides_iterate.tsv from PPTX/XLSX source (exit code)" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="Assign_RunSlidesFromCsv">
       <Assign.To>
         <OutArgument x:TypeArguments="x:Int32">[io_SlidesCsvShellResult]</OutArgument>
       </Assign.To>
@@ -431,7 +431,7 @@
     <ui:LogMessage DisplayName="Composed narration size" sap:VirtualizedContainerService.HintSize="451.2,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_ComposedNarrationSize" Level="Info" Message="[&quot;Loaded gpt_slide_content length: &quot; + If(io_GptComposedSlides Is Nothing, &quot;0&quot;, io_GptComposedSlides.Length.ToString)]" />
     <If Condition="[io_PipelineShellResult = 0 AndAlso String.IsNullOrWhiteSpace(io_GptComposedSlides)]" DisplayName="Fail if composed file empty after OK pipeline" sap:VirtualizedContainerService.HintSize="451.2,340.8" sap2010:WorkflowViewState.IdRef="If_WarnEmptyGptContent">
       <If.Then>
-        <Throw DisplayName="gpt_slide_content empty after pipeline" Exception="[New Exception(&quot;gpt_slide_content.txt is empty after pipeline exit 0. Run pipeline_extract_and_compose.py from the project folder with --root set to CurrentDirectory; check stderr for API key, PPTX input (including Input\\pptx_file_here), or CSV fallback input. Ensure presentation_master_prompt.txt asks for === SLIDE | n | title === blocks.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_EmptyGptSlideContent" />
+        <Throw DisplayName="gpt_slide_content empty after pipeline" Exception="[New Exception(&quot;gpt_slide_content.txt is empty after pipeline exit 0. Run pipeline_extract_and_compose.py from the project folder with --root set to CurrentDirectory; check stderr for API key, PPTX input (including Input\\pptx_file_here), or XLSX fallback input. Ensure presentation_master_prompt.txt asks for === SLIDE | n | title === blocks.&quot;)]" sap:VirtualizedContainerService.HintSize="449.6,90.4" sap2010:WorkflowViewState.IdRef="Throw_EmptyGptSlideContent" />
       </If.Then>
       <If.Else>
         <Sequence DisplayName="Else" sap:VirtualizedContainerService.HintSize="449.6,89.6">

@@ -3,9 +3,9 @@
 Priority:
 1) Configured .pptx path in Data/AIPresenter/Config/ai_settings.json
 2) Ordered .pptx list in Data/AIPresenter/Input/pptx_run_order.xlsx
-    or Data/AIPresenter/Input/pptx_run_order_template.csv
+    or Data/AIPresenter/Input/pptx_run_order_template.xlsx
 3) First .pptx in Data/AIPresenter/Input/pptx_file_here
-4) Data/AIPresenter/Input/slides.csv (legacy fallback)
+4) Data/AIPresenter/Input/slides.xlsx (legacy fallback)
 
 TSV columns (tab-separated): index, title, absolute_path, relative_path
 Rows are sorted by slide_index ascending.
@@ -13,7 +13,6 @@ Rows are sorted by slide_index ascending.
 from __future__ import annotations
 
 import argparse
-import csv
 import importlib
 import json
 import os
@@ -22,14 +21,32 @@ import sys
 from typing import Any
 
 RUN_ORDER_DEFAULT = os.path.join("Data", "AIPresenter", "Input", "pptx_run_order.xlsx")
-RUN_ORDER_TEMPLATE_CSV_DEFAULT = os.path.join(
-    "Data", "AIPresenter", "Input", "pptx_run_order_template.csv"
+RUN_ORDER_TEMPLATE_XLSX_DEFAULT = os.path.join(
+    "Data", "AIPresenter", "Input", "pptx_run_order_template.xlsx"
 )
+SUPPORTED_WORKBOOK_EXTENSIONS = {".xlsx", ".xlsm", ".xltx", ".xltm"}
 PPTX_SOURCE_ERROR_FILE = os.path.join(
     "Data", "AIPresenter", "Temp", "pptx_source_resolution_error.txt"
 )
 DEFAULT_EXPORT_WIDTH = 2560
 DEFAULT_EXPORT_HEIGHT = 1440
+
+
+def configure_stdio_utf8_fallback() -> None:
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        if stream is None:
+            continue
+        reconfigure = getattr(stream, "reconfigure", None)
+        if not callable(reconfigure):
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="backslashreplace")
+        except Exception:
+            pass
+
+
+configure_stdio_utf8_fallback()
 
 
 def clear_pptx_export_root(root: str) -> str:
@@ -146,7 +163,7 @@ def build_run_order_mismatch_message(
         [
             "",
             "Fix:",
-            "- Update pptx_run_order_template.csv (or pptx_run_order.xlsx).",
+            "- Update pptx_run_order_template.xlsx (or pptx_run_order.xlsx).",
             "- Ensure each pptx_path exactly matches an existing .pptx file name/path.",
         ]
     )
@@ -309,85 +326,6 @@ def read_pptx_run_order(root: str, input_dir: str, queue_path: str) -> tuple[lis
     return ordered_paths, rows_with_path, unresolved_paths
 
 
-def read_pptx_run_order_csv(root: str, input_dir: str, queue_path: str) -> tuple[list[str], int, list[str]]:
-    if not os.path.isfile(queue_path):
-        return [], 0, []
-
-    try:
-        with open(queue_path, newline="", encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            if not reader.fieldnames:
-                return [], 0, []
-
-            def norm_header(value: Any) -> str:
-                return str(value or "").strip().lower().replace(" ", "_")
-
-            path_aliases = {"pptx_path", "file_path", "path", "pptx", "file", "filename", "pptx_file"}
-            order_aliases = {"run_order", "order", "stt", "index", "priority"}
-            enabled_aliases = {"enabled", "is_enabled", "active", "use"}
-
-            header_pairs = [(name, norm_header(name)) for name in reader.fieldnames]
-            path_key = next((name for name, h in header_pairs if h in path_aliases), None)
-            order_key = next((name for name, h in header_pairs if h in order_aliases), None)
-            enabled_key = next((name for name, h in header_pairs if h in enabled_aliases), None)
-
-            if not path_key:
-                print(
-                    "WARN pptx run-order CSV does not contain a path column. "
-                    "Expected one of: pptx_path, file_path, path, pptx.",
-                    file=sys.stderr,
-                )
-                return [], 0, []
-
-            items: list[tuple[int, str]] = []
-            unresolved_paths: list[str] = []
-            rows_with_path = 0
-            for row in reader:
-                raw_path = str((row.get(path_key) if row else "") or "").strip()
-                if not raw_path:
-                    continue
-
-                rows_with_path += 1
-
-                enabled = True
-                if enabled_key:
-                    enabled = parse_enabled(row.get(enabled_key) if row else None)
-                if not enabled:
-                    continue
-
-                order_value = rows_with_path
-                if order_key:
-                    order_raw = (row.get(order_key) if row else None)
-                    if order_raw not in (None, ""):
-                        try:
-                            order_value = int(float(str(order_raw).strip()))
-                        except ValueError:
-                            order_value = rows_with_path
-
-                resolved = resolve_pptx_candidate(root, input_dir, raw_path)
-                if not resolved:
-                    print(f"WARN queue path not found: {raw_path}", file=sys.stderr)
-                    unresolved_paths.append(raw_path)
-                    continue
-
-                items.append((order_value, resolved))
-
-        items.sort(key=lambda it: (it[0], it[1].lower()))
-        ordered_paths: list[str] = []
-        seen: set[str] = set()
-        for _, path in items:
-            key = path.lower()
-            if key in seen:
-                continue
-            seen.add(key)
-            ordered_paths.append(path)
-
-        return ordered_paths, rows_with_path, unresolved_paths
-    except Exception as e:
-        print(f"WARN Could not read PPTX run-order CSV: {queue_path} ({e})", file=sys.stderr)
-        return [], 0, []
-
-
 def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
     input_dir = os.path.join(root, "Data", "AIPresenter", "Input")
     preferred_dir = os.path.join(input_dir, "pptx_file_here")
@@ -411,7 +349,7 @@ def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
         )
     else:
         queue_candidates.append(os.path.join(root, RUN_ORDER_DEFAULT))
-        queue_candidates.append(os.path.join(root, RUN_ORDER_TEMPLATE_CSV_DEFAULT))
+        queue_candidates.append(os.path.join(root, RUN_ORDER_TEMPLATE_XLSX_DEFAULT))
 
     queue_rows_detected = 0
     queue_path_with_rows = ""
@@ -419,9 +357,18 @@ def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
     for queue_path in queue_candidates:
         ext = os.path.splitext(queue_path)[1].lower()
         if ext == ".csv":
-            queue_paths, queue_rows, unresolved = read_pptx_run_order_csv(root, input_dir, queue_path)
-        else:
-            queue_paths, queue_rows, unresolved = read_pptx_run_order(root, input_dir, queue_path)
+            raise RuntimeError(
+                "CSV run-order is no longer supported. "
+                "Use Excel workbook .xlsx for pptx_run_order_file."
+            )
+        if ext and ext not in SUPPORTED_WORKBOOK_EXTENSIONS:
+            print(
+                f"WARN Unsupported run-order extension '{ext}' for file: {queue_path}. "
+                "Expected an Excel workbook (.xlsx/.xlsm/.xltx/.xltm).",
+                file=sys.stderr,
+            )
+            continue
+        queue_paths, queue_rows, unresolved = read_pptx_run_order(root, input_dir, queue_path)
 
         if queue_rows > 0 and unresolved:
             preferred_files = list_pptx_files(preferred_dir)
@@ -472,24 +419,79 @@ def resolve_pptx_paths(root: str, cfg: dict) -> list[str]:
     return []
 
 
-def load_rows_from_csv(root: str, csv_path: str) -> list[tuple[int, str, str, str]]:
+def load_rows_from_excel(root: str, workbook_path: str) -> list[tuple[int, str, str, str]]:
     rows: list[tuple[int, str, str, str]] = []
-    if not os.path.isfile(csv_path):
+    if not os.path.isfile(workbook_path):
         return rows
 
-    with open(csv_path, newline="", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if not row:
+    try:
+        from openpyxl import load_workbook
+    except Exception:
+        print(
+            "WARN slides.xlsx found but openpyxl is missing. "
+            "Install dependencies to use Excel slide source mode.",
+            file=sys.stderr,
+        )
+        return rows
+
+    workbook = None
+    try:
+        workbook = load_workbook(workbook_path, data_only=True, read_only=True)
+        sheet = workbook.active
+        header_row = None
+        for values in sheet.iter_rows(min_row=1, max_row=1, values_only=True):
+            header_row = list(values)
+            break
+        if not header_row:
+            return rows
+
+        def norm_header(value: Any) -> str:
+            return str(value or "").strip().lower().replace(" ", "_")
+
+        headers = [norm_header(v) for v in header_row]
+        idx_aliases = {"slide_index", "index", "slide", "slide_no", "slide_number"}
+        title_aliases = {"slide_title", "title", "slide_name", "name"}
+        path_aliases = {"slide_path", "path", "image_path", "file_path"}
+
+        idx_col = next((i for i, h in enumerate(headers) if h in idx_aliases), -1)
+        title_col = next((i for i, h in enumerate(headers) if h in title_aliases), -1)
+        path_col = next((i for i, h in enumerate(headers) if h in path_aliases), -1)
+        if idx_col < 0 or path_col < 0:
+            print(
+                "WARN slides.xlsx missing required columns. "
+                "Expected at least: slide_index and slide_path.",
+                file=sys.stderr,
+            )
+            return rows
+
+        for values in sheet.iter_rows(min_row=2, values_only=True):
+            row = list(values)
+            idx_raw = ""
+            rel_raw = ""
+            title_raw = ""
+            if idx_col < len(row) and row[idx_col] is not None:
+                idx_raw = str(row[idx_col]).strip()
+            if path_col < len(row) and row[path_col] is not None:
+                rel_raw = str(row[path_col]).strip().strip('"')
+            if title_col >= 0 and title_col < len(row) and row[title_col] is not None:
+                title_raw = str(row[title_col]).strip()
+
+            if not idx_raw or not rel_raw:
                 continue
-            idx_s = (row.get("slide_index") or "").strip()
-            title = (row.get("slide_title") or "").strip()
-            rel = (row.get("slide_path") or "").strip().strip('"')
-            if not idx_s or not rel:
+            try:
+                idx = int(float(idx_raw))
+            except ValueError:
                 continue
-            idx = int(idx_s)
-            abs_path = rel if os.path.isabs(rel) else os.path.normpath(os.path.join(root, rel))
-            rows.append((idx, title, abs_path, rel))
+            abs_path = rel_raw if os.path.isabs(rel_raw) else os.path.normpath(os.path.join(root, rel_raw))
+            rows.append((idx, title_raw, abs_path, rel_raw))
+    except Exception as e:
+        print(f"WARN Could not read slides workbook: {workbook_path} ({e})", file=sys.stderr)
+    finally:
+        try:
+            if workbook is not None:
+                workbook.close()
+        except Exception:
+            pass
 
     rows.sort(key=lambda x: x[0])
     return rows
@@ -618,9 +620,14 @@ def main() -> None:
         help="Project root (UiPath Environment.CurrentDirectory)",
     )
     p.add_argument(
+        "--slides-xlsx",
+        default=os.path.join("Data", "AIPresenter", "Input", "slides.xlsx"),
+        help="Path to slides.xlsx (relative to --root if not absolute)",
+    )
+    p.add_argument(
         "--csv",
-        default=os.path.join("Data", "AIPresenter", "Input", "slides.csv"),
-        help="Path to slides.csv (relative to --root if not absolute)",
+        default="",
+        help="Deprecated. CSV source is no longer supported. Use --slides-xlsx.",
     )
     args = p.parse_args()
     root = os.path.normpath(args.root)
@@ -638,9 +645,28 @@ def main() -> None:
         if not os.path.isfile(path):
             open(path, "w", encoding="utf-8").close()
 
-    csv_path = args.csv
-    if not os.path.isabs(csv_path):
-        csv_path = os.path.normpath(os.path.join(root, csv_path))
+    slides_xlsx_path = args.slides_xlsx
+    if args.csv.strip():
+        legacy_path = args.csv.strip()
+        if legacy_path.lower().endswith(".csv"):
+            detail = (
+                "CSV slide source is no longer supported. "
+                "Please convert to Data/AIPresenter/Input/slides.xlsx."
+            )
+            write_pptx_source_error(root, detail)
+            print(detail, file=sys.stderr)
+            sys.exit(1)
+        slides_xlsx_path = legacy_path
+    if not os.path.isabs(slides_xlsx_path):
+        slides_xlsx_path = os.path.normpath(os.path.join(root, slides_xlsx_path))
+    if slides_xlsx_path.lower().endswith(".csv"):
+        detail = (
+            "CSV slide source is no longer supported. "
+            "Please use an Excel workbook (.xlsx) for slides input."
+        )
+        write_pptx_source_error(root, detail)
+        print(detail, file=sys.stderr)
+        sys.exit(1)
 
     out_tsv = os.path.join(temp_dir, "slides_iterate.tsv")
 
@@ -708,9 +734,28 @@ def main() -> None:
             file=sys.stderr,
         )
     else:
-        rows = load_rows_from_csv(root, csv_path)
+        rows = load_rows_from_excel(root, slides_xlsx_path)
         if rows:
-            source_mode = "slides.csv"
+            source_mode = "slides.xlsx"
+
+    if source_mode.startswith("pptx") and rows:
+        exported_images = sum(1 for _, _, abs_path, _ in rows if abs_path and os.path.isfile(abs_path))
+        if exported_images == 0:
+            detail = (
+                "PPTX text was extracted but 0 slide images were exported. "
+                "Failing fast to prevent audio-only playback. "
+                "Verify Microsoft PowerPoint Desktop, Python package 'comtypes', and write permission "
+                "for Data/AIPresenter/Temp/pptx_slides."
+            )
+            write_pptx_source_error(root, detail)
+            print(detail, file=sys.stderr)
+            sys.exit(3)
+        if exported_images < len(rows):
+            print(
+                f"WARN Only {exported_images}/{len(rows)} slide images were exported. "
+                "Slides without images may play narration audio only.",
+                file=sys.stderr,
+            )
 
     with open(out_tsv, "w", encoding="utf-8") as out:
         for idx, title, abs_path, rel in rows:
@@ -721,8 +766,9 @@ def main() -> None:
 
     if source_mode == "none":
         detail = (
-            "No PPTX or slides.csv source found. Ensure at least one .pptx is available "
-            "(Data/AIPresenter/Input/pptx_file_here or configured path)."
+            "No PPTX or slides.xlsx source found. Ensure at least one .pptx is available "
+            "(Data/AIPresenter/Input/pptx_file_here or configured path), "
+            "or provide Data/AIPresenter/Input/slides.xlsx."
         )
         write_pptx_source_error(root, detail)
         print(detail, file=sys.stderr)

@@ -12,9 +12,9 @@ This project uses Python for (UiPath invokes `pyw` for no console window):
     Data\AIPresenter\Input\gpt_slide_content.txt, and Temp\gpt_slide.txt exist
     if missing; prioritizes configured PPTX path, then ordered list in
     Data\AIPresenter\Input\pptx_run_order.xlsx (or
-    Data\AIPresenter\Input\pptx_run_order_template.csv), then PPTX in
+    Data\AIPresenter\Input\pptx_run_order_template.xlsx), then PPTX in
     Data\AIPresenter\Input\pptx_file_here, then PPTX in Data\AIPresenter\Input,
-    and falls back to slides.csv if needed.
+    and falls back to slides.xlsx if needed.
     (slide_index, slide_title, slide_path relative to project root), sorts by
     index, writes Temp\slides_iterate.tsv for slide iteration.
 
@@ -72,8 +72,7 @@ This project uses Python for (UiPath invokes `pyw` for no console window):
     py -m pip install -r Data\AIPresenter\Scripts\requirements-aipresenter.txt
 
   This installs:
-    - openpyxl for reading ordered PPTX list from pptx_run_order.xlsx.
-      (If openpyxl is unavailable, pptx_run_order_template.csv still works.)
+    - openpyxl for reading/writing Excel workbook inputs (.xlsx).
 
 --------------------------------------------------------------------------------
 4. UiPath runtime notes
@@ -96,10 +95,10 @@ This project uses Python for (UiPath invokes `pyw` for no console window):
 
   This prioritizes configured PPTX input, then ordered PPTX list in
   Data\AIPresenter\Input\pptx_run_order.xlsx (or
-  Data\AIPresenter\Input\pptx_run_order_template.csv), then PPTX in
+  Data\AIPresenter\Input\pptx_run_order_template.xlsx), then PPTX in
   Data\AIPresenter\Input\pptx_file_here, and falls back to
-  Data\AIPresenter\Input\slides.csv when needed.
-  In CSV mode, it calls OpenAI Vision on each image and appends each slide block
+  Data\AIPresenter\Input\slides.xlsx when needed.
+  In Excel-image mode, it calls OpenAI Vision on each image and appends each slide block
   to a single file
   Data\AIPresenter\Temp\extracted_slides_raw.txt (flushed after each slide),
   then calls GPT with Data\AIPresenter\Input\presentation_master_prompt.txt
@@ -117,7 +116,7 @@ This project uses Python for (UiPath invokes `pyw` for no console window):
   [ ] py -m pip install -r Data\AIPresenter\Scripts\requirements-aipresenter.txt
   [ ] (Optional for multi-PPTX) Fill one of these queue files:
       - Data\AIPresenter\Input\pptx_run_order.xlsx
-      - Data\AIPresenter\Input\pptx_run_order_template.csv
+      - Data\AIPresenter\Input\pptx_run_order_template.xlsx
   [ ] See Data\AIPresenter\Input\pptx_run_order.README.txt for full queue rules
   [ ] Run the UiPath workflow again
 
