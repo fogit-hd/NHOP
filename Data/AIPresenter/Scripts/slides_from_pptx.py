@@ -7,7 +7,7 @@ Priority:
 3) First .pptx in Data/AIPresenter/Input/pptx_file_here
 4) Data/AIPresenter/Input/slides.xlsx (legacy fallback)
 
-TSV columns (tab-separated): index, title, absolute_path, relative_path
+TSV columns (tab-separated): index, title, image_path, relative_path
 Rows are sorted by slide_index ascending.
 """
 from __future__ import annotations
@@ -27,6 +27,9 @@ RUN_ORDER_TEMPLATE_XLSX_DEFAULT = os.path.join(
 SUPPORTED_WORKBOOK_EXTENSIONS = {".xlsx", ".xlsm", ".xltx", ".xltm"}
 PPTX_SOURCE_ERROR_FILE = os.path.join(
     "Data", "AIPresenter", "Temp", "pptx_source_resolution_error.txt"
+)
+PPTX_EXPORT_DIAGNOSTICS_FILE = os.path.join(
+    "Data", "AIPresenter", "Temp", "pptx_export_diagnostics.txt"
 )
 DEFAULT_EXPORT_WIDTH = 2560
 DEFAULT_EXPORT_HEIGHT = 1440
@@ -120,6 +123,22 @@ def format_path_for_message(root: str, path: str) -> str:
         return path.replace("\\", "/")
 
 
+def project_relative_path_or_original(root: str, path_value: str) -> str:
+    raw = os.path.normpath(str(path_value or "").strip())
+    if not raw:
+        return ""
+    if not os.path.isabs(raw):
+        return raw
+    try:
+        rel = os.path.relpath(raw, root)
+    except ValueError:
+        return raw
+    rel_norm = os.path.normpath(rel)
+    if rel_norm.startswith("..") or os.path.isabs(rel_norm):
+        return raw
+    return rel_norm
+
+
 def build_run_order_mismatch_message(
     root: str,
     queue_path: str,
@@ -196,6 +215,97 @@ def write_pptx_source_error(root: str, message: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write((message or "").strip() + "\n")
+
+
+def clear_pptx_export_diagnostics(root: str) -> None:
+    path = os.path.join(root, PPTX_EXPORT_DIAGNOSTICS_FILE)
+    try:
+        if os.path.isfile(path):
+            os.remove(path)
+    except OSError:
+        pass
+
+
+def append_pptx_export_diagnostics(
+    root: str,
+    pptx_path: str,
+    out_dir: str,
+    slide_count: int,
+    export_width: int,
+    export_height: int,
+    notes: list[str],
+) -> None:
+    path = os.path.join(root, PPTX_EXPORT_DIAGNOSTICS_FILE)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    has_existing = os.path.isfile(path) and os.path.getsize(path) > 0
+    lines = [
+        f"pptx={format_path_for_message(root, pptx_path)}",
+        f"output_dir={format_path_for_message(root, out_dir)}",
+        f"requested_slide_count={slide_count}",
+        f"export_resolution={export_width}x{export_height}",
+        f"python_executable={sys.executable}",
+        f"python_version={sys.version.split()[0]}",
+    ]
+    lines.extend(str(note) for note in notes if str(note).strip())
+    with open(path, "a", encoding="utf-8") as f:
+        if has_existing:
+            f.write("\n" + ("=" * 80) + "\n")
+        f.write("\n".join(lines).strip() + "\n")
+
+
+def format_exception_message(error: BaseException) -> str:
+    return f"{type(error).__name__}: {error}"
+
+
+def export_with_powerpoint_backend(
+    client_module: Any,
+    backend_name: str,
+    pptx_path: str,
+    out_dir: str,
+    slide_count: int,
+    export_width: int,
+    export_height: int,
+) -> tuple[list[str], str]:
+    app = None
+    pres = None
+    exported: list[str] = [""] * max(0, slide_count)
+    try:
+        create_object = getattr(client_module, "CreateObject", None)
+        if callable(create_object):
+            app = create_object("PowerPoint.Application")
+        else:
+            dispatch = getattr(client_module, "Dispatch", None)
+            if callable(dispatch):
+                app = dispatch("PowerPoint.Application")
+            else:
+                raise RuntimeError(
+                    f"{backend_name} module does not expose CreateObject/Dispatch for PowerPoint."
+                )
+        app.Visible = 1
+        pres = app.Presentations.Open(pptx_path, False, False, False)
+        total = int(pres.Slides.Count)
+        if total > len(exported):
+            exported.extend([""] * (total - len(exported)))
+        for idx in range(1, total + 1):
+            out_png = os.path.join(out_dir, f"slide_{idx:03d}.png")
+            slide = pres.Slides.Item(idx)
+            slide.Export(out_png, "PNG", export_width, export_height)
+            if os.path.isfile(out_png):
+                exported[idx - 1] = os.path.normpath(out_png)
+        return exported, ""
+    except Exception as error:
+        return exported, f"{backend_name} export failed: {format_exception_message(error)}"
+    finally:
+        try:
+            if pres is not None:
+                pres.Close()
+        except Exception:
+            pass
+        try:
+            if app is not None:
+                app.Quit()
+        except Exception:
+            pass
 
 
 def parse_enabled(value: Any) -> bool:
@@ -482,8 +592,8 @@ def load_rows_from_excel(root: str, workbook_path: str) -> list[tuple[int, str, 
                 idx = int(float(idx_raw))
             except ValueError:
                 continue
-            abs_path = rel_raw if os.path.isabs(rel_raw) else os.path.normpath(os.path.join(root, rel_raw))
-            rows.append((idx, title_raw, abs_path, rel_raw))
+            stored_path = project_relative_path_or_original(root, rel_raw)
+            rows.append((idx, title_raw, stored_path, stored_path))
     except Exception as e:
         print(f"WARN Could not read slides workbook: {workbook_path} ({e})", file=sys.stderr)
     finally:
@@ -510,48 +620,99 @@ def export_pptx_slides_to_images(
     out_dir = os.path.join(out_root, f"deck_{deck_order:03d}_{deck_name}")
     os.makedirs(out_dir, exist_ok=True)
 
-    try:
-        cc = importlib.import_module("comtypes.client")
-    except Exception:
-        print(
-            "WARN Could not import comtypes.client for PowerPoint image export.",
-            file=sys.stderr,
-        )
-        return []
-
-    app = None
-    pres = None
+    notes: list[str] = []
     exported: list[str] = [""] * max(0, slide_count)
-    try:
-        app = cc.CreateObject("PowerPoint.Application")
-        app.Visible = 1
+    backend_used = ""
 
-        # Open(FileName, ReadOnly, Untitled, WithWindow)
-        pres = app.Presentations.Open(pptx_path, False, False, False)
-        total = int(pres.Slides.Count)
-        for idx in range(1, total + 1):
-            out_png = os.path.join(out_dir, f"slide_{idx:03d}.png")
-            slide = pres.Slides.Item(idx)
-            # Use higher resolution to improve OCR readability on image-heavy slides.
-            slide.Export(out_png, "PNG", export_width, export_height)
-            if os.path.isfile(out_png):
-                exported[idx - 1] = os.path.normpath(out_png)
-    except Exception as e:
+    probe_path = os.path.join(out_dir, ".__write_probe__.tmp")
+    try:
+        with open(probe_path, "w", encoding="utf-8") as probe:
+            probe.write("ok")
+        os.remove(probe_path)
+        notes.append("output_dir_write_test=OK")
+    except Exception as error:
+        notes.append(f"output_dir_write_test=FAIL ({format_exception_message(error)})")
+        try:
+            if os.path.isfile(probe_path):
+                os.remove(probe_path)
+        except OSError:
+            pass
+
+    try:
+        with open(pptx_path, "rb") as test_in:
+            test_in.read(1)
+        notes.append("pptx_read_test=OK")
+    except Exception as error:
+        notes.append(f"pptx_read_test=FAIL ({format_exception_message(error)})")
+
+    comtypes_client = None
+    try:
+        comtypes_client = importlib.import_module("comtypes.client")
+        notes.append("backend_comtypes_import=OK")
+    except Exception as error:
+        notes.append(f"backend_comtypes_import=FAIL ({format_exception_message(error)})")
+
+    if comtypes_client is not None:
+        exported, backend_error = export_with_powerpoint_backend(
+            comtypes_client,
+            "comtypes",
+            pptx_path,
+            out_dir,
+            slide_count,
+            export_width,
+            export_height,
+        )
+        if backend_error:
+            notes.append(f"backend_comtypes_export=FAIL ({backend_error})")
+        else:
+            backend_used = "comtypes"
+            notes.append("backend_comtypes_export=OK")
+
+    if not any(exported):
+        win32_client = None
+        try:
+            win32_client = importlib.import_module("win32com.client")
+            notes.append("backend_win32com_import=OK")
+        except Exception as error:
+            notes.append(f"backend_win32com_import=FAIL ({format_exception_message(error)})")
+
+        if win32_client is not None:
+            win32_exported, backend_error = export_with_powerpoint_backend(
+                win32_client,
+                "win32com",
+                pptx_path,
+                out_dir,
+                slide_count,
+                export_width,
+                export_height,
+            )
+            if any(win32_exported):
+                exported = win32_exported
+                backend_used = "win32com"
+            if backend_error:
+                notes.append(f"backend_win32com_export=FAIL ({backend_error})")
+            else:
+                notes.append("backend_win32com_export=OK")
+
+    exported_count = sum(1 for path in exported if path and os.path.isfile(path))
+    notes.append(f"exported_images={exported_count}/{max(slide_count, len(exported))}")
+    append_pptx_export_diagnostics(
+        root,
+        pptx_path,
+        out_dir,
+        slide_count,
+        export_width,
+        export_height,
+        notes,
+    )
+    if backend_used:
+        print(f"INFO PPTX image export backend: {backend_used}", file=sys.stderr)
+    elif exported_count == 0:
         print(
-            f"WARN PPTX slide image export failed via PowerPoint COM: {e}",
+            "WARN PPTX slide image export produced 0 files. "
+            "See Data/AIPresenter/Temp/pptx_export_diagnostics.txt for backend details.",
             file=sys.stderr,
         )
-    finally:
-        try:
-            if pres is not None:
-                pres.Close()
-        except Exception:
-            pass
-        try:
-            if app is not None:
-                app.Quit()
-        except Exception:
-            pass
 
     return exported
 
@@ -599,8 +760,9 @@ def load_rows_from_single_pptx(
         if local_idx - 1 < len(exported_abs_paths):
             candidate = exported_abs_paths[local_idx - 1]
             if candidate and os.path.isfile(candidate):
-                abs_path = candidate
-                rel_path = os.path.relpath(candidate, root)
+                rel_candidate = os.path.normpath(os.path.relpath(candidate, root))
+                abs_path = rel_candidate
+                rel_path = rel_candidate
         rows.append((global_idx, title, abs_path, rel_path))
 
     if not any(r[2] for r in rows):
@@ -690,6 +852,7 @@ def main() -> None:
     export_height = parse_export_dimension(cfg.get("pptx_export_height"), DEFAULT_EXPORT_HEIGHT)
 
     clear_pptx_source_error(root)
+    clear_pptx_export_diagnostics(root)
     try:
         pptx_paths = resolve_pptx_paths(root, cfg)
     except RuntimeError as e:
@@ -739,13 +902,24 @@ def main() -> None:
             source_mode = "slides.xlsx"
 
     if source_mode.startswith("pptx") and rows:
-        exported_images = sum(1 for _, _, abs_path, _ in rows if abs_path and os.path.isfile(abs_path))
+        exported_images = 0
+        for _, _, image_path, _ in rows:
+            if not image_path:
+                continue
+            candidate = (
+                image_path
+                if os.path.isabs(image_path)
+                else os.path.normpath(os.path.join(root, image_path))
+            )
+            if os.path.isfile(candidate):
+                exported_images += 1
         if exported_images == 0:
             detail = (
                 "PPTX text was extracted but 0 slide images were exported. "
                 "Failing fast to prevent audio-only playback. "
                 "Verify Microsoft PowerPoint Desktop, Python package 'comtypes', and write permission "
-                "for Data/AIPresenter/Temp/pptx_slides."
+                "for Data/AIPresenter/Temp/pptx_slides. "
+                "See Data/AIPresenter/Temp/pptx_export_diagnostics.txt for backend diagnostics."
             )
             write_pptx_source_error(root, detail)
             print(detail, file=sys.stderr)

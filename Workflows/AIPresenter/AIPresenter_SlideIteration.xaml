@@ -232,6 +232,14 @@
         <InArgument x:TypeArguments="x:String">[in_slideItem.Split(Convert.ToChar(9))(2)]</InArgument>
       </Assign.Value>
     </Assign>
+    <Assign DisplayName="Normalize slide image path to absolute" sap2010:Annotation.AnnotationText="Executes 'Normalize slide image path to absolute' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_NormalizeAbsSlidePathFromTsv">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[strAbsSlideImagePath]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(String.IsNullOrWhiteSpace(strAbsSlideImagePath), "", If(System.IO.Path.IsPathRooted(strAbsSlideImagePath), strAbsSlideImagePath, System.IO.Path.Combine(Environment.CurrentDirectory, strAbsSlideImagePath)))]</InArgument>
+      </Assign.Value>
+    </Assign>
     <Assign DisplayName="Slide photo relative path (project root)" sap2010:Annotation.AnnotationText="Executes 'Slide photo relative path (project root)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_RelSlidePathTsv">
       <Assign.To>
         <OutArgument x:TypeArguments="x:String">[strRelSlidePath]</OutArgument>

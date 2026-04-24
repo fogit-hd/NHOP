@@ -388,6 +388,52 @@ if errorlevel 1 (
   )
 )
 
+%PY_CMD% -c "import comtypes" >nul 2>nul
+if errorlevel 1 (
+  echo [WARN] comtypes is not importable after requirements install. Trying direct install...
+  %PY_CMD% -m pip install --disable-pip-version-check --quiet "comtypes>=1.2.0" >>"%PIP_LOG%" 2>&1
+  if errorlevel 1 (
+    echo [ERROR] comtypes direct install failed.
+    echo [INFO] pip details:
+    type "%PIP_LOG%"
+    set "HAS_FAILURE=1"
+    echo.
+    exit /b 0
+  )
+
+  %PY_CMD% -c "import comtypes" >nul 2>nul
+  if errorlevel 1 (
+    echo [ERROR] comtypes is still not importable in the selected Python interpreter.
+    set "HAS_FAILURE=1"
+    echo.
+    exit /b 0
+  )
+)
+
+%PY_CMD% -c "import win32com.client" >nul 2>nul
+if errorlevel 1 (
+  echo [WARN] pywin32 (win32com) is not importable after requirements install. Trying direct install...
+  %PY_CMD% -m pip install --disable-pip-version-check --quiet "pywin32>=306" >>"%PIP_LOG%" 2>&1
+  if errorlevel 1 (
+    echo [ERROR] pywin32 direct install failed.
+    echo [INFO] pip details:
+    type "%PIP_LOG%"
+    set "HAS_FAILURE=1"
+    echo.
+    exit /b 0
+  )
+
+  %PY_CMD% -m pywin32_postinstall -install >nul 2>nul
+
+  %PY_CMD% -c "import win32com.client" >nul 2>nul
+  if errorlevel 1 (
+    echo [ERROR] pywin32 (win32com) is still not importable in the selected Python interpreter.
+    set "HAS_FAILURE=1"
+    echo.
+    exit /b 0
+  )
+)
+
 %PY_CMD% -c "import tkinter" >nul 2>nul
 if errorlevel 1 (
   echo [ERROR] tkinter is not available in the selected Python interpreter.
@@ -416,6 +462,18 @@ for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import PIL; print(PIL.__version_
 )
 if not defined PILLOW_VER set "PILLOW_VER=unknown"
 
+set "COMTYPES_VER="
+for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import comtypes; print(getattr(comtypes, '__version__', 'unknown'))" 2^>nul`) do (
+  set "COMTYPES_VER=%%V"
+)
+if not defined COMTYPES_VER set "COMTYPES_VER=unknown"
+
+set "PYWIN32_VER="
+for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import importlib.metadata as m; print(m.version('pywin32'))" 2^>nul`) do (
+  set "PYWIN32_VER=%%V"
+)
+if not defined PYWIN32_VER set "PYWIN32_VER=unknown"
+
 set "TK_VER="
 for /f "usebackq delims=" %%V in (`%PY_CMD% -c "import tkinter as tk; print(tk.TkVersion)" 2^>nul`) do (
   set "TK_VER=%%V"
@@ -426,6 +484,8 @@ echo [OK] Python requirements are satisfied.
 echo [OK] python-pptx import check passed (version !PPTX_VER!).
 echo [OK] openpyxl import check passed (version !OPENPYXL_VER!).
 echo [OK] Pillow import check passed (version !PILLOW_VER!).
+echo [OK] comtypes import check passed (version !COMTYPES_VER!).
+echo [OK] pywin32 import check passed (version !PYWIN32_VER!).
 echo [OK] tkinter import check passed (Tk !TK_VER!).
 echo.
 exit /b 0
