@@ -1,26 +1,26 @@
 === SLIDE | 1 | Group Life Insurance Benefits Orientation ===
-Welcome to the Group Life Insurance Benefits Orientation for employees of FPT Software Philippines Corp. The policy is effective from April 1, 2026.
+Welcome to the Group Life Insurance Benefits Orientation for employees of FPT Software Philippines Corp. The policy will be effective starting April 1, 2026.
 
 === SLIDE | 2 | Manulife in the Philippines… ===
-Manulife has been established in the Philippines since 1907. It operates as a wholly-owned subsidiary of Manulife, based in Toronto, Canada, and is led by a dynamic management team of financial services experts.
+Manulife has been established in the Philippines since 1907. It operates as a wholly-owned subsidiary of Manulife, based in Toronto, Canada. The company is led by a dynamic management team composed of financial services experts.
 
 === SLIDE | 3 | Group Life Insurance Benefits ===
 Key details include: Basic Life (BL); Accidental Death, Dismemberment & Disablement Benefit (ADD&D); Total Permanent Disability Benefit (TPDB). Additional details include: Terminal Illness Benefit (TIB); Family Assistance Benefit (FAB).
 
 === SLIDE | 4 | Who are Eligible? ===
-Eligibility for the Group Life Insurance Benefit is extended to all active, regular, and full-time employees aged 18 to 65 who are in good health at the policy's inception. Future full-time employees will be enrolled upon eligibility, and probationary employees will be covered under certain conditions.
+Eligibility for the Group Life Insurance Benefit is extended to all active, regular, and full-time employees aged 18 to 65 who are in good health at the policy's inception. Future full-time employees will be enrolled upon eligibility. Probationary employees will be covered under NEL after passing a medical exam prior to employment.
 
 === SLIDE | 5 | Group Life Insurance Benefit ===
-This slide outlines the schedule of coverage for all eligible employees.
+The slide outlines the schedule of coverage for all eligible employees.
 
 === SLIDE | 6 | ACCIDENTAL DEATH, DISMEMBERMENT, & DISABLEMENT BENEFIT (ADD&D) ===
-In the event of an accidental death, dismemberment, or disablement, Manulife will pay the insured employee or their beneficiaries an amount specified in the policy, provided the injury occurs within 180 days of the accident.
+In the event of an accidental death, dismemberment, or disablement, Manulife will pay the insured employee or their beneficiaries an amount specified in the policy, provided the loss occurs within 180 days of the accident.
 
 === SLIDE | 7 | ACCIDENTAL DEATH, DISMEMBERMENT, & DISABLEMENT BENEFIT (ADD&D) GROUP LIFE INSURANCE ===
-The slide details the percentage of benefits payable for various types of losses, such as 100% for the loss of life or two hands, and 50% for the loss of one hand.
+The slide details the percentage of benefits payable for various types of loss, such as 100% for loss of life or two hands, and 50% for loss of one hand or one foot.
 
 === SLIDE | 8 | ACCIDENTAL DEATH, DISMEMBERMENT, & DISABLEMENT BENEFIT (ADD&D) ===
-Accidental dismemberment is defined as the severance of hands or feet at or above the wrist or ankle joints, and total, irrecoverable loss of eyesight.
+Accidental dismemberment involves severance at or above the wrist or ankle joints. In cases of multiple injuries, only the loss with the highest indemnity is payable.
 
 === SLIDE | 9 | ACCIDENTAL DEATH, DISMEMBERMENT, & DISABLEMENT BENEFIT (ADD&D) GROUP LIFE INSURANCE ===
 EXCLUSIONS on Accidental Death, Dismemberment & Disablement Benefit (ADD&D). Key details include: No benefit shall be made for any loss resulting from or caused by any of the following:; Insect Bite; Insanity; Pregnancy, childbirth, miscarriage or abortion. Additional details include: Suicide or intentionally self-inflicted injury or any similar attempt whether sane or insane; Travel or flight in or descent from any aircraft, if the insured person is a member of the crew or pilot of the aircraft, or if the flight is made for instructional or training purposes; War or any act incident to war, whether declared or undeclared; Riot, civil commotion or insurrection. Additional details include: Congenital anomalies or conditions arising from there; Any violation or attempt of violation of the law or resistance to arrest; Any kind of disease, sickness or infection other than bacterial infections occurring as a consequence of an accidental cut or wound; Any drug, poison, gas or fumes voluntarily or otherwise taken, administered, absorbed or inhaled, other than as a result of an accident arising from a hazard incident to the member’s occupation. Additional details include: Nuclear weapons or fissionable material, ionizing radiation or contamination by radioactivity from any nuclear fuel or from any nuclear waste, or from the combustion of nuclear fuel, and for the purpose of this exclusion, combustion shall include any self- sustaining process of nuclear fission or fusion; Murder or provoked assault; Any loss in which the proximate cause was the member’s attempt at, or commission of or willful participation in any act or crime punishable under the Revised Penal Code of the Philippines or any other statute except crimes of reckless imprudence as defined in Article 365, or similar laws of any country in which the crime was attempted or committed, or resistance to lawful arrest.
@@ -32,40 +32,40 @@ Manulife offers double indemnity for deaths occurring under specific circumstanc
 A sample computation shows how double indemnity and basic life benefits combine to provide a total benefit claim of 1,500,000 in a specific scenario.
 
 === SLIDE | 12 | TOTAL & PERMANENT DISABILITY BENEFIT (TPDB) GROUP LIFE INSURANCE ===
-If an insured employee becomes totally and permanently disabled for at least six months, Manulife will pay a lump sum equivalent to the Death Benefit to compensate for lost income.
+If an insured employee becomes totally and permanently disabled for at least six months, Manulife will pay a lump sum equivalent to the Death Benefit, compensating for lost income.
 
 === SLIDE | 13 | TOTAL & PERMANENT DISABILITY BENEFIT (TPDB) GROUP LIFE INSURANCE ===
 EXCLUSIONS on Total and Permanent Disability Benefit (TPDB). Key details include: No benefit shall be made for any loss resulting from or caused by any of the following:; Any injury intentionally self-inflicted; War or any act incident to war whether declared or undeclared; Riot, civil commotion or insurrection. Additional details include: Travel or flight or descent from any aircraft as a member of the crew, or; Attempted murder; Travel or flight in or descent from any aircraft of any military, naval, or air force; Any violation or attempt of violation of the law or resistance to arrest. Additional details include: Provoked assault, or participation in an assault or brawl; Any drug, poison, gas or fumes, voluntarily or involuntarily taken, administered, absorbed or inhaled, except as a result of an accident arising from a hazard incident to the member’s occupation..
 
 === SLIDE | 14 | TERMINAL ILLNESS BENEFIT (TIB) GROUP LIFE INSURANCE ===
-The Terminal Illness Benefit pays 50% of the basic life coverage in advance if the member is diagnosed with a terminal illness, with the remaining balance paid to the designated beneficiaries.
+The Terminal Illness Benefit pays 50% of the basic life coverage in advance if the member is diagnosed with a terminal illness, with the balance paid to the designated beneficiaries.
 
 === SLIDE | 15 | FAMILY ASSISTANCE BENEFIT (FAB) GROUP LIFE INSURANCE ===
-Upon the death of an insured employee, Manulife provides a Family Assistance Benefit to help cover expenses or debts, payable to the same beneficiary as the Life Insurance benefit.
+Upon proof of an insured employee's death, Manulife will pay the Family Assistance Benefit to help cover expenses or debts. This benefit is payable to the same beneficiary as the Life Insurance benefit.
 
 === SLIDE | 16 | BENEFICIARY ===
-Beneficiary
+This section focuses on the designation of beneficiaries.
 
 === SLIDE | 17 | BENEFICIARY DESIGNATION GROUP LIFE INSURANCE ===
-We encourage all eligible employees to follow the Hierarchy below in designating the beneficiaries. Key details include: If Insured is Single; If Insured is Single with a Child; If Insured is Married. Additional details include: Parents are the legal heirs.; Child is the legal heir. (subject to submission of proof and other requirements).; Spouse is the legal heir. (require Original PSA Marriage Contract & other requirements).
+Employees are encouraged to follow a hierarchy when designating beneficiaries. For single employees, parents are the legal heirs. If single with a child, the child is the heir. For married employees, the spouse is the legal heir, requiring proof of marriage.
 
 === SLIDE | 18 | BENEFICIARY DESIGNATION FORM GROUP LIFE INSURANCE ===
-The form requires complete and accurate information, with corrections countersigned.
+The form requires complete and accurate information, using black ink. Corrections must be countersigned.
 
 === SLIDE | 19 | BENEFICIARY DESIGNATION FORM GROUP LIFE INSURANCE ===
-Employees can allocate specific percentages of the proceeds to each designated beneficiary.
+Insured employees can allocate a percentage of proceeds to each designated beneficiary by indicating the number of shares.
 
 === SLIDE | 20 | BENEFICIARY DESIGNATION GROUP LIFE INSURANCE ===
-If a beneficiary is a minor, a trustee must be appointed. In the absence of an appointed trustee, a court-approved guardian will be necessary.
+If a beneficiary is a minor, a trustee must be appointed. In the absence of a trustee, a court-approved guardian will be required.
 
 === SLIDE | 21 | BENEFICIARY DESIGNATION FORM GROUP LIFE INSURANCE ===
-The form requires detailed address information for processing.
+The form requires detailed address information for the designated beneficiaries.
 
 === SLIDE | 22 | BENEFICIARY DESIGNATION GROUP LIFE INSURANCE ===
 Common Law Partner or Same Sex Partner can be designated as a beneficiary provided that they are able to submit the ff requirements. Key details include: Common Law Partner: Same Sex Partner:; 1. Cenomar for both partners; 2. Affidavit of Joint Domestic Partnership; 2. Interview by a Manulife Advisor. Additional details include: 3. Valid ID’s of both partners.
 
 === SLIDE | 23 | CLAIMS REQUIREMENTS ===
-Claims Requirements
+This section outlines the requirements for filing claims.
 
 === SLIDE | 24 | CLAIMS PROCESS ===
 Group Life Insurance Benefit. The process includes: Customer/Agent; Send an email to PH Claims; PH Claims; Screen and endorse for processing. Additional details include: Claims Team; Review and Process claim; Notify customer/agent of completion; Send claim notification. Additional details include: Send requirement (please refer to separate checklist); Send acknowledgement within 24 to 48 hours; Ask for additional requirements (if any); Screen for completion and endorse to processing team for review. Additional details include: Review, approve, and process claim application; Directly credit proceeds to bank account; Notify customer and agent via email that proceeds was already credited to bank account; Dedicated email for Group and Individual Claims: phclaims@manulife.com. Additional details include: - All submissions, inquiries, and status updates can be emailed to this address; mailto:phclaims@manulife.com.
@@ -80,7 +80,7 @@ Required details include: Accident Claim Form; Attending Physician’s Statement
 Required details include: Proof of Disability (Claimant’s Statement); Proof of Disability (Attending Physician’s Statement); Birth Certificate (Certified True Copy ) or Any Proof of Age (Baptismal Certificate or Marriage Contract); Insurance Claim Verification Form (to be completed by Claims Dept.). Additional details include: Certified true Copy of Daily Time record; Claimant may be requested to be examined by an accredited physician of Manulife; Note: additional documents may be required in view of certain information revealed during the review of the claim; Certified True Copies of documents should be submitted.
 
 === SLIDE | 28 | TERMINAL ILLNESS BENEFIT CLAIMS REQUIREMENTS GROUP LIFE INSURANCE ===
-Claims for Terminal Illness benefits require a Terminal Illness Form, Employer Statement, and medical records. Additional documents may be requested during the review.
+Claims for terminal illness benefits require a terminal illness form, employer statement, medical records, and valid IDs. Additional documents may be needed during the review.
 
 === SLIDE | 29 | Group Life Insurance Benefit ===
 For more information, you can visit the Manulife website. This link appears to direct viewers to the Manulife website for additional information related to this slide.

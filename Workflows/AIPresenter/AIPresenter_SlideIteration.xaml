@@ -532,14 +532,26 @@
                                 </Assign>
                               </If.Else>
                             </If>
-                            <If Condition="[Not String.IsNullOrWhiteSpace(strPreviousFfplayPid) AndAlso Not String.IsNullOrWhiteSpace(strCurrentFfplayPid) AndAlso strPreviousFfplayPid.Trim() &lt;&gt; strCurrentFfplayPid.Trim()]" DisplayName="Close previous slide after next appears" sap2010:Annotation.AnnotationText="Executes 'Close previous slide after next appears' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ClosePreviousAfterNextShown">
+                            <If Condition="[Not String.IsNullOrWhiteSpace(strPreviousFfplayPid) AndAlso System.Text.RegularExpressions.Regex.IsMatch(strPreviousFfplayPid.Trim(), &quot;^\d+$&quot;) AndAlso (String.IsNullOrWhiteSpace(strCurrentFfplayPid) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(strCurrentFfplayPid.Trim(), &quot;^\d+$&quot;) OrElse strPreviousFfplayPid.Trim() &lt;&gt; strCurrentFfplayPid.Trim())]" DisplayName="Close previous slide after next launch delay" sap2010:Annotation.AnnotationText="Closes the previous slide player after the pause-aware delay, even when the new PID file update is late on slower machines." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ClosePreviousAfterNextShown">
                               <If.Then>
                                 <Assign DisplayName="Close previous slide (hidden shell)" sap2010:Annotation.AnnotationText="Executes 'Close previous slide (hidden shell)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ClosePreviousAfterNextShown">
                                   <Assign.To>
                                     <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                                   </Assign.To>
                                   <Assign.Value>
-                                    <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell("taskkill.exe /F /PID " + strPreviousFfplayPid.Trim(), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                                    <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell("taskkill.exe /F /T /PID " + strPreviousFfplayPid.Trim(), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                                  </Assign.Value>
+                                </Assign>
+                              </If.Then>
+                            </If>
+                            <If Condition="[Not String.IsNullOrWhiteSpace(strCurrentFfplayPid) AndAlso System.Text.RegularExpressions.Regex.IsMatch(strCurrentFfplayPid.Trim(), &quot;^\d+$&quot;)]" DisplayName="Force close older ffplay windows" sap2010:Annotation.AnnotationText="As a safety net, closes any ffplay process except the current slide PID so previous slide windows never remain open." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ForceCloseOlderFfplayByNameFilter">
+                              <If.Then>
+                                <Assign DisplayName="Kill all ffplay except current PID" sap2010:Annotation.AnnotationText="Uses taskkill filters to remove stale ffplay windows while keeping the current slide playback process alive." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_KillOlderFfplayByNameFilter">
+                                  <Assign.To>
+                                    <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
+                                  </Assign.To>
+                                  <Assign.Value>
+                                    <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell("taskkill.exe /F /T /FI ""IMAGENAME eq ffplay.exe"" /FI ""PID ne " + strCurrentFfplayPid.Trim() + """", Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                                   </Assign.Value>
                                 </Assign>
                               </If.Then>
@@ -729,14 +741,14 @@
               </Assign>
             </If.Else>
           </If>
-          <If Condition="[Not String.IsNullOrWhiteSpace(strCurrentFfplayPid)]" DisplayName="Kill final slide window by PID" sap2010:Annotation.AnnotationText="Executes 'Kill final slide window by PID' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_KillFinalSlideByPid">
+          <If Condition="[Not String.IsNullOrWhiteSpace(strCurrentFfplayPid) AndAlso System.Text.RegularExpressions.Regex.IsMatch(strCurrentFfplayPid.Trim(), &quot;^\d+$&quot;)]" DisplayName="Kill final slide window by PID" sap2010:Annotation.AnnotationText="Executes 'Kill final slide window by PID' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,108.8" sap2010:WorkflowViewState.IdRef="If_KillFinalSlideByPid">
             <If.Then>
               <Assign DisplayName="Close final slide (hidden shell)" sap2010:Annotation.AnnotationText="Executes 'Close final slide (hidden shell)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="850.4,82.4" sap2010:WorkflowViewState.IdRef="Assign_CloseFinalSlideByPid">
                 <Assign.To>
                   <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                 </Assign.To>
                 <Assign.Value>
-                  <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell("taskkill.exe /F /PID " + strCurrentFfplayPid.Trim(), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                  <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell("taskkill.exe /F /T /PID " + strCurrentFfplayPid.Trim(), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                 </Assign.Value>
               </Assign>
             </If.Then>

@@ -510,6 +510,55 @@
         </Sequence>
       </If.Then>
     </If>
+    <If Condition="[intTotalSlides &gt; 0]" DisplayName="Safety close leftover slide player" sap2010:Annotation.AnnotationText="Ensures any remaining slide playback window is force-closed after the slide loop completes." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_SafetyCloseLeftoverSlidePlayer">
+      <If.Then>
+        <Sequence DisplayName="Force-close residual ffplay process" sap2010:Annotation.AnnotationText="Uses PID-file first, then process-name fallback, to guarantee slide window closure." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_ForceCloseResidualFfplay">
+          <Assign DisplayName="Read last ffplay PID for safety close" sap2010:Annotation.AnnotationText="Loads the last recorded ffplay PID for final cleanup." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_ReadLastFfplayPidForSafetyClose">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[strPresentationControlPid]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(strFfplayPidFilePath), System.IO.File.ReadAllText(strFfplayPidFilePath), "")]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <If Condition="[Not String.IsNullOrWhiteSpace(strPresentationControlPid)]" DisplayName="Kill leftover ffplay by PID" sap2010:Annotation.AnnotationText="Kills the exact last ffplay process when a PID is available." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_KillLeftoverFfplayByPid">
+            <If.Then>
+              <Assign DisplayName="Taskkill leftover ffplay by PID" sap2010:Annotation.AnnotationText="Force-closes the specific ffplay PID (and child tree) left after slide playback." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_TaskkillLeftoverFfplayByPid">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:Int32">[intPlayResponseShellResult]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell("taskkill.exe /F /T /PID " + strPresentationControlPid.Trim(), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                </Assign.Value>
+              </Assign>
+            </If.Then>
+          </If>
+          <If Condition="[System.Diagnostics.Process.GetProcessesByName(&quot;ffplay&quot;).Length &gt; 0]" DisplayName="Fallback close ffplay by process name" sap2010:Annotation.AnnotationText="Cleans up any remaining ffplay window in case PID-file cleanup missed it." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_FallbackCloseFfplayByName">
+            <If.Then>
+              <Assign DisplayName="Taskkill ffplay by image name" sap2010:Annotation.AnnotationText="Force-closes any remaining ffplay process by image name as a final safety net." sap:VirtualizedContainerService.HintSize="600,82.4" sap2010:WorkflowViewState.IdRef="Assign_TaskkillFfplayByImageName">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:Int32">[intPlayResponseShellResult]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell("taskkill.exe /F /T /IM ffplay.exe", Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                </Assign.Value>
+              </Assign>
+            </If.Then>
+          </If>
+          <If Condition="[System.IO.File.Exists(strFfplayPidFilePath)]" DisplayName="Clear ffplay PID file after cleanup" sap2010:Annotation.AnnotationText="Resets last_ffplay_pid.txt so the next run starts cleanly." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_ClearFfplayPidAfterSafetyClose">
+            <If.Then>
+              <ui:WriteTextFile File="{x:Null}" Output="{x:Null}" DisplayName="Reset last ffplay PID file" sap2010:Annotation.AnnotationText="Clears PID file content after final safety cleanup." FileName="[strFfplayPidFilePath]" sap:VirtualizedContainerService.HintSize="600,80.8" sap2010:WorkflowViewState.IdRef="WriteTextFile_ResetLastFfplayPidAfterSafetyClose">
+                <ui:WriteTextFile.Text>
+                  <InArgument x:TypeArguments="x:String">
+                    <Literal x:TypeArguments="x:String" Value="" />
+                  </InArgument>
+                </ui:WriteTextFile.Text>
+              </ui:WriteTextFile>
+            </If.Then>
+          </If>
+        </Sequence>
+      </If.Then>
+    </If>
     <If Condition="[intTotalSlides &gt; 0]" DisplayName="Stop Pause/Continue control popup" sap2010:Annotation.AnnotationText="This activity evaluates a condition and runs the matching branch for &quot;Stop Pause/Continue control popup&quot;." sap:VirtualizedContainerService.HintSize="600,108.8" sap2010:WorkflowViewState.IdRef="If_StopPresentationControlPopup">
       <If.Then>
         <Sequence DisplayName="Stop control popup and clear state" sap2010:Annotation.AnnotationText="This activity groups related workflow steps for &quot;Stop control popup and clear state&quot;." sap:VirtualizedContainerService.HintSize="600,200" sap2010:WorkflowViewState.IdRef="Sequence_StopPresentationControlPopup">
