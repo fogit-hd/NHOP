@@ -127,7 +127,7 @@
       <Variable x:TypeArguments="x:Double" Default="0" Name="dblPadSeconds" />
       <Variable x:TypeArguments="x:Double" Default="0" Name="dblRemainingWaitSeconds" />
       <Variable x:TypeArguments="x:Double" Default="0" Name="dblWaitStepSeconds" />
-      <Variable x:TypeArguments="x:Double" Default="0.35" Name="dblCloseAfterNextDelaySeconds" />
+      <Variable x:TypeArguments="x:Double" Default="0.8" Name="dblCloseAfterNextDelaySeconds" />
       <Variable x:TypeArguments="x:Double" Default="0" Name="dblCloseAfterNextDelayRemaining" />
       <Variable x:TypeArguments="x:Boolean" Default="False" Name="blnCloseAfterNextDelayResumePending" />
       <Variable x:TypeArguments="x:String" Default="running" Name="strPresentationControlState" />
@@ -532,7 +532,7 @@
                                 </Assign>
                               </If.Else>
                             </If>
-                            <If Condition="[Not String.IsNullOrWhiteSpace(strPreviousFfplayPid) AndAlso System.Text.RegularExpressions.Regex.IsMatch(strPreviousFfplayPid.Trim(), &quot;^\d+$&quot;) AndAlso (String.IsNullOrWhiteSpace(strCurrentFfplayPid) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(strCurrentFfplayPid.Trim(), &quot;^\d+$&quot;) OrElse strPreviousFfplayPid.Trim() &lt;&gt; strCurrentFfplayPid.Trim())]" DisplayName="Close previous slide after next launch delay" sap2010:Annotation.AnnotationText="Closes the previous slide player after the pause-aware delay, even when the new PID file update is late on slower machines." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ClosePreviousAfterNextShown">
+                            <If Condition="[Not String.IsNullOrWhiteSpace(strPreviousFfplayPid) AndAlso System.Text.RegularExpressions.Regex.IsMatch(strPreviousFfplayPid.Trim(), &quot;^\d+$&quot;) AndAlso Not String.IsNullOrWhiteSpace(strCurrentFfplayPid) AndAlso System.Text.RegularExpressions.Regex.IsMatch(strCurrentFfplayPid.Trim(), &quot;^\d+$&quot;) AndAlso strPreviousFfplayPid.Trim() &lt;&gt; strCurrentFfplayPid.Trim()]" DisplayName="Close previous slide after next launch delay" sap2010:Annotation.AnnotationText="Closes the previous slide player only after the next slide PID is confirmed, to avoid visual gaps between slides." sap:VirtualizedContainerService.HintSize="780,108.8" sap2010:WorkflowViewState.IdRef="If_ClosePreviousAfterNextShown">
                               <If.Then>
                                 <Assign DisplayName="Close previous slide (hidden shell)" sap2010:Annotation.AnnotationText="Executes 'Close previous slide (hidden shell)' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="780,82.4" sap2010:WorkflowViewState.IdRef="Assign_ClosePreviousAfterNextShown">
                                   <Assign.To>
