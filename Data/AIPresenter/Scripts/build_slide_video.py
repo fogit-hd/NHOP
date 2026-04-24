@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -38,6 +39,30 @@ def _safe_print(message: str, *, is_error: bool = False) -> None:
                 buffer.flush()
             except Exception:
                 pass
+
+
+def _decode_bytes(payload: bytes | None) -> str:
+    return (payload or b"").decode("utf-8", errors="replace")
+
+
+def _write_err_log(err_log: Path, content: str) -> None:
+    try:
+        err_log.write_text(content, encoding="utf-8")
+    except OSError:
+        pass
+
+
+def _unblock_mark_of_web(path: Path) -> None:
+    if sys.platform != "win32":
+        return
+    try:
+        os.remove(str(path) + ":Zone.Identifier")
+    except OSError:
+        pass
+
+
+def _valid_output(path: Path) -> bool:
+    return path.is_file() and path.stat().st_size >= 100
 
 
 def _resolve_ffmpeg_exe(ffmpeg_arg: str) -> Path | None:
@@ -114,6 +139,61 @@ def _duration_seconds_wave_pcm(audio: Path) -> float | None:
         return None
 
 
+def _ensure_ffmpeg_runnable(ffmpeg_exe: Path, err_log: Path) -> bool:
+    kwargs = _subprocess_kwargs_windows()
+    _unblock_mark_of_web(ffmpeg_exe)
+    ffprobe = ffmpeg_exe.parent / "ffprobe.exe"
+    if ffprobe.is_file():
+        _unblock_mark_of_web(ffprobe)
+
+    try:
+        r = subprocess.run(
+            [str(ffmpeg_exe), "-hide_banner", "-version"],
+            capture_output=True,
+            timeout=30,
+            check=False,
+            **kwargs,
+        )
+    except OSError as e:
+        _write_err_log(
+            err_log,
+            (
+                "ffmpeg preflight execution failed.\n"
+                f"ffmpeg_path={ffmpeg_exe}\n"
+                f"os_error={e!r}\n"
+                "Possible causes: AppLocker/Defender policy block, missing execute permission, or invalid binary."
+            ),
+        )
+        _safe_print(
+            f"ffmpeg.exe was found but could not execute (possible policy/security block). See {err_log}",
+            is_error=True,
+        )
+        return False
+
+    stdout_text = _decode_bytes(r.stdout)
+    stderr_text = _decode_bytes(r.stderr)
+    if r.returncode != 0:
+        _write_err_log(
+            err_log,
+            (
+                "ffmpeg preflight returned non-zero.\n"
+                f"ffmpeg_path={ffmpeg_exe}\n"
+                f"returncode={r.returncode}\n"
+                "=== stdout ===\n"
+                f"{stdout_text}\n\n"
+                "=== stderr ===\n"
+                f"{stderr_text}"
+            ),
+        )
+        _safe_print(
+            f"ffmpeg.exe failed preflight check (-version, rc={r.returncode}). See {err_log}",
+            is_error=True,
+        )
+        return False
+
+    return True
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--image", required=True)
@@ -145,6 +225,10 @@ def main() -> None:
         _safe_print(f"Audio not found: {audio}", is_error=True)
         sys.exit(2)
     out.parent.mkdir(parents=True, exist_ok=True)
+    err_log = out.parent / (out.stem + "_ffmpeg_mux_stderr.txt")
+
+    if not _ensure_ffmpeg_runnable(ffmpeg_exe, err_log):
+        sys.exit(1)
 
     # Drive output length from narration audio. Using only -shortest with -loop 1 still image
     # can truncate audio on some FFmpeg builds (video track seen as shorter than WAV).
@@ -207,34 +291,48 @@ def main() -> None:
         tail.append("-shortest")
     tail.extend(["-movflags", "+faststart", str(out)])
     kwargs = _subprocess_kwargs_windows()
-    err_log = out.parent / (out.stem + "_ffmpeg_mux_stderr.txt")
-
-    def run_mux(video_codec_args: list[str]) -> subprocess.CompletedProcess:
+    def run_mux(video_codec_args: list[str]) -> tuple[subprocess.CompletedProcess | None, str]:
         cmd = head + video_codec_args + tail
-        return subprocess.run(
-            cmd,
-            cwd=str(out.parent),
-            timeout=3600,
-            check=False,
-            capture_output=True,
-            **kwargs,
-        )
-
-    r = run_mux(h264_v)
-    if r.returncode != 0 or not out.is_file() or out.stat().st_size < 100:
-        r2 = run_mux(mpeg4_v)
-        stderr_text = (r.stderr or b"").decode("utf-8", errors="replace")
-        stderr2 = (r2.stderr or b"").decode("utf-8", errors="replace")
         try:
-            err_log.write_text(
-                "=== libx264 attempt ===\n" + stderr_text + "\n\n=== mpeg4 fallback ===\n" + stderr2,
-                encoding="utf-8",
+            return (
+                subprocess.run(
+                    cmd,
+                    cwd=str(out.parent),
+                    timeout=3600,
+                    check=False,
+                    capture_output=True,
+                    **kwargs,
+                ),
+                "",
             )
-        except OSError:
-            pass
-        if r2.returncode != 0 or not out.is_file() or out.stat().st_size < 100:
+        except OSError as e:
+            return None, f"{type(e).__name__}: {e!r}"
+
+    r, exec_err1 = run_mux(h264_v)
+    first_failed = bool(exec_err1) or (r is None) or (r.returncode != 0) or (not _valid_output(out))
+    if first_failed:
+        r2, exec_err2 = run_mux(mpeg4_v)
+        stderr_text = _decode_bytes(r.stderr if r is not None else None)
+        stderr2 = _decode_bytes(r2.stderr if r2 is not None else None)
+
+        details: list[str] = []
+        if exec_err1:
+            details.append(f"=== libx264 launch error ===\n{exec_err1}")
+        if r is not None:
+            details.append(f"=== libx264 returncode ===\n{r.returncode}")
+            details.append(f"=== libx264 stderr ===\n{stderr_text}")
+        if exec_err2:
+            details.append(f"=== mpeg4 launch error ===\n{exec_err2}")
+        if r2 is not None:
+            details.append(f"=== mpeg4 returncode ===\n{r2.returncode}")
+            details.append(f"=== mpeg4 stderr ===\n{stderr2}")
+        _write_err_log(err_log, "\n\n".join(details).strip())
+
+        second_failed = bool(exec_err2) or (r2 is None) or (r2.returncode != 0) or (not _valid_output(out))
+        if second_failed:
+            first_lines = stderr_text[:800] if stderr_text else (exec_err1 or exec_err2 or "No ffmpeg stderr.")
             _safe_print(
-                f"ffmpeg mux failed (see {err_log}). First error lines:\n{stderr_text[:800]}",
+                f"ffmpeg mux failed (see {err_log}). First error lines:\n{first_lines}",
                 is_error=True,
             )
             sys.exit(3)

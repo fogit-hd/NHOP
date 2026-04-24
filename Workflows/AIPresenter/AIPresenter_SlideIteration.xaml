@@ -309,7 +309,7 @@
               <InArgument x:TypeArguments="x:String" x:Key="in_ElevenLabsKey">[io_ElevenLabsKey]</InArgument>
               <InArgument x:TypeArguments="x:String" x:Key="in_VoiceId">[io_VoiceId]</InArgument>
               <InArgument x:TypeArguments="x:String" x:Key="in_OutputAudioPath">[io_NarrationAudioPath]</InArgument>
-              <InArgument x:TypeArguments="x:String" x:Key="in_PythonExe">[in_PythonwExe]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="in_PythonExe">[io_PythonExe]</InArgument>
               <OutArgument x:TypeArguments="x:String" x:Key="out_ResponseRaw">[io_ElevenResponseRaw]</OutArgument>
             </ui:InvokeWorkflowFile.Arguments>
           </ui:InvokeWorkflowFile>
@@ -343,7 +343,7 @@
                     <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                   </Assign.To>
                   <Assign.Value>
-                    <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + strWavDurationScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --out " + Chr(34) + strWavDurationResultFile + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                    <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + io_PythonExe + Chr(34) + " " + Chr(34) + strWavDurationScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --out " + Chr(34) + strWavDurationResultFile + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                   </Assign.Value>
                 </Assign>
                 <Delay DisplayName="Delay 0.15 second" sap2010:Annotation.AnnotationText="Executes 'Delay 0.15 second' to complete this step in the slide iteration workflow." Duration="00:00:00.1500000" sap:VirtualizedContainerService.HintSize="416,122.4" sap2010:WorkflowViewState.IdRef="Delay_WaitForDurationFile" />
@@ -396,7 +396,7 @@
                           <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                         </Assign.To>
                         <Assign.Value>
-                          <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + in_BuildSlideVideoScript + Chr(34) + " --image " + Chr(34) + strAbsSlideImagePath + Chr(34) + " --audio " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --out " + Chr(34) + strSlideSegmentMp4 + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34) + " --append-manifest " + Chr(34) + in_SegmentsManifestPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                          <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + io_PythonExe + Chr(34) + " " + Chr(34) + in_BuildSlideVideoScript + Chr(34) + " --image " + Chr(34) + strAbsSlideImagePath + Chr(34) + " --audio " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --out " + Chr(34) + strSlideSegmentMp4 + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34) + " --append-manifest " + Chr(34) + in_SegmentsManifestPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                         </Assign.Value>
                       </Assign>
                       <Delay DisplayName="Wait for mux file" sap2010:Annotation.AnnotationText="Executes 'Wait for mux file' to complete this step in the slide iteration workflow." Duration="00:00:00.2500000" sap:VirtualizedContainerService.HintSize="816.8,122.4" sap2010:WorkflowViewState.IdRef="Delay_AfterMux" />
@@ -551,7 +551,7 @@
                                 <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                               </Assign.To>
                               <Assign.Value>
-                                <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                                <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + io_PythonExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                               </Assign.Value>
                             </Assign>
                             <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate WAV fallback playback" sap2010:Annotation.AnnotationText="Executes 'Validate WAV fallback playback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="781.6,254.4" sap2010:WorkflowViewState.IdRef="If_ValidateWavFallbackPlayback">
@@ -577,7 +577,7 @@
                           <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                         </Assign.To>
                         <Assign.Value>
-                          <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                          <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + io_PythonExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                         </Assign.Value>
                       </Assign>
                       <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate WAV fallback playback" sap2010:Annotation.AnnotationText="Executes 'Validate WAV fallback playback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="333.6,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateWavFallbackPlayback_NoImagePath">
@@ -603,7 +603,7 @@
                     <OutArgument x:TypeArguments="x:Int32">[io_PlayResponseShellResult]</OutArgument>
                   </Assign.To>
                   <Assign.Value>
-                    <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + in_PythonwExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
+                    <InArgument x:TypeArguments="x:Int32">[CInt(Microsoft.VisualBasic.Interaction.Shell(Chr(34) + io_PythonExe + Chr(34) + " " + Chr(34) + io_PlayResponseAudioScript + Chr(34) + " --wav " + Chr(34) + io_NarrationAudioPath + Chr(34) + " --ffmpeg " + Chr(34) + io_FfmpegPath + Chr(34), Microsoft.VisualBasic.AppWinStyle.Hide, True))]</InArgument>
                   </Assign.Value>
                 </Assign>
                 <If Condition="[io_PlayResponseShellResult &lt;&gt; 0]" DisplayName="Validate narration WAV playback" sap2010:Annotation.AnnotationText="Executes 'Validate narration WAV playback' to complete this step in the slide iteration workflow." sap:VirtualizedContainerService.HintSize="333.6,108.8" sap2010:WorkflowViewState.IdRef="If_ValidateNarrationWavPlayback">

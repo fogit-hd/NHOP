@@ -182,7 +182,7 @@
         <OutArgument x:TypeArguments="x:String">[strPythonExe]</OutArgument>
       </Assign.To>
       <Assign.Value>
-        <InArgument x:TypeArguments="x:String">[strPythonwExe]</InArgument>
+        <InArgument x:TypeArguments="x:String">[If(System.IO.File.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Microsoft","WindowsApps","py.exe")), "py", strPythonwExe)]</InArgument>
       </Assign.Value>
     </Assign>
     <ui:LogMessage DisplayName="MainFlow init step" sap2010:Annotation.AnnotationText="This activity logs runtime progress for observability for &quot;MainFlow init step&quot;." sap:VirtualizedContainerService.HintSize="600,174.4" sap2010:WorkflowViewState.IdRef="LogMessage_MainFlowInitStep" Level="Info" Message="[&quot;Initializing config, slide extraction, and composition pipeline.&quot;]" />
